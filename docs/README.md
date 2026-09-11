@@ -1,4 +1,4 @@
-```markdown
+
 # Research Hand-Off — Shelf Manipulation RL
 
 ## 0. 현재 상태 한 줄 요약
@@ -829,4 +829,4 @@ Cartesian / OSC / Relative Observation / Initial Pose Randomization 작업은 �
 # 22. 현재 연구 방향을 가장 짧게 표현하면
 
 > **선반 환경의 Low-level contact manipulation을 대상으로, 조작 중 Vision tracking 없이 Force/Tactile feedback으로 접촉 변화에 적응하는 문제와, 상위 Planner가 주는 다양한 Goal에 따라 방향·거리·회전을 수행하는 Goal-conditioned manipulation 문제를 분리하여 연구한다. 기존 Cartesian/OSC sweeping framework를 공통 기반으로 사용하며, 실제 Planner의 접근 오차를 반영한 Initial Pose distribution과 연속 Skill 실행 가능성을 먼저 검증한다. 두 연구에서 충분한 Insight를 얻은 뒤 향후 Vision-Free Goal-conditioned Contact Manipulation으로 통합하는 것을 장기 방향으로 둔다.**
-```
+
