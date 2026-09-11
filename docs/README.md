@@ -352,20 +352,6 @@ Track A는 단일 물체를 대상으로 하는 vision-free lateral sweeping tas
 2. Little Translation, Rotation Handling Policy
     - Pivoting(용어는 고려 필요)이 유리한 케이스가 있다 → 이거를 잘
 
-!image.png
-
-!image.png
-
-!image.png
-
-!image.png
-
-!image.png
-
-!image.png
-
-!ChatGPT Image 2026년 9월 11일 오전 02_19_04.png
-
 ---
 
 ## 내일 의논할 사항 정리
@@ -606,7 +592,9 @@ $g=[\text{Shape Type},\,d_1,\,d_2,\,d_3]$
 
 </aside>
 
-!ChatGPT Image 2026년 9월 11일 오후 03_11_58.png
+![img1](../img/img1.png)
+![img2](../img/img2.png)
+
 
 ## 1줄 요약
 
