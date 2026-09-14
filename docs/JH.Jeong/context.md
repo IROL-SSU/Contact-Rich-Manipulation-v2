@@ -4,7 +4,7 @@
 >
 > **문서 성격:** 현재 합의, 작업 가설, 미결정 사항, 그리고 의사결정 과정을 함께 보존하는 living hand-off document
 >
-> **최종 갱신:** 2026-09-14
+> **최종 갱신:** 2026-09-15
 
 ---
 
@@ -24,9 +24,9 @@
 
 ### 후속 작업자가 우선 읽을 부분
 
-1. `1. 현재 결론 요약` — 특히 1.5절의 현재 우선 작업
-2. `5. Track B` — 특히 5.10절의 GD2P 분석과 Approach reward 후보
-3. `15.2 참고 논문 목록과 DOI` — 읽기 순서·연결점·한계
+1. `1. 현재 결론 요약` — 특히 1.5절의 baseline 우선 검토와 1.6절의 1단계 역할 경계
+2. `5. Track B` — 특히 5.3절·5.7절의 실행 범위와 contribution 후보, 5.11절의 baseline 비교 관점
+3. `15.2 기존 참고 논문 목록과 DOI`와 `15.3 후속 baseline 탐색 자료` — 후보별 연결점·한계; 5.10절의 reward 분석은 이전 검토 이력
 4. `3. 전체 시스템에서 두 Track의 위치`와 `6. Track A와 Track B의 관계`
 5. `11. 의사결정 과정`과 `13. 현재 결정 레지스터와 미결 Backlog`
 6. `14. 후속 Agent 작업 지침`
@@ -88,13 +88,27 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 
 **Track A/B는 서로 다른 연구축이고, 1단계/2단계는 Track B를 중심으로 구체화한 진행 단계다. `Track A = 1단계`, `Track B = 2단계`로 해석하지 않는다.**
 
-### 1.5 현재 우선 작업 — Track B 1단계의 hand configuration과 reward
+### 1.5 현재 우선 작업 — Reward formulation보다 baseline의 전체 접근 방식 검토
 
-**[2026-09-14 현재 합의]** 사용자는 Track B를 본인의 연구주제로 삼는 방향이며, 현재는 **1단계 low-level policy 학습**을 우선 구체화한다. 특히 Approach에서 **이후 Rotation과 Push에 유리한 손 구성과 접촉 상태를 어떻게 학습할 것인가**를 중심으로 관련 문헌을 검토한다.
+**[2026-09-15 현재 합의]** 사용자는 Track B를 본인의 연구주제로 삼는 방향이며, 현재는 **1단계 low-level policy 학습**을 우선 구체화한다. Reward 항을 먼저 정하기보다 baseline 후보의 문제 정의, 목표·관측·행동, 접촉 구성의 생성·선택, 학습·제어 방식과 실패 해결 방식을 먼저 살펴본다.
 
-GD2P의 geometry 기반 pre-contact pose 합성은 reward 설계의 참고이며 RL 방법 자체가 아니다. Geometric shaping, 실제 접촉 형성, task-specific wrench capability, 후속 정책의 수행 가능성을 구분해 검토한다. 특정 reward 수식·가중치·학습 구조·novelty는 아직 확정하지 않았다.
+**[현재 합의: 연구 관점]** 단순히 회전과 밀기라는 서로 다른 동작을 나열하는 것이 아니라, 다양한 초기 물체 자세에서 **목표 방향의 pushing을 위해 물체를 주어진 자세로 돌려두고, 이에 필요한 hand configuration과 접촉 상태를 형성·조절하는 문제**로 이해한다. Contribution의 범위를 최초 Approach에만 한정하지 않는다.
 
-2단계의 조작 의사결정 통합은 후속 확장으로 유지한다. 상세한 최신 분석은 **5.10절**, 논문 20편의 DOI·방법·연결점·한계는 **15.2절**에 기록한다.
+GD2P의 energy와 Approach reward 분석은 폐기하지 않고 **5.10절의 이전 검토 이력·설계 후보**로 보존한다. 최신 baseline 비교 관점은 **5.11절**, 기존 논문 20편은 **15.2절**, 후속 탐색 논문은 **15.3절**에 기록한다. GD2P·Hermans et al.·TaskDexGrasp 우선 독해는 Agent의 추천이며, 최종 실험 baseline의 선정은 미결이다.
+
+### 1.6 1단계에서 확인된 역할 경계와 contribution 후보
+
+**[2026-09-15 현재 합의]** 1단계에서 **어떤 물체 자세가 밀기에 적합한지 판단하고 목표 orientation을 선택하는 것은 상위 모듈의 역할**이다. 상위 모듈은 blocker와 목표 회전·병진을 제공하고, 우리 policy는 손목·손가락 구성과 접촉 상태를 형성·조절하여 이를 실행한다.
+
+- `적합한 물체 자세를 형성한다`는 1단계에서 **주어진 목표 자세를 실제로 달성한다**는 뜻이지, policy가 최적의 물체 자세를 선택한다는 뜻이 아니다.
+- Approach는 접촉 준비의 시작이며, Rotation과 Push에서도 접촉 조절·재구성이 필요할 수 있다. 각 phase마다 별도의 novelty나 독립 network가 있어야 한다는 뜻은 아니다.
+- 밀기에 적합한 중간 물체 orientation 자체를 policy가 선택하는 것은 2단계의 후속 확장으로 남긴다.
+
+사용자가 합리적이라고 확인한 **1단계 contribution 후보의 표현**은 다음과 같다. 역할 경계와 framing에 대한 합의이며, 신규성·성능을 입증한 결과는 아니다.
+
+> **주어진 물체 회전·병진 목표를 수행하기 위해, 접근부터 회전과 밀기까지 다지 손의 접촉 구성을 형성·전환하고 접촉 피드백으로 보정하는 조작 방법.**
+
+**[작업 가설 / 미결]** 이 방향에서 기존 방법 대비 어떤 접촉 표현·평가·학습·제어 메커니즘을 새롭게 제안할지와 실제 성능 우위는 아직 정하지 않았다. `회전 후 밀기`, `다지 손 사용`, `촉각 사용`, `RL 사용` 또는 이들의 결합만으로 contribution이 증명되었다고 쓰지 않는다.
 
 ---
 
@@ -325,6 +339,8 @@ Vision과 Low-level contact sensing은 서로 다른 주기로 병렬 사용할 
 
 상위 판단기는 **왜 이 blocker를 어느 방향으로 움직일지** 결정하고, 정책은 **접촉 불확실성 아래에서 그 움직임을 어떻게 수행할지** 학습한다. Rotation/Translation의 목표는 물체 상태를 뜻하며, 손목 자세 목표와 구분한다.
 
+**[2026-09-15 재확인]** 여기에는 **밀기에 적합한 목표 물체 orientation의 선택도 상위 판단기가 담당한다**는 경계가 포함된다. Policy가 결정·조절하는 손목 pose·손가락 configuration·접촉 배치와, 상위에서 주어지는 목표 물체 pose를 혼동하지 않는다. 상위 판단기의 목표 선택 알고리즘은 현재 low-level policy의 contribution이 아니다.
+
 **회전 후 병진의 동기:** 원하는 이동 방향으로 힘을 전달하기 유리한 물체 자세와 접촉 배치를 먼저 확보한다. 접촉면이 이동 방향에 수직인 자세는 유용한 후보지만, 접촉 위치·마찰·힘의 작용선도 물체 운동에 영향을 주므로 면의 정렬만으로 회전 없는 병진을 보장하지 않는다. 손의 접근 위치 변경만으로 충분한지, 선반·로봇 제약 때문에 물체 회전이 필요한지는 task scenario에서 검증할 사항이다.
 
 **[작업 가설 / 설계안]** 회전이 불필요한 명령은 회전량 0으로 처리할 수 있도록 한다. 회전에 유효한 접촉이 병진에도 유효하다고 고정하지 않고, 손목·손가락 자세와 접촉 위치를 재조정할 여지를 둔다.
@@ -335,7 +351,7 @@ Vision과 Low-level contact sensing은 서로 다른 주기로 병렬 사용할 
 - 최종 orientation만 요구할지, 특정 pivot 축 주위의 궤적까지 요구할지 구분한다. 고정 pivot을 요구한다면 축 방향 외에 위치도 필요하다.
 - 이동 방향·거리 또는 최종 position을 입력하는 방식은 미결이다. 지정 위치 도달이 목적이면 명령 시점 위치 `p₀`, 방향 단위벡터 `d̂`, 거리 `s`를 이용해 `p_g = p₀ + s d̂`로 목표를 고정하는 안이 있다.
 - 위 안에서는 회전 중 물체가 이동하더라도 `p_g`를 유지하고, Push 단계에서 현재 위치부터 남은 변위를 계산한다.
-- 요구 orientation이 최종 배치 조건인지, 병진을 돕기 위한 중간 자세인지는 미결이다.
+- **2026-09-15 구체화:** 회전의 연구 동기는 후속 pushing에 유리한 물체 자세를 준비하는 것이다. 그 목표 orientation은 1단계에서 상위가 지정한다. Push 중·종료 시 같은 orientation을 어느 오차 범위까지 유지할지, 별도의 최종 배치 orientation을 둘지는 미결이다.
 
 ### 5.4 2단계 — 공간 확보 목적에서 조작 의사결정을 통합
 
@@ -397,16 +413,21 @@ Tactile은 관측으로 활용할 수 있으며 반드시 reward에 직접 들�
 
 ### 5.7 Contribution 후보와 주장 범위
 
-현재 연구 방향을 한 문장으로 쓰면 다음과 같다.
+**[2026-09-15 현재 framing]** 1단계의 contribution 후보를 다음처럼 표현한다.
 
-> **접촉 기반 low-level 조작 정책을 먼저 학습하고, 이후 target 접근 공간 확보에 필요한 조작 목표 설정과 동작 전환까지 통합하는 목표 조건부 정책으로 확장한다.**
+> **주어진 물체 회전·병진 목표를 수행하기 위해, 접근부터 회전과 밀기까지 다지 손의 접촉 구성을 형성·전환하고 접촉 피드백으로 보정하는 조작 방법.**
+
+사용자가 확인한 것은 이 표현의 합리성과 **목표 물체 자세 선택은 상위, 접촉 실행은 policy**라는 역할 구분이다. 특정 method의 신규성이나 성능을 확정한 것이 아니다. 이전 표현인 `low-level 실행 → 공간 확보 의사결정 통합`은 연구 로드맵으로 계속 유효하지만, 그 자체로 1단계의 구체적인 방법적 contribution을 설명하지는 않는다.
+
+Contribution을 Approach에만 한정하지 않는다. 접근 때 손을 준비하는 것뿐 아니라, 주어진 orientation으로 회전하는 중의 접촉 조절과 후속 Push에 필요한 재배치가 포함된다. 반대로 각 phase에 모두 새로운 알고리즘이 있어야 한다는 뜻도 아니다. Pushing은 준비의 유효성을 검증하는 후속 과업이 될 수 있으며, Push controller 자체에 별도 novelty가 필수인지는 아직 정하지 않았다.
 
 검증할 **[작업 가설]**는 다음과 같다.
 
-- 1단계: 근사 형상으로 준비한 손 구성과 접촉 배치를 F/T·Tactile로 수정하면, 실제 접촉 형상 불일치 아래에서 목표 조작의 정확도·안정성이 개선되는가?
+- 1단계: 같은 목표 물체 orientation에 도달해도 서로 다른 손목·손가락·접촉 상태가 후속 pushing 성공에 차이를 만드는가? 그 차이를 고려하는 표현·평가·학습 방식이 단순한 phase 연결보다 유효한가?
+- 1단계: 근사 형상으로 준비한 접촉을 F/T·Tactile로 보정하면, 형상·마찰 등 불확실성 아래에서 접촉 형성·전환 실패를 줄이고 주어진 조작 목표의 정확도·안정성을 개선하는가? 센서 추가의 효과뿐 아니라 어떤 접촉 행동과 실패가 달라졌는지 검증한다.
 - 2단계: 학습된 실행 능력을 기반으로 중간 목표와 동작 전환을 결정하면, 공간 확보 성공과 조작 효율을 개선할 수 있는가?
 
-단순히 센서를 함께 쓰거나 세 동작을 순서대로 학습한다는 사실만으로 novelty를 확정하지 않는다. 역할을 정책으로 통합하면 반드시 성능이 개선된다는 주장도 하지 않는다. 비교 방법과 최종 Contribution, 각 단계의 논문화 범위는 미결이다.
+단순히 센서를 함께 쓰거나 세 동작을 순서대로 학습한다는 사실만으로 novelty를 확정하지 않는다. 준비 회전은 B21, 작업별 손 구성은 B01·B02, 촉각 기반 손목–손가락 제어는 B22, 후속 성공을 고려한 연결은 B08에 선행 사례가 있다. 이들 전체에 대한 우위나 `최초`를 현재 문헌 검토만으로 주장하지 않는다. 비교 방법과 최종 Contribution, 각 단계의 논문화 범위는 미결이다.
 
 ### 5.8 현재 설명용 조작 예시
 
@@ -420,9 +441,11 @@ Top view, 양옆이 개방된 선반, 주변 물체 배치는 **설명용 그림
 
 ### 5.10 1단계 우선 연구 질문과 문헌 기반 설계 후보 — 2026-09-14
 
+**[이전 검토 이력; 2026-09-15 우선순위 변경]** 아래 내용은 Approach reward를 먼저 분석하던 시점의 기록이다. 기술 분석과 설계 후보는 유지하되, 현재는 baseline 전체 방법의 독해가 우선이며 contribution을 Approach에만 한정하지 않는다. 최신 해석은 1.5·1.6·5.7·5.11절을 따른다.
+
 #### 5.10.1 Approach의 목표를 후속 동작과 연결
 
-**[현재 연구 초점]** Approach에서 적절한 hand configuration을 형성하는 문제를 먼저 구체화한다. 단순히 물체에 가까워지거나 접촉 수를 늘리는 것보다, 주어진 명령 아래에서 **후속 Rotation과 Push를 수행하기 유리한 hand–object 상태를 만드는가**가 중요하다.
+**[2026-09-14의 연구 초점]** Approach에서 적절한 hand configuration을 형성하는 문제를 먼저 구체화했다. 단순히 물체에 가까워지거나 접촉 수를 늘리는 것보다, 주어진 명령 아래에서 **후속 Rotation과 Push를 수행하기 유리한 hand–object 상태를 만드는가**가 중요하다는 문제의식은 유지한다.
 
 **[작업 가설]** 이 상태의 적합성은 손목 pose·손가락 구성·실제 접촉·물체 상태·팔의 실행 여유를 함께 고려해 평가할 수 있다. Approach 종료 상태와 후속 정책의 성공 관계를 검증해야 하며, 지금 특정 평가함수로 확정한 것은 아니다.
 
@@ -496,7 +519,7 @@ TaskDexGrasp의 Task Wrench Space는 사전 지정하는 방향 집합이다. �
 
 B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. 이를 Approach reward로 직접 사용하는 것은 우리의 확장안이다. 할인된 value를 보정된 성공확률로 설명하지 않는다. 물체를 손 안에서 파지한 상태와 선반에 지지된 nonprehensile 상태의 차이도 검증해야 한다.
 
-#### 5.10.6 우선 확인할 사항
+#### 5.10.6 당시의 우선 확인 사항 — Reward 검토 재개 시 참고
 
 1. Approach 종료 상태와 Rotation/Push의 실행 성공 기준을 정의한다.
 2. 접촉 가능한 기하 조건과 후속 조작 적합성을 구분한다.
@@ -506,6 +529,27 @@ B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. �
 6. 우선 읽기 순서: **B02 TaskDexGrasp → B03 RL critic → B04 GraspXL → B05 UniDexFPM → B06 HANDFUL**. GD2P는 이미 정독·energy 분석을 시작한 기준 논문이다.
 
 문헌의 모든 항을 한꺼번에 합치지 않는다. 각 항이 해결하는 실패 원인을 정의하고, 실제 후속 성공 개선 여부를 확인해 채택한다.
+
+### 5.11 Baseline을 다시 고르는 관점 — 2026-09-15
+
+**[현재 합의: 탐색 기준]** 완전히 같은 과업이나 동일한 로봇·센서·RL 알고리즘만 찾지 않는다. **목표 방향으로 밀기 위한 물체 자세와 hand configuration의 준비**에 어떤 해결 방식을 제시하는지 먼저 본다. 이 비교 관점이 1단계 policy에 목표 물체 자세 선택 권한을 추가하는 것은 아니다.
+
+**[Agent 추천; 최종 baseline 미선정]** 우선 독해 후보의 역할은 다음과 같다.
+
+| 후보 | 먼저 확인할 내용 | 우리 범위와 구분할 점 |
+| --- | --- | --- |
+| B01 GD2P | 주어진 물체 상태·밀기 방향에서 손목·손가락 pose를 생성하고 실제 push 성공으로 검증하는 전체 pipeline | 준비 회전 목표의 선택·실행이나 tactile closed-loop 정책을 그대로 제공하는 방법은 아님 |
+| B21 Hermans et al. | 형상에서 안정 밀기·회전 접촉점을 예측하고, 안정 접촉이 목표 방향과 정렬되도록 물체를 돌린 뒤 미는 관점 | 다지 손 configuration 학습이 아님; 정량 실험의 중심은 두 동작 각각의 접촉점 예측 |
+| B02 TaskDexGrasp | 작업에 필요한 힘·모멘트를 가할 수 있는 손 자세의 생성·평가 | 정적 pose 합성이며 지지면을 포함한 실제 Rotation→Push 성공과 동일하지 않음 |
+| B22 DexMove | 촉각 기반 손목–손가락 공동 제어와 접촉 데이터 학습 | 시연 기반 flow policy; RL이나 우리 shelf 목표와 동일한 방법은 아님 |
+| B23 Task-oriented contact optimization | 주어진 물체 운동을 적은 접촉력으로 실행할 접촉 배치 최적화 | 다중 이동로봇 설정; 독립 접촉점을 다지 손 관절로 그대로 치환하지 않음 |
+| B24 Tactile-based negotiation | 회전 후 밀어 경로 확보, 방향별 접촉 위치 선택과 감각 기반 손 정렬 | 큰 장애물·mobile manipulation·계획/순응 제어; 다지 손 학습이 아님 |
+
+ExDex(B07)·UniDexFPM(B05)은 arm–hand 제어와 구현 구조, Sequential Dexterity(B08)는 phase 연결의 비교 후보로 유지한다. GraspXL(B04)·critic 기반 선택(B03) 등은 후속 구성 요소 검토에 활용한다. CORN(B25)·DyWA(B26)·VTDexManip(B27)은 각각 일반 비파지 목표 제어·물성 적응·센서 표현의 보조 후보이며, RetrDex(B17)는 주로 2단계 공간 확보 목적의 참고다.
+
+**[작업 가설: 공정한 비교]** GD2P 단독과만 비교하면 우리에게 추가된 회전 동작의 효과와 새로운 접촉 방법의 효과가 섞일 수 있다. `별도 회전 정책 + GD2P` 같은 단순 결합 방법, 접촉 구성 고정/적응 방식, 접촉 feedback 유무 등을 비교하는 안이 제안되었다. 이는 실험 설계 후보이지 구현·채택한 baseline이 아니다. 동일 목표·초기 물체 상태·사용 가능 관측 및 안전 조건을 맞추고, 원래 방법에 추가한 모듈을 명시해야 한다.
+
+다음 독해는 **문제·성공 조건 → 목표/관측/행동 → 접촉 구성 생성·선택 → 학습/제어·전환 방식 → 실패와 비교 실험 → reward** 순으로 진행하는 것을 권한다. 문헌의 코드 공개 여부는 재현 완료와 다르며, 현재 대화에서 학습·실험을 재현한 것은 아니다.
 
 ---
 
@@ -792,6 +836,36 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **검토 후보:** Wrench-space 적합성, 후속 RL critic 기반 평가, 목표 조건부 접촉 보상, 다목표 reward 결합, 후속 손가락 사용 여유.
 - **미결:** 실제 reward 수식, policy 구성, tactile 표현, phase 전환 및 contribution. 2단계 확장은 backlog로 유지한다.
 
+### Stage 8 — Reward 항보다 baseline의 해결 방식을 먼저 검토
+
+- **기록 날짜:** 2026-09-15. Stage 7 이후 대화의 순서를 보존한다.
+- **사용자 요청:** Reward formulation을 고민하던 중, baseline 논문의 접근 방식과 해결 방식을 먼저 살펴보는 것이 우선이라고 설명하고 논문 탐색을 요청했다.
+- **Agent의 초기 추천:** ExDex·DexMove·UniDexFPM·Sequential Dexterity·GD2P를 주요 후보로, CORN·DyWA·VTDexManip을 보조 후보로 제시했다. 과업·로봇·학습·센서·phase 연결의 유사성을 기준으로 삼았다.
+- **새 결론 [현재 합의]:** 특정 reward 항을 채택하기 전에 baseline의 전체 문제 정의와 해결 pipeline을 이해한다. 기존 GD2P energy 분석은 보존하지만 즉시 reward로 구현하기로 한 것은 아니다.
+- **남은 질문:** 최종 baseline 선정, 공개 코드 재현 가능성, 우리의 손·센서·목표 조건으로 이식할 범위.
+
+### Stage 9 — Pushing을 위한 물체 자세와 hand configuration으로 비교 관점 이동
+
+- **기록 날짜:** 2026-09-15. Stage 8 이후 사용자 설명과 문헌 탐색을 기록한다.
+- **사용자 설명:** 물체가 다양한 초기 자세에 있더라도 밀기에 적합한 자세로 돌려두고 미는 관점이 중요하다. 완전히 일치하는 연구를 찾기보다 특정 방향으로 밀기 위한 물체 자세와 hand configuration에 집중해야 한다. 사용자는 GD2P가 어느 정도 부합한다고 평가했다.
+- **Agent의 후속 추천:** GD2P에 더해 Hermans et al.(B21)의 준비 회전·안정 접촉점 선택, TaskDexGrasp(B02)의 작업별 wrench 기반 손 자세 합성을 우선 후보로 제안했다. Task-oriented contact optimization(B23)과 tactile-based negotiation(B24)을 추가했다. 이는 사용자가 최종 baseline을 확정한 기록이 아니다.
+- **Contribution 논의:** 준비 회전, 다지 손의 pushing pose, tactile wrist–finger 제어, downstream skill 연결 각각에 선행 연구가 있음을 확인했다. 따라서 이 요소들을 사용한다는 사실만으로 novelty를 주장할 수 없고, 접촉 구성의 형성·전환·보정에 구체적인 방법과 검증이 필요하다고 설명했다.
+- **작업 가설:** 후속 pushing에 유효한 접촉 상태를 준비하고 실제 geometry/contact mismatch를 보정하는 방향. `별도 회전 정책 + GD2P`와 같은 단순 결합 비교도 Agent가 제안했지만 확정하지 않았다.
+- **영향:** 문헌 탐색의 기준을 generic dexterous RL/skill chaining에서 pushing을 위한 준비 조작으로 좁혔다. 물체 목표를 선택하는 주체는 다음 Stage 10에서 명확히 재확인했다.
+
+### Stage 10 — Approach만의 contribution이라는 해석과 목표 자세 선택 권한을 정정
+
+- **날짜:** 2026-09-15.
+- **논의 배경:** 사용자가 “결국 처음 Approach 단계에 contribution이 있는 것인가?”라고 물었다. Agent는 준비 조작이 Approach뿐 아니라 Rotation 및 Push로 넘어가는 접촉 조절에도 걸친다고 설명했다.
+- **모호했던 Agent 표현 [대체됨]:** “다양한 초기 물체 자세에서, 목표 방향의 pushing에 적합한 물체 자세와 hand configuration을 형성하는 조작 방법.” 이 문장은 물체 자세를 **선택**하는 것과 주어진 자세를 **달성**하는 것을 분명히 구분하지 못했다.
+- **사용자 재확인:** “적합한 물체 자세는 1단계에서 우리의 policy가 판단할 내용이 아닌 것 아닌가?”라고 지적했다.
+- **정정 [현재 합의]:** 상위 모듈이 밀기에 적합한 목표 물체 orientation과 병진 목표를 제공한다. Policy는 그 목표를 실행하기 위한 손목·손가락 구성과 접촉 상태를 형성·조절한다. 적합한 중간 물체 orientation 자체를 선택하는 것은 후속 확장이다.
+- **정정 후 contribution 후보:** “주어진 물체 회전·병진 목표를 수행하기 위해, 접근부터 회전과 밀기까지 다지 손의 접촉 구성을 형성·전환하고 접촉 피드백으로 보정하는 조작 방법.”
+- **사용자의 확인:** 위 정정이 더 합리적이라고 동의하고, 여기까지의 내용을 `context.md`와 `research_topic.md`에 반영하도록 요청했다.
+- **합의의 범위:** 역할 경계와 연구 framing에 대한 확인이다. 최종 method novelty, reward, policy 수, 성능 우위가 확정된 것은 아니다. Approach만의 novelty로 축소하거나 각 phase마다 별도 novelty가 있다고 확대하지 않는다.
+- **영향:** 최신 요약, Track B의 목표 해석·contribution, baseline 검토, 대체 관계, 결정 레지스터, backlog, 후속 Agent 지침과 research topic 요약.
+- **남은 질문:** 실제 접촉 표현·평가·학습 방법, 회전–밀기 전환 조건, 목표 orientation 유지 허용 범위, 공정한 baseline과 검증 방법.
+
 ---
 
 ## 12. 이전 자료와 최신 결론의 충돌 정리
@@ -819,6 +893,11 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | GD2P energy가 검증된 RL reward | 우리의 reward에 적용하는 것은 설계 후보이며 별도 검증 필요 | **[해석 제한]** |
 | Approach에서 접촉을 많이 만들면 후속 동작에도 유리 | Task-specific 접촉 능력과 실제 후속 성공을 함께 평가 | **[작업 가설]** |
 | Critic value를 그대로 성공확률로 사용 | 학습된 return 또는 ranking proxy이며 보정·검증 필요 | **[해석 제한]** |
+| Approach reward의 수식 구체화를 최우선 작업으로 둠 | Baseline의 문제 정의와 전체 해결 방식을 먼저 검토 | **[우선순위 변경 · 2026-09-15]** 기존 분석은 5.10절에 보존 |
+| Contribution이 처음 Approach 단계에만 있음 | 접근·회전·밀기 과정의 접촉 형성·전환·보정이 후보 범위 | **[대체됨]** 각 phase의 독립 novelty를 주장하는 것도 아님 |
+| 1단계 policy가 밀기에 적합한 물체 자세를 스스로 선택 | 목표 물체 orientation·병진은 상위가 지정; policy는 손 구성·접촉을 조절하며 실행 | **[명시적 정정 · 2026-09-15]** 물체 자세의 선택과 달성을 구분 |
+| 요구 orientation이 왜 필요한지 자체가 미결 | 현재 동기는 후속 pushing 준비; 목표는 상위가 지정 | **[구체화됨]** Push 중·최종 orientation 제약의 수치·표현은 미결 |
+| 새 contribution 후보 문장에 동의 = 신규성과 성능이 입증됨 | 연구 framing·역할 경계에 동의; 구체 method와 실험 검증은 남음 | **[해석 제한]** |
 
 ---
 
@@ -845,10 +924,15 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-015 | 현재 합의 · 2026-09-14 | End-to-end에 가까운 확장은 목적→행동의 역할 통합을 의미하며 raw sensor 입력, 단일 network, VLA 또는 특정 학습 알고리즘을 확정하지 않는다. |
 | D-016 | 현재 합의 · 2026-09-14 | Track A/B와 1단계/2단계는 별개다. 이번 변경이 Track A의 관측 조건 변경이나 두 Track의 Vision-Free 통합을 뜻하지 않는다. |
 | D-017 | 현재 합의 · 2026-09-14 후속 논의 | Track B를 사용자의 연구주제로 삼는 방향이며, 현재는 1단계 low-level policy와 관련 문헌 검토를 우선한다. |
-| D-018 | 현재 연구 초점 | Approach에서 이후 Rotation과 Push를 고려한 hand configuration reward를 구체화한다. 수식·architecture는 미결이다. |
+| D-018 | 이전 우선순위 · 2026-09-15 변경 | Approach에서 이후 Rotation과 Push를 고려한 hand configuration reward를 먼저 검토했다. 분석은 보존하며 최신 우선순위는 D-022를 따른다. |
 | D-019 | 문헌 확인 | GD2P는 geometry-conditioned pre-contact hand pose 생성이며 RL 또는 point-cloud diffusion augmentation이 아니다. |
 | D-020 | 작업 가설 | Task-specific wrench capability와 후속 정책의 execution value를 Approach 적합성의 평가 후보로 검토한다. |
 | D-021 | 문헌 해석 원칙 | 원 논문, 공개 구현, 우리의 reward 확장안을 구분하고 DOI 유형·출판 상태를 명시한다. |
+| D-022 | 현재 합의 · 2026-09-15 | Reward formulation보다 baseline의 문제 정의와 전체 접근·해결 방식을 먼저 살펴본다. 최종 baseline 선정은 미결이다. |
+| D-023 | 현재 합의 · 2026-09-15 | 연구 관점은 목표 방향의 pushing을 위해 물체를 주어진 자세로 돌려두고 손 구성·접촉을 준비하는 것이다. 최초 Approach에만 contribution을 한정하지 않는다. |
+| D-024 | 현재 합의 · 2026-09-15 | 1단계의 적합한 목표 물체 orientation 선택은 상위 모듈의 역할이다. Policy는 주어진 물체 회전·병진 목표를 접촉 조작으로 달성한다. |
+| D-025 | 합의된 framing / 검증 전 후보 · 2026-09-15 | Contribution 후보는 주어진 물체 목표를 위한 다지 손 접촉 구성의 형성·전환·피드백 보정 방법이다. 구체 method와 신규성·성능은 미결이다. |
+| D-026 | Agent 추천 / 미선정 | GD2P·Hermans et al.·TaskDexGrasp를 관점별 우선 독해 후보로 두고, 단순 회전 정책+GD2P 등의 비교를 검토한다. 사용자가 실험 baseline을 확정한 것은 아니다. |
 
 ### 13.2 미결 Backlog
 
@@ -875,12 +959,15 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 #### Track B — 1단계 우선 명세
 
+- Baseline 전체 pipeline의 비교: 목표/관측/행동, 접촉 구성 생성·선택, 학습·제어, 실패 해결 방식과 재현·이식 범위
+- 현재 contribution framing을 실현할 새로운 방법과 기존 방법 대비 검증 가능한 차이
 - Approach 종료 상태의 정의와 후속 Rotation/Push 성공률의 관계
+- Rotation 종료 시 물체 목표 달성과 hand/contact 상태의 후속 Push 적합성을 구분하는 평가
 - Task-specific wrench prior의 표현·물리 가정과 downstream critic 평가의 신뢰도
 - Geometry 기반 접근 shaping과 실제 tactile 접촉 평가의 역할 분담
 
 - Goal 표현: 회전각·축 / 목표 orientation, 방향·거리 / 목표 position, 기준 좌표계·시점
-- Orientation이 최종 배치 조건인지 병진을 위한 중간 자세인지
+- 상위가 지정한 pushing 준비 orientation을 Push 중·종료 시 유지할 허용 오차 및 별도 최종 orientation 조건 여부; 목표 orientation 선택 주체는 상위로 확정
 - 평면 병진·yaw부터 시작할지와 feasible direction/rotation 범위
 - 물체 근처 시작 pose 분포, contact formation 범위, 손목·손가락 action 범위
 - 근사 geometry와 robot state, F/T·Tactile observation 및 history/fusion 표현
@@ -923,8 +1010,11 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 11. Continuous Vision·근사 geometry의 availability와 정확한 접촉 상태의 완전 관측을 구분한다. 손목 자유도와 손가락 자유도, joint 관측과 action도 구분한다.
 12. 단계별 실행 성능과 공간 확보·실제 인출 성능을 혼동하지 않는다. 그림 속 시리얼 박스·hooking·선반 구성은 설명용 예시이며 자동으로 학습 명세가 되지 않는다.
 
-13. 현재 우선 작업은 Track B 1단계의 Approach hand configuration과 reward 관련 문헌 분석이다. 2단계 전체 명세를 먼저 확정하지 않는다.
+13. 현재 우선 작업은 Track B 1단계의 pushing 준비·접촉 구성 관점에서 baseline의 전체 해결 방식을 분석하는 것이다. 5.10절의 reward 후보를 바로 채택하거나 2단계 전체 명세를 먼저 확정하지 않는다.
 14. 논문에 명시된 방법·공개 코드 관찰·우리 연구의 확장 후보를 구분한다. DOI 미확인을 DOI 부재로 단정하지 않는다.
+15. 1단계에서는 상위가 적합한 목표 물체 orientation과 병진 목표를 제공한다. `물체 자세 형성`을 policy의 목표 자세 선택으로 해석하지 않는다. 손목·손가락 구성의 조절은 물체 목표의 선택과 별개다.
+16. Contribution을 Approach에만 한정하거나, 각 phase마다 신규성이 입증되었다고 쓰지 않는다. 사용자가 동의한 framing과 검증된 논문 contribution을 구분한다.
+17. 추천 논문·단순 결합 baseline·sensor ablation은 후보이며 확정 실험이 아니다. 다음 작업은 이 범위를 유지한 baseline 독해이며, 문헌의 reward 항을 한꺼번에 조합하는 것이 아니다.
 
 ### 14.2 문서를 갱신할 때
 
@@ -960,17 +1050,18 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ### 15.1 연구 논의의 출처
 
+- 2026-09-15 정리한 Stage 8–10의 후속 사용자 대화: reward보다 baseline 접근 방식 검토를 우선하도록 변경했고, pushing을 위한 물체 자세·hand configuration으로 관점을 좁혔다. 이어 Approach에만 contribution이 있는지 논의하고, 1단계 목표 물체 자세 선택은 상위 모듈의 역할임을 재확인했다. 사용자는 정정된 contribution 후보 표현이 합리적이라고 확인하고 두 문서의 업데이트를 요청했다.
 - 2026-09-14 사용자 제안 및 후속 확인: low-level action 학습을 우선 수행하고 이후 상위 추론기의 일부 역할을 정책으로 통합하는 방향을 제안했다. 단계별 정리에 동의하고 `context.md` 업데이트를 요청했다.
 - 본 대화의 Track B 구체화: 근사 geometry, Approach / Contact Formation → Rotation → Push, F/T·Tactile 기반 접촉 보정, 뒤쪽 target 인출을 위한 blocker 재배치 목적과 설명 그림을 논의했다. 설계 후보와 그림 조건은 확정된 architecture·학습 명세와 구분했다.
 - [`docs/README.md`](../README.md): 전체 프로젝트의 기존 hand-off. Vision-based Sweeping의 한계, 두 Track으로의 decoupling, initial pose randomization, sequential manipulation, sensor/geometry 문제 등이 자세히 기록되어 있다.
 - 과거 대화 초안: `Sweeping vs Handling/Pivoting`, 두 Skill의 Vision 조건, geometry 문제, 역할 중복 및 비교 시나리오를 검토했다. 해당 첨부 원문은 다른 컴퓨터에서 접근할 수 없을 수 있으므로, 후속 작업에 필요한 결론과 사고 과정은 이 문서의 7절·9절·11절·12절에 내재화했다.
 - 2026-09-12 사용자 설명: Track A의 initial-Vision/contact-feedback 조건, Track B의 continuous-Vision/current-pose-and-geometry 조건, 그리고 두 Track이 다른 동작이 아닌 다른 연구 문제라는 점을 최신 결론으로 반영했다.
 
-### 15.2 참고 논문 목록과 DOI — 2026-09-14 확인
+### 15.2 기존 참고 논문 목록과 DOI — 2026-09-14 확인
 
 주요 관련 논문 **17편(B01–B17)**과 GD2P의 energy·데이터 생성 배경 논문 **3편(B18–B20)**을 수록한다. DOI는 앞선 문헌 조사에서 확인한 정보를 반영했다. **arXiv DOI는 정식 출판 DOI와 구분**한다. 정식 DOI 미확인은 DOI가 없다는 단정이 아니다.
 
-현재 읽기 우선순위는 **B02 → B03 → B04 → B05 → B06**이다. B01은 이미 분석을 시작한 기준 논문이다. B07–B16은 실행·센서·phase 연결, B17은 retrieval 목적과 후속 확장, B18–B20은 energy·데이터 평가의 배경으로 활용한다.
+**이전 읽기 순서(2026-09-14): B02 → B03 → B04 → B05 → B06.** Reward/Approach 중심의 당시 순서로 보존한다. **2026-09-15 현재 Agent 추천은 B01·B21·B02의 전체 방법을 우선 비교**하는 것이다(5.11절). B07–B16은 실행·센서·phase 연결, B17은 retrieval 목적과 후속 확장, B18–B20은 energy·데이터 평가의 배경으로 계속 활용한다. 후속 탐색 논문 B21–B27은 15.3절에 수록한다.
 
 | ID | 약칭 | 방법 / 주요 활용 |
 | --- | --- | --- |
@@ -1197,7 +1288,74 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ---
 
+### 15.3 후속 baseline 탐색 자료 — 2026-09-15 정리
+
+아래는 Stage 8–10의 대화에서 검토한 추가 자료다. 적합성 평가는 Agent의 해석이며, baseline 채택·학습 재현·성능 검증을 뜻하지 않는다. 기존 B01–B20의 ID는 유지한다. 출판사 DOI를 새로 확인하지 않은 항목은 원문·공식 프로젝트 링크만 남기며 DOI 부재로 단정하지 않는다.
+
+#### B21. Learning Contact Locations for Pushing and Orienting Unknown Objects
+
+- **발표 정보:** Tucker Hermans, Fuxin Li, James M. Rehg, Aaron F. Bobick; Humanoids 2013
+- **원문:** [저자 공개 논문](https://users.cs.utah.edu/~thermans/papers/hermans-ichr2013.pdf)
+- **방법:** 국소·전체 형상 특징에서 직선 밀기 안정성과 회전 효과를 각각 회귀 모델로 예측하고 접촉 위치를 선택한다.
+- **직접 연결점:** 서론에서 안정적인 pushing 접촉점이 목표까지의 직선 방향과 정렬되도록 물체를 먼저 회전시키고 이후 미는 전략을 명시한다. `밀기를 위한 준비 회전` 자체를 우리의 최초 기여로 주장하지 않는다.
+- **한계:** 고정 gripper 동작과 접촉 위치 선택 중심이며 다지 손 configuration 학습은 아니다. 정량 실험은 직선·회전 접촉 위치 예측 각각이 중심이므로 전체 준비→밀기 성능이 같은 수준으로 검증되었다고 확대하지 않는다.
+
+#### B22. DexMove
+
+- **정식 제목 / 발표:** DexMove: Learning Tactile-Guided Non-Prehensile Manipulation with Dexterous Hands; ICLR 2026
+- **원문 / 공식 자료:** [프로젝트](https://peilin-666.github.io/projects/DexMove/), [OpenReview](https://openreview.net/forum?id=dT3ZciXvNX)
+- **방법:** 물리적으로 검증한 손목–손가락 궤적과 인간 촉각 시연을 활용하여 flow-matching 기반 비파지 조작 정책을 학습한다.
+- **연결점 / 주의:** 촉각 기반 wrist–finger 공동 제어에 가까운 선행 연구다. 촉각을 추가한다는 사실만으로 novelty를 주장하지 않는다. RL·우리 sensor 구성·shelf 과업과 동일하지 않다. 대화에서는 공식 프로젝트와 공개 논문 설명을 검토했으며 정책 학습 코드의 공개·재현은 확인하지 못했다.
+
+#### B23. Task-Oriented Contact Optimization for Pushing Manipulation with Mobile Robots
+
+- **발표 정보:** Filippo Bertoncelli, Mario Selvaggio, Fabio Ruggiero, Lorenzo Sabattini; IROS 2022
+- **자료:** [소속기관 공개 논문 정보](https://iris.unimore.it/handle/11380/1295974)
+- **방법:** 주어진 평면 궤적을 수행하는 접촉력 크기를 줄이도록 접촉 위치를 최적화하고, 계산한 힘과 위치 feedback으로 추종한다.
+- **연결점 / 주의:** 목표 운동에 따른 접촉 배치의 적합성 비교에 유용하다. 다중 mobile robot의 독립 접촉점을 손 관절의 운동학·충돌 제약이 있는 다지 손으로 그대로 치환할 수 없다. 공개 초록·논문 설명 기준의 검토이며 상세 최적화·재현은 후속 독해 대상이다.
+
+#### B24. Tactile-Based Negotiation of Unknown Objects during Navigation in Unstructured Environments with Movable Obstacles
+
+- **발표 정보:** Simon Armleder et al.; Advanced Intelligent Systems 2024
+- **DOI:** [10.1002/aisy.202300621](https://doi.org/10.1002/aisy.202300621)
+- **원문:** [소속기관 공개 전문](https://research.chalmers.se/publication/539508/file/539508_Fulltext.pdf)
+- **방법:** 장애물을 먼저 회전시킨 뒤 밀어 경로를 확보한다. 방향별 접촉 위치를 선택하고 robot skin의 근접·힘 신호로 표면 정렬과 순응 제어를 수행한다.
+- **연결점 / 주의:** 준비 회전·접촉 위치 선택·접촉 중 손 정렬의 사례다. 큰 장애물의 mobile manipulation이며 다지 손 policy 학습이 아니다. 물체 운동·질량 분포 등에 단순화된 가정이 있고, 센서 구성을 우리의 wrist F/T·tactile과 동일시하지 않는다.
+
+#### B25. CORN
+
+- **정식 제목 / 발표:** CORN: Contact-based Object Representation for Nonprehensile Manipulation of General Unseen Objects; ICLR 2024
+- **원문 / 코드:** [논문](https://arxiv.org/html/2403.10760), [저장소](https://github.com/iMSquared/corn)
+- **방법 / 연결점:** 접촉 예측으로 사전학습한 기하 표현을 goal-conditioned 비파지 RL과 teacher–student 학습에 사용한다.
+- **주의:** Gripper 설정이며 `contact-based`가 실제 tactile sensor 입력을 뜻하지 않는다. 물체 수준 목표 제어의 보조 후보이지 다지 손 configuration의 직접 baseline은 아니다.
+
+#### B26. DyWA
+
+- **정식 제목 / 발표:** DyWA: Dynamics-adaptive World Action Model for Generalizable Non-prehensile Manipulation; ICCV 2025
+- **원문 / 코드:** [논문](https://arxiv.org/html/2503.16806), [저장소](https://github.com/jiangranlv/DyWA)
+- **방법 / 연결점:** 관측·행동 이력의 적응 표현과 상태 예측을 이용한 비파지 조작. 물성 변화 대응의 보조 후보다.
+- **주의:** Gripper 설정이며 다지 손·촉각 방법으로 분류하지 않는다. 목표 물체 자세의 준비와 손 접촉 구성을 함께 다루는 직접 baseline으로 확정하지 않는다.
+
+#### B27. VTDexManip
+
+- **정식 제목 / 발표:** VTDexManip: A Dataset and Benchmark for Visual-tactile Pretraining and Dexterous Manipulation with Reinforcement Learning; ICLR 2025
+- **공식 자료 / 코드:** [프로젝트](https://lqts.github.io/VTDexManip/), [저장소](https://github.com/LQTS/VTDexManip)
+- **방법 / 연결점:** Visual–tactile 표현 사전학습과 RL을 결합하며 tabletop reorientation 등의 과업을 포함한다.
+- **주의:** Sensor 표현·융합 방식의 참고이며, 우리 Rotation→Push 전체 과업이나 wrist F/T 설정과 동일하지 않다.
+
+---
+
 ## 16. Change Log
+
+### 2026-09-15 — Baseline 우선 검토와 1단계 contribution·목표 선택 경계 명확화
+
+- Reward formulation보다 baseline의 전체 해결 방식을 먼저 검토하도록 현재 우선순위를 수정했다. 이전 GD2P energy·Approach reward 분석과 당시 읽기 순서는 이력으로 보존했다.
+- 목표 방향의 pushing을 위한 준비 조작이라는 사용자 관점을 반영하고, contribution을 Approach에만 한정하는 해석을 정정했다.
+- 1단계에서 적합한 목표 물체 자세를 선택하는 주체는 상위 모듈이며, policy는 주어진 회전·병진 목표에 맞춰 손 구성과 접촉 상태를 형성·전환·보정한다는 경계를 재확인했다.
+- 합의된 contribution 후보 표현과 아직 검증되지 않은 method novelty·성능·비교 실험을 분리했다.
+- Stage 8–10에 baseline 추천의 변경 과정, Agent의 모호한 표현, 사용자의 지적과 최종 확인을 기록했다.
+- 현재 요약·대체 관계·결정 레지스터·backlog·후속 Agent 지침을 함께 갱신하고 B21–B27 및 후보별 역할·한계를 추가했다.
+- `research_topic.md`에도 현재 역할 경계와 후보 framing을 반영했다. Track A, Track B 센서 조건, 기존 2단계 확장과 미결 설계는 유지했다.
 
 ### 2026-09-14 — Track B 1단계 초점·GD2P 분석·DOI 참고문헌 보강
 
