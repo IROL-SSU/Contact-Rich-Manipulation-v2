@@ -4,7 +4,7 @@
 >
 > **문서 성격:** 현재 합의, 작업 가설, 미결정 사항, 그리고 의사결정 과정을 함께 보존하는 living hand-off document
 >
-> **최종 갱신:** 2026-09-13
+> **최종 갱신:** 2026-09-14
 
 ---
 
@@ -58,11 +58,11 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 ### 1.2 현재의 핵심 구분
 
 - **Track A:** 조작 시작 전에 Vision으로 파악한 초기 blocker pose를 이용하되, 조작 중에는 지속적인 시각 추적에 의존하지 않고 F/T·Tactile feedback으로 접촉을 조절하는 RL 문제
-- **Track B:** 조작 중 Vision을 지속적으로 사용해 blocker의 현재 pose와 geometry를 알고, Vision·F/T·Tactile을 함께 이용해 회전과 다양한 방향의 이동을 수행하는 RL 문제
+- **Track B:** 조작 중 Vision으로 현재 blocker pose와 근사 geometry를 지속적으로 제공받고, Vision·F/T·Tactile을 함께 사용한다. 우선 주어진 조작 목표를 실행하는 low-level 정책을 학습한 뒤, target 접근 공간 확보에 필요한 조작 목표 설정과 동작 전환까지 정책의 역할을 확장하는 RL 문제
 
 이를 가장 짧게 표현하면 다음과 같다.
 
-> **Track A는 제한된 시각 관측 아래의 contact adaptation을, Track B는 지속적인 시각·기하 관측 아래의 goal-conditioned multidirectional manipulation을 연구한다.**
+> **Track A는 제한된 시각 관측 아래의 contact adaptation을, Track B는 지속적인 시각·근사 기하 관측 아래의 목표 조건부 조작과 그 의사결정 통합을 연구한다.**
 
 ### 1.3 아직 연구 제목이나 Contribution을 확정한 것은 아님
 
@@ -74,6 +74,19 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 - F/T·Tactile을 사용하면 반드시 더 빠르거나 더 안전하다는 주장
 - 모든 방향과 회전을 하나의 범용 정책이 이미 처리할 수 있다는 주장
 - 현재 가정한 pose·geometry 정보가 실제 환경에서도 오차 없이 얻어진다는 주장
+
+### 1.4 최신 진행 방향 — Low-level 실행에서 조작 의사결정 통합으로
+
+**[2026-09-14 현재 합의]** 먼저 **주어진 조작 목표를 안정적으로 실행하는 능력**을 학습하고, 이후 **목적 달성에 필요한 조작 목표와 순서를 결정하는 능력**까지 정책의 역할을 확장한다. 현재 구체화 대상은 Track B다.
+
+1. **1단계:** 상위 판단기가 blocker와 목표 회전·이동을 제공한다. 정책은 `Approach / Contact Formation → Rotation → Push`를 기본 순서로 접촉을 형성·조절하며 명령을 실행한다.
+2. **2단계:** 상위 입력을 blocker와 확보해야 할 접근 공간 등의 목적 수준으로 추상화한다. 정책이 회전 필요성, 중간 자세, 이동 방향·거리, 동작 전환과 완료 판단 등을 수행하는 방향으로 확장한다.
+
+2단계의 첫 확장에서는 blocker 선택을 상위 판단기에 남긴다. 여러 blocker 중 선택·조작 순서를 결정하는 문제와 실제 target 인출 동작의 통합은 추가 확장으로 둔다.
+
+여기서 `end-to-end에 가까운 정책`은 **공간 확보 목적에서 조작 행동까지 연결하는 범위를 넓힌다**는 뜻이다. Raw sensor부터 robot action까지의 완전한 end-to-end architecture를 확정한 것이 아니다. 두 단계는 학습·연구 범위의 구분이며, 두 개의 논문 또는 특정 수의 독립 정책으로 나눈다는 뜻도 아니다.
+
+**Track A/B는 서로 다른 연구축이고, 1단계/2단계는 Track B를 중심으로 구체화한 진행 단계다. `Track A = 1단계`, `Track B = 2단계`로 해석하지 않는다.**
 
 ---
 
@@ -90,19 +103,25 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 | **Sweeping mode** | Blocker의 병진 이동을 주된 목표로 하는 task mode다. 현재 Track A 자체와 동의어가 아니다. |
 | **Vision-Free during manipulation** | 전체 시스템이 Vision을 전혀 쓰지 않는다는 뜻이 아니다. 조작 전 초기 인식에는 Vision을 쓰지만, 조작 중 지속적인 object-pose update에 의존하지 않는다는 뜻이다. |
 | **Omnidirectional** | Track B의 방향성을 설명하기 위한 잠정 용어다. 평면상의 전 방향인지, 로봇과 선반 제약을 반영한 방향 집합인지, SE(2) pose goal 전체인지 아직 정의되지 않았다. |
+| **Approximated geometry** | Perception module이 제공하는 근사 외형·점유 정보. 실제 국소 접촉 표면의 위치·법선·곡률까지 정확히 아는 것은 아니다. |
+| **Hand configuration** | 손목의 위치·자세와 손가락 관절 구성. 손목 6자유도와 손가락 제어 자유도는 별개다. |
+| **1단계 / 2단계** | 주어진 조작 목표 실행을 우선 학습한 뒤, 공간 확보를 위한 조작 의사결정까지 통합하는 연구 진행 단계. Track A/B와 구분한다. |
+| **End-to-end에 가까운 정책** | 세분화된 상위 지시를 줄이고 목적에서 행동까지 정책의 담당 범위를 확장한다는 현재 표현. Raw sensor 입력 또는 단일 neural network를 필수로 뜻하지 않는다. |
 
 `partially observable`도 두 층위로 구분해야 한다.
 
 1. **시스템 수준:** 최종 target object가 blocker에 의해 부분적으로 보이거나 가려져 있다.
 2. **Track A 조작 수준:** manipulation 도중 blocker 자체의 visual pose tracking도 로봇·Hand·주변 물체의 가림으로 제한될 수 있다.
 
-두 의미를 섞어 쓰지 않는다.
+두 의미를 섞어 쓰지 않는다. 또한 Track B의 continuous Vision은 정확한 접촉 형상·마찰·질량 분포까지 모두 관측된다는 뜻이 아니다. **Pose와 근사 geometry의 관측 가능성**과 **전체 물리 상태의 완전 관측 가능성**을 동일시하지 않는다.
 
 ---
 
 ## 3. 전체 시스템에서 두 Track의 위치
 
 ### 3.1 개념적 실행 흐름
+
+다음은 **1단계의 기본 역할 분담**이다. Track B의 2단계에서는 2번의 조작 목표 설정 및 조작 내부의 동작 전환·완료 판단 일부를 정책으로 옮긴다.
 
 1. Perception/VLM 등이 선반 장면을 관측한다.
 2. 상위 판단기가 target object를 찾거나 꺼내기 위해 이동해야 할 blocker와 조작 목표를 정한다.
@@ -111,9 +130,11 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 5. 장면을 다시 관측하고 target object의 노출 또는 접근 가능성을 판단한다.
 6. 필요하면 다른 blocker 조작 또는 target retrieval 단계를 수행한다.
 
-### 3.2 현재 Low-level 연구의 담당 범위
+### 3.2 우선 수행 범위와 이후 확장 범위
 
-**[현재 합의]** 핵심 연구 대상은 4번의 blocker manipulation policy다. 상위 VLM planning, 전체 탐색 순서 결정, 장거리 reaching, target retrieval 전체를 하나의 RL policy로 해결하려는 연구가 아니다.
+**[현재 합의]** 우선 수행할 1단계의 핵심은 4번의 blocker manipulation policy다. Track B의 기본 동작에는 물체 근처의 Approach와 contact formation을 포함하되, 상위 VLM planning, 전체 탐색 순서 결정, 장거리 reaching, target retrieval 전체를 처음부터 하나의 RL policy로 해결하지 않는다. Track A의 시작 시 접촉 여부와 contact formation 범위는 4절의 미결 상태를 유지한다.
+
+**[2026-09-14 현재 합의]** 이 경계를 연구의 영구적인 범위로 고정하지 않는다. Track B의 2단계에서는 공간 확보 목적에 필요한 회전·병진 목표 설정, 동작 선택·전환 및 작업 완료 판단 등을 정책의 역할로 통합한다. 최종 target 선택, 장거리 접근, 외부 안전 중단, 실제 인출 실행까지 모두 정책으로 이전하기로 한 것은 아니다.
 
 다만 Low-level policy와 외부 시스템 사이의 인터페이스는 명확해야 한다.
 
@@ -134,7 +155,7 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 - 초기 실험은 선반 지지면 위의 단일 blocker object로 단순화할 수 있다.
 - 주변 물체와의 multi-object contact 및 clutter interaction은 후속 확장으로 둘 수 있다.
 - Ground-truth object state는 simulation reward와 evaluation에 사용할 수 있으나, 각 Track에서 정의한 policy observation 조건을 위반해서는 안 된다.
-- 외부 중단, 다음 Skill 전환, 로봇 정지/명령 유지 등은 별도 execution layer의 책임으로 둘 수 있다.
+- 외부 안전 중단과 로봇 정지/명령 유지 등은 별도 execution layer의 책임으로 둘 수 있다. 조작 내부의 다음 동작 선택과 작업 완료 판단은 Track B 2단계에서 정책으로 통합할 대상이며, 외부 안전 중단과 구분한다.
 - 이동 Base는 전체 플랫폼의 일부일 수 있지만, 초기 실험에서 고정 운용할 수 있다.
 
 주의: Track A의 시작 상태가 이미 접촉한 상태인지, near-contact/non-contact 상태인지, contact formation을 얼마나 포함하는지는 **아직 미결**이다. 최신 설명에서 확정된 것은 planner가 `물체를 옆으로 밀어내기 위한 tool 위치`까지 접근시킨 후 policy가 시작된다는 수준이다.
@@ -248,101 +269,146 @@ Vision과 Low-level contact sensing은 서로 다른 주기로 병렬 사용할 
 
 ---
 
-## 5. Track B — Continuous Vision, Goal-Conditioned Multidirectional Manipulation
+## 5. Track B — Goal-Conditioned Manipulation에서 조작 의사결정 통합으로
 
-### 5.1 현재 문제 정의
+### 5.1 현재 문제 정의와 단계적 진행
 
-**[현재 합의]** Track B에서는 Vision을 manipulation 전 과정에서 지속적으로 사용한다. 따라서 연구 문제의 abstraction에서는 blocker object의 **현재 pose와 geometry를 지속적으로 알고 있다고 가정**한다.
+**[현재 합의]** 선반에서 target object를 꺼낼 수 있도록 blocker object를 재배치한다. 조작 중 continuous Vision으로 현재 pose와 근사 geometry를 제공받고, F/T·Tactile feedback으로 실제 접촉에 맞게 손 구성과 동작을 조정한다.
 
-Track B는 다음 능력을 목표로 한다.
+**[2026-09-14 현재 합의]** 연구를 다음 순서로 진행한다.
 
-- Blocker를 회전시키기
-- 단순 lateral axis에 한정하지 않고 다양한 방향으로 밀거나 이동시키기
-- 필요하면 회전과 translation을 결합하기
-- Vision, F/T sensor, tactile sensor를 모두 사용하기
+> **주어진 조작 목표의 실행 능력 확보 → 공간 확보 목적에 필요한 조작 목표 설정과 실행을 통합**
 
-이때 Vision이 main information source이고, F/T와 tactile은 접촉 상태와 force interaction을 보완하는 sub information source가 될 수 있다. 정확한 역할 분담과 fusion 방식은 아직 확정하지 않았다.
+| 구분 | 1단계: Low-level 조작 학습 | 2단계: 조작 의사결정까지 통합 |
+| --- | --- | --- |
+| 핵심 질문 | 주어진 회전·병진 목표를 안정적으로 실행할 수 있는가? | 공간 확보에 필요한 조작 목표와 순서를 스스로 결정할 수 있는가? |
+| 상위 입력 | 조작할 blocker, 목표 회전, 이동 방향·거리 | 조작할 blocker와 확보해야 할 접근 공간 또는 경로 |
+| 정책 역할 | 접촉 형성·조절, 요구된 물체 운동 실행 | 회전 필요성, 중간 자세, 이동 방향·거리, 동작 전환 등을 결정하고 실행 |
+| 동작 순서 | Approach → Rotation → Push를 기본 순서로 사용 | 필요한 동작과 순서를 상황에 따라 선택하는 방향 |
+| 주된 평가 수준 | 조작 정확도와 접촉 안정성 | 접근 공간 확보 효과와 조작 효율·안정성 |
 
-현재 문제를 한 문장으로 쓰면 다음과 같다.
+두 단계의 차이는 행동 종류의 추가보다 **상위 판단기가 제공하던 조작 지시를 정책이 얼마나 스스로 결정하는가**에 있다. Lateral·depth·diagonal translation과 회전을 다루는 기존 방향은 유지하며, 정확한 goal 범위와 curriculum은 미결이다. 학습 알고리즘, network 수, policy 호출 구조 및 최종 Contribution은 아직 확정하지 않았다.
 
-> **지속적으로 관측되는 blocker의 pose와 geometry, 그리고 contact feedback을 이용해, RL policy가 blocker를 회전시키고 다양한 방향의 manipulation goal을 수행할 수 있는가?**
+### 5.2 관측 조건과 센서 역할
 
-### 5.2 관측 조건
+**[현재 합의]** Vision은 manipulation 전 과정에서 사용하며, F/T와 tactile도 함께 사용한다. Geometry는 정확한 전체 shape가 아니라 **근사 형상·점유 정보**로 구체화한다.
 
-- **[현재 합의]** 조작 중 지속적인 Vision
-- **[현재 합의]** 현재 blocker pose
-- **[현재 합의]** Blocker geometry
-- **[현재 합의]** F/T sensor
-- **[현재 합의]** Tactile sensor
-- **[작업 가설]** Robot proprioception
+| 정보 | 역할 | 상태 |
+| --- | --- | --- |
+| 현재 blocker pose | 회전·병진 목표 오차와 진행 상태 확인 | 현재 합의 |
+| 근사 geometry | 접근 방향과 초기 hand configuration 준비 | 현재 합의; 표현 형식은 미결 |
+| Tactile | 실제 접촉 위치·분포를 참고해 손 구성과 접촉 배치 조정 | 사용은 현재 합의; 실제 센서에서 얻을 물리량은 미결 |
+| Wrist F/T | 손에 전달되는 합력·모멘트를 참고해 전체 접촉 부하 조절 | 현재 합의 |
+| Robot/hand state | EEF pose와 관절 구성·운동 상태 확인 | 기본 관측 후보; 정확한 항목은 미결 |
 
-중요한 최신 수정은 다음과 같다.
+접촉 전에는 해당 물체의 tactile 신호가 없으므로 **근사 geometry로 준비하고, 접촉 후 실제 feedback으로 보정**한다. 국소 법선·전단력·미끄러짐 등을 센서가 직접 제공한다고 임의로 가정하지 않는다.
 
-> Track B는 초기 pose와 geometry만 받은 뒤 open-loop로 조작하는 문제가 아니다. Vision을 계속 사용하여 pose와 geometry를 지속적으로 안다는 조건이다.
+근사 형상과 실제 접촉 표면, perception 오차 및 미지 물성의 불확실성이 남으므로, continuous Vision을 사용한다는 이유만으로 전체 문제를 fully observable이라고 표현하지 않는다. Pose update rate, noise, geometry representation, sensor fusion 및 history 사용 여부는 미결이다.
 
-`안다`는 현재의 연구 abstraction을 뜻한다. 실제 perception noise, occlusion, update rate, geometry representation을 어느 수준으로 모델링할지는 별도 미결 사항이다.
+### 5.3 1단계 — 주어진 조작 목표를 실행하는 Low-level policy
 
-### 5.3 목표 동작의 범위
+**[현재 합의]** 상위 판단기가 blocker와 목표 회전·이동을 제공하고, 정책은 물체 근처의 접근부터 접촉 조절과 조작 실행을 담당한다. 기본 순서는 `Approach / Contact Formation → Rotation → Push`다.
 
-Track B는 `물체를 먼저 회전시킨 뒤 다시 lateral 방향으로만 미는 policy`에 머물러서는 안 된다. 회전을 이용하더라도 최종적으로 다양한 방향의 이동을 수행할 수 있어야 한다.
+| 단계 | 물체에 대한 목표 | Hand의 역할 |
+| --- | --- | --- |
+| Approach / Contact Formation | 후속 조작을 수행할 접촉 형성 | 근사 geometry로 손목 pose·손가락 구성을 준비하고 실제 접촉으로 보정 |
+| Rotation | 요구된 orientation 달성 | 필요한 회전 모멘트를 만들도록 접촉 위치와 힘 분포 조절 |
+| Push / Translation | 목표 위치 도달 및 요구 orientation 유지 | 병진에 적합하게 접촉을 재조정하고 방향·속도·손 구성을 보정 |
 
-현재 고려 가능한 manipulation mode는 다음과 같다.
+상위 판단기는 **왜 이 blocker를 어느 방향으로 움직일지** 결정하고, 정책은 **접촉 불확실성 아래에서 그 움직임을 어떻게 수행할지** 학습한다. Rotation/Translation의 목표는 물체 상태를 뜻하며, 손목 자세 목표와 구분한다.
 
-- Lateral translation
-- Depth-direction translation
-- Diagonal translation
-- Yaw rotation
-- Rotation followed by translation
-- Translation and rotation이 결합된 평면 조작
+**회전 후 병진의 동기:** 원하는 이동 방향으로 힘을 전달하기 유리한 물체 자세와 접촉 배치를 먼저 확보한다. 접촉면이 이동 방향에 수직인 자세는 유용한 후보지만, 접촉 위치·마찰·힘의 작용선도 물체 운동에 영향을 주므로 면의 정렬만으로 회전 없는 병진을 보장하지 않는다. 손의 접근 위치 변경만으로 충분한지, 선반·로봇 제약 때문에 물체 회전이 필요한지는 task scenario에서 검증할 사항이다.
 
-다만 이 목록 전체를 하나의 policy가 즉시 모두 수행해야 한다는 결론은 아직 없다. `Omnidirectional`의 정확한 범위와 단계적 curriculum은 추후 결정한다.
+**[작업 가설 / 설계안]** 회전이 불필요한 명령은 회전량 0으로 처리할 수 있도록 한다. 회전에 유효한 접촉이 병진에도 유효하다고 고정하지 않고, 손목·손가락 자세와 접촉 위치를 재조정할 여지를 둔다.
 
-### 5.4 Method 방향 — Track A보다 덜 구체화됨
+**상위 명령 인터페이스 설계안**
 
-현재 Method의 상위 방향은 다음과 같다.
+- 회전각은 `Δθ`로 표기하고 각속도 `ω`와 구분한다. 회전축 방향과 회전각의 기준 좌표계를 명시한다.
+- 최종 orientation만 요구할지, 특정 pivot 축 주위의 궤적까지 요구할지 구분한다. 고정 pivot을 요구한다면 축 방향 외에 위치도 필요하다.
+- 이동 방향·거리 또는 최종 position을 입력하는 방식은 미결이다. 지정 위치 도달이 목적이면 명령 시점 위치 `p₀`, 방향 단위벡터 `d̂`, 거리 `s`를 이용해 `p_g = p₀ + s d̂`로 목표를 고정하는 안이 있다.
+- 위 안에서는 회전 중 물체가 이동하더라도 `p_g`를 유지하고, Push 단계에서 현재 위치부터 남은 변위를 계산한다.
+- 요구 orientation이 최종 배치 조건인지, 병진을 돕기 위한 중간 자세인지는 미결이다.
 
-- Goal-conditioned RL manipulation
-- 지속적인 visual pose/geometry feedback 사용
-- Vision을 주된 상태 정보로 활용
-- F/T·Tactile을 contact interaction 보조 정보로 활용
-- 다양한 translation direction 및 rotation goal을 다루는 방향으로 확장
+### 5.4 2단계 — 공간 확보 목적에서 조작 의사결정을 통합
 
-그러나 무엇이 핵심 Method novelty가 될지는 아직 결정하지 않았다. 다음은 후보일 뿐이다.
+**[현재 합의]** 1단계 조작 능력을 확보한 뒤, 상위 판단기의 일부 역할을 정책으로 옮긴다. 상위 입력을 세부 motion instruction에서 목적 수준으로 추상화한다.
 
-- Goal representation
-- Pose/geometry-conditioned policy
-- Vision–F/T–Tactile multimodal fusion
-- Rotation과 translation을 연결하는 strategy learning
-- Goal distribution 또는 curriculum 설계
-- 물체 geometry에 따른 contact strategy 변화
+> 1단계: “이 물체를 지정 각도만큼 회전시키고, 지정 방향으로 지정 거리만큼 이동시켜라.”
+>
+> 2단계: “이 물체를 조작해 target으로 접근할 공간을 확보하라.”
 
-### 5.5 Contribution 방향 — 추가 구체화 필요
+정책으로 통합할 의사결정의 범위는 다음과 같다. 정확한 통합 순서와 구현은 미결이다.
 
-현재 가능한 Contribution 서술의 골격은 다음과 같다.
+- 회전 필요 여부와 바로 Push할 수 있는지 판단
+- 후속 이동에 적합한 중간 orientation과 접촉 배치 결정
+- 이동 방향·거리 결정
+- 회전에서 Push로 전환할 시점과 필요한 동작 순서 결정
+- 접촉 재형성, 접촉 전환, 추가 조작 필요 여부 판단
+- 공간 확보가 충분한지와 작업 완료 여부 판단
 
-> **지속적인 pose·geometry 관측과 multimodal contact feedback을 이용하여, blocker를 회전시키고 여러 방향으로 이동시키는 goal-conditioned manipulation policy를 학습한다.**
+1단계에서 상위 입력이었던 회전량·회전축·이동 목표는 2단계에서는 정책의 의사결정 대상이 될 수 있다. 이를 명시적인 subgoal로 출력할지, 행동 생성 과정에 암묵적으로 통합할지는 미결이다.
 
-하지만 이 문장은 아직 연구 결과가 아니라 방향 설명이다. 다음 중 무엇을 중심 기여로 삼을지는 추가 논의와 feasibility 결과가 필요하다.
+**역할 분담의 경계:** 첫 확장에서는 조작할 blocker 선택을 상위 판단기에 남긴다. 여러 blocker 중 선택과 조작 순서까지 학습하는 문제는 후속 확장으로 둔다. 실제 target 인출 동작과 장거리 reaching 전체를 이번 2단계에 포함하기로 한 것은 아니다. 정책의 작업 완료 판단과 외부 execution layer의 안전 중단도 구분한다.
 
-- 하나의 policy가 다양한 방향·거리·회전 goal에 대응하는 능력
-- Geometry에 따라 서로 다른 접촉 또는 회전 전략을 선택하는 능력
-- Vision을 주 정보로 하고 F/T·Tactile을 보조 정보로 사용하는 multimodal policy
-- 제한된 선반 공간에서 단순 lateral sweeping보다 다양한 blocker 재배치를 가능하게 하는 능력
+**필요한 관측 확장:** Blocker pose와 geometry만으로는 어느 재배치가 target 접근에 유효한지 판단하기 어렵다. Target 위치, 확보할 접근 영역, 주변 물체와 선반의 점유·공간 제약 등 **목적과 공간적 유용성을 판단할 정보**가 필요하다. 실제로 어떤 정보와 표현을 제공할지는 미결이며, 시뮬레이션의 전체 정답 장면을 자동으로 policy observation에 넣지 않는다.
 
-### 5.6 Track B에서 나중에 구체화할 사항
+**End-to-end의 현재 의미:** 목적에서 조작 행동까지 정책의 역할을 넓힌다는 방향이다. 외부 perception이 추정한 pose·geometry를 입력받는 정책을 raw sensor부터 action까지의 완전한 end-to-end 학습이라고 부르지 않는다. 단일 network나 VLA 학습을 필수 구조로 확정하지 않는다.
 
-아래 질문 역시 backlog이며 즉시 모두 결정할 필요는 없다.
+### 5.5 두 단계를 연결하는 설계 원칙
 
-- Goal을 direction/distance로 표현할지, target pose로 표현할지
-- `Omnidirectional`을 평면 전 방향으로 볼지, 제한된 feasible direction set으로 볼지
-- Rotation goal과 translation goal을 별도 mode로 둘지 통합할지
-- 회전 후 translation 순서를 지정할지, policy가 전략을 선택하게 할지
-- RGB/RGB-D, estimated pose, geometric feature 중 어떤 Vision representation을 사용할지
-- Geometry를 dimension, shape class, bounding box, point cloud 등 어떤 형태로 제공할지
-- Pose·geometry estimation error를 어느 단계부터 반영할지
-- F/T·Tactile이 구체적으로 어떤 실패를 보완해야 하는지
-- Sensor modality ablation을 어떻게 설계할지
-- Track B의 최종 Method novelty와 Contribution
+**[현재 합의]** 1단계에서 얻은 조작 능력을 후속 의사결정 통합의 기반으로 활용한다.
+
+- 특정 고정 명령만 실행하도록 제한하지 않고 회전량·이동 방향·거리 등의 goal conditioning을 고려한다.
+- Hand configuration을 Approach에서 고정하지 않고 전체 조작 중 조정할 수 있도록 설계한다.
+- 동작 완료 여부, 실행 상태 및 필요한 접촉 상태를 후속 의사결정과 연결할 수 있게 한다. 정확한 interface는 미결이다.
+- 1단계의 기본 동작 순서를 2단계에서도 필수 순서로 고정하지 않는다.
+- 손목 6자유도와 손가락 제어 자유도를 구분한다. Tactile 사용 자체가 손목 6자유도 개방을 필수로 만들지는 않는다. Joint 관측과 joint action도 별개다.
+
+**[작업 가설 / 구조 후보]** 다음 두 경로를 열어 둔다.
+
+1. 학습된 low-level 정책을 호출하는 상위 정책을 추가한다.
+2. 기존 정책을 초기값으로 사용해 조작 의사결정과 실행을 함께 학습한다.
+
+Policy 개수, parameter freeze 여부, 공동 fine-tuning 방식, memory 구조 및 학습 알고리즘은 미결이다. 연구의 두 단계와 세 가지 동작 구분을 network 수 또는 논문 수와 동일시하지 않는다.
+
+### 5.6 Reward 설계 방향
+
+다음은 **[작업 가설 / 설계안]**이며, 확정된 수식이나 구현이 아니다.
+
+| 범위 | 보상 목표 후보 | 주의점 |
+| --- | --- | --- |
+| 1단계 Approach | 접근 진전, 후속 조작에 유효한 접촉 형성 | 근사 geometry에서 만든 특정 손 자세를 실제 정답처럼 강제하지 않음 |
+| 1단계 Rotation | 목표 orientation 오차 감소 | 필요한 회전 모멘트까지 일괄 억제하지 않음; 허용 위치 이탈은 미결 |
+| 1단계 Push | 목표 position 오차 감소, orientation 및 경로 유지 | 단순 이동량 증가만 보상하지 않음 |
+| 공통 접촉 안정성 | 과도한 부하·충격, 전도·낙하, 불필요한 동작 억제 | 필요한 재접촉과 접촉 전환을 방해하지 않음 |
+| 2단계 목적 달성 | 접근 공간 확보, 불필요한 조작 감소, 안정적인 실행 | 회전·병진 정확도만으로 공간적 유용성을 대체하지 않음 |
+
+Tactile은 관측으로 활용할 수 있으며 반드시 reward에 직접 들어가야 하는 것은 아니다. 접촉 면적·압력·활성 센서 수를 무조건 최대화하지 않는다. Manipulability는 후속 동작에 필요한 로봇 운동 여유를 확보하는 보조항으로 검토하되, Jacobian 기반 운동학적 manipulability와 물체 접촉의 조작 가능성을 구분한다.
+
+단계별 reward 활성화, 동작 전환 gate, 완료·실패 threshold와 접근 공간의 정량적 정의는 미결이다. 평가 기준은 10.2절에서 단계별로 구분한다.
+
+### 5.7 Contribution 후보와 주장 범위
+
+현재 연구 방향을 한 문장으로 쓰면 다음과 같다.
+
+> **접촉 기반 low-level 조작 정책을 먼저 학습하고, 이후 target 접근 공간 확보에 필요한 조작 목표 설정과 동작 전환까지 통합하는 목표 조건부 정책으로 확장한다.**
+
+검증할 **[작업 가설]**는 다음과 같다.
+
+- 1단계: 근사 형상으로 준비한 손 구성과 접촉 배치를 F/T·Tactile로 수정하면, 실제 접촉 형상 불일치 아래에서 목표 조작의 정확도·안정성이 개선되는가?
+- 2단계: 학습된 실행 능력을 기반으로 중간 목표와 동작 전환을 결정하면, 공간 확보 성공과 조작 효율을 개선할 수 있는가?
+
+단순히 센서를 함께 쓰거나 세 동작을 순서대로 학습한다는 사실만으로 novelty를 확정하지 않는다. 역할을 정책으로 통합하면 반드시 성능이 개선된다는 주장도 하지 않는다. 비교 방법과 최종 Contribution, 각 단계의 논문화 범위는 미결이다.
+
+### 5.8 현재 설명용 조작 예시
+
+UR5e + Inspire RH56E2 hand가 앞쪽 시리얼 박스를 조작해 뒤쪽 target의 인출 경로를 확보하는 예시를 사용한다. Approach에서는 모서리에 손가락을 거는 hooking을 표현하고, 회전 후 좁은 측면의 법선 방향으로 Push한다. 손바닥과 손가락 안쪽 패드가 물체 측면을 향해야 한다.
+
+Top view, 양옆이 개방된 선반, 주변 물체 배치는 **설명용 그림의 구성**이다. 모든 학습 episode를 시리얼 박스·hooking·동일한 회전각·동일한 선반 구조로 제한한 합의는 아니다. 뒤쪽 target 인출은 최종 목적이며, 그림 속 policy가 직접 수행하는 동작은 blocker의 재배치다.
+
+### 5.9 Track B에서 나중에 구체화할 사항
+
+진행 방향은 정했지만 전체 세부 명세를 한 번에 확정하지 않는다. 핵심 미결 사항은 13.2절의 Track B backlog에서 관리한다. 특히 1단계 goal·action·전환 기준과 2단계 공간 확보 목적의 표현·평가 기준을 구분해 구체화한다.
 
 ---
 
@@ -353,15 +419,15 @@ Track B는 `물체를 먼저 회전시킨 뒤 다시 lateral 방향으로만 미
 | 구분 | Track A | Track B |
 | --- | --- | --- |
 | 응용 시나리오 | 가려진 target을 위해 blocker 조작 | 가려진 target을 위해 blocker 조작 |
-| Track 구분 기준 | 제한된 시각 조건에서 contact sensing으로 적응 | 알려진 visual/geometric state에서 다양한 goal 수행 |
+| Track 구분 기준 | 제한된 시각 조건에서 contact sensing으로 적응 | 지속적인 pose·근사 geometry 관측 아래 조작 실행 및 의사결정 통합 |
 | 초기 Vision | 사용 | 사용 |
 | 조작 중 Vision | 지속적 blocker-pose tracking에 의존하지 않음 | 지속적으로 사용 |
 | 조작 중 pose | 직접적인 visual update 없음 | 지속적으로 알고 있다고 가정 |
-| Geometry | 사용 여부 미결 | 지속적으로 알고 있다고 가정 |
+| Geometry | 사용 여부 미결 | 근사 geometry를 지속적으로 제공받음; 정확한 국소 접촉 형상은 불확실 |
 | F/T·Tactile | 주된 closed-loop feedback | 사용하며, Vision에 대한 보조 정보가 될 수 있음 |
-| 현재 중심 문제 | Partial observability와 contact adaptation | Goal-conditioned multidirectional/rotational manipulation |
+| 현재 중심 문제 | Partial observability와 contact adaptation | 주어진 조작 목표 실행 → 공간 확보를 위한 목표 설정·동작 전환 통합 |
 | 동작 종류 | 특정 동작 하나로 Track을 정의하지 않음 | 특정 동작 하나로 Track을 정의하지 않음 |
-| 구체화 수준 | 문제와 초기 contribution 방향이 비교적 명확 | 문제·Method·Contribution 추가 구체화 필요 |
+| 구체화 수준 | 문제와 초기 contribution 방향이 비교적 명확 | 2단계 진행 방향과 역할 분담 구체화; architecture·goal·reward·최종 Contribution은 미결 |
 
 ### 6.2 반드시 피해야 할 오해
 
@@ -378,6 +444,8 @@ Track B는 `물체를 먼저 회전시킨 뒤 다시 lateral 방향으로만 미
 [`docs/README.md`](../README.md)에서는 두 Track에서 insight를 확보한 뒤 `Vision-Free Goal-conditioned Contact Manipulation`으로 통합하는 가능성을 제시했다.
 
 그러나 최신 설명에서 Track B는 continuous Vision을 명확한 조건으로 갖는다. 따라서 완전한 Vision-Free 통합은 **현재 확정된 최종 endpoint가 아니라 과거에 제안된 장기 가능성**으로 남긴다. 향후 두 Track을 어떤 수준에서 통합할지는 다시 논의해야 한다.
+
+**2026-09-14에 합의한 2단계 확장은 Track B의 실행 능력에서 조작 의사결정으로 역할을 넓히는 것이며, Track A/B의 통합이나 Vision-Free 전환을 뜻하지 않는다.**
 
 ---
 
@@ -466,19 +534,23 @@ Sweeping 중 회전을 억제하거나 Handling에서 적절한 접촉 위치를
 ### 9.2 최신 Track별 상태
 
 - **Track A:** 초기 blocker pose는 Vision으로 안다. Geometry를 policy에 제공할지는 최신 논의에서 확정하지 않았다.
-- **Track B:** blocker의 current pose와 geometry를 continuous Vision을 통해 지속적으로 안다고 가정한다.
+- **Track B:** continuous Vision을 통해 blocker의 current pose와 **근사 geometry**를 지속적으로 제공받는다. Geometry availability는 유지하되 실제 접촉 표면까지 정확히 아는 조건으로 해석하지 않는다.
 
 따라서 `Geometry가 두 Track 모두에서 미지다` 또는 `Geometry 입력은 두 Track 모두 사용하지 않는다`는 이전 표현은 현재 유효하지 않다.
 
-### 9.3 여전히 남아 있는 미결 사항
+### 9.3 근사 형상과 실제 형상의 불일치
 
-Track B에서 geometry의 **availability assumption**은 정해졌지만 아래 사항은 미결이다.
+**[현재 합의]** Perception이 제공한 근사 geometry만으로 정확한 접촉 자세를 결정하기 어려운 조건에서 F/T·Tactile로 조작을 보정하는 방향을 다룬다.
 
-- Shape class와 dimensions로 줄지
-- Bounding box, point cloud, mesh 또는 learned feature를 사용할지
-- 정확한 ground truth에 가까운 값으로 시작할지
-- Perception error와 occlusion을 어느 단계에서 반영할지
-- Geometry conditioning이 실제 성능과 strategy에 어떤 영향을 주는지
+**[작업 가설 / 학습 구성안]** 유사한 bounding box를 갖지만 실제 외부 접촉 표면이 다른 물체군을 사용해 근사 형상과 실제 접촉 형상의 불일치를 검증한다. 외형이 동일하고 내부 구조·질량 분포만 다른 물체군은 질량·무게중심·관성 변화에 대한 적응 실험으로 구분한다. 두 종류의 불확실성을 같은 문제로 취급하지 않는다.
+
+### 9.4 여전히 남아 있는 미결 사항
+
+- Bounding box, dimension/shape class, point cloud, mesh 또는 feature 중 어떤 근사 표현을 제공할지
+- 실제 표면 형상 차이, perception bias/noise, occlusion을 어떤 분포로 구성할지
+- 초기 feasibility에서 ground truth pose를 사용할 범위와 perception 오차 도입 시점
+- 2단계에 필요한 target·주변 물체·선반 점유 정보를 어떤 표현으로 제공할지
+- Geometry conditioning 및 contact feedback의 효과를 분리할 실험 구성
 
 ---
 
@@ -498,16 +570,25 @@ Track B에서 geometry의 **availability assumption**은 정해졌지만 아래 
 - Proprioception-only / F/T-only / tactile-only / combined sensor ablation
 - History length 또는 memory 구조에 따른 차이
 
-### 10.2 Track B 후보 평가축
+### 10.2 Track B의 단계별 후보 평가축
 
-- Direction 및 distance goal success
-- Position/orientation error
-- 학습 가능한 direction range
-- Translation에서 rotation 또는 combined SE(2) goal로의 확장성
-- Object geometry 변화에 대한 generalization
-- Vision-only와 Vision+contact sensing 비교
-- Goal과 geometry에 따라 나타나는 contact/rotation strategy
-- 제한된 선반 공간에서 target visibility 또는 접근 가능 영역의 변화
+**1단계 — 요구된 조작 목표의 실행 능력**
+
+- 최종 position/orientation error, 목표 회전·병진 성공률
+- 접근·접촉 형성 성공, 접촉 손실·복구와 단계 전환 실패
+- Peak/mean force, 병진 중 불필요한 회전, 전도·낙하와 수행 시간
+- 다양한 방향·거리·회전 목표 및 근사/실제 형상 불일치에 대한 robustness
+- 공통 Vision·robot-state 조건에서 F/T-only, tactile-only, combined contact sensing의 추가 효과
+- 고정 hand configuration과 조작 중 조정하는 구성 비교
+
+**2단계 — 공간 확보 목적에 맞는 의사결정과 실행**
+
+- 확보된 접근 공간, 접근 경로의 유효성, target 인출 가능 조건 충족
+- 필요한 조작 횟수, 불필요한 회전·접촉 전환, 전체 수행 시간
+- 주변 배치와 공간 제약이 달라졌을 때의 목표 설정·동작 선택 효과
+- 위 공간 확보 성과와 함께 측정한 접촉 부하·전도·낙하 등 실행 안정성
+
+**[미결]** Clearance/retrievability의 정량적 정의, 비교 baseline, threshold, 평가 protocol은 아직 확정하지 않았다. 접근 공간 추정 지표와 실제 target 인출 실행 성공률은 구분해서 보고한다.
 
 ### 10.3 Skill metric과 시스템 metric의 분리
 
@@ -583,6 +664,30 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ---
 
+### Stage 5 — Track B의 근사 형상과 세 단계 조작 구체화
+
+- **기록 날짜:** 2026-09-14
+- **논의 배경:** Continuous Vision 조건에서 Hand Configuration 준비, Rotation, Translation을 연결하는 구체적인 조작 문제를 정리했다.
+- **이전 해석:** Track B는 pose·geometry를 안다는 availability 조건과 다양한 방향·회전 목표만 정의되어 있었고, 동작 구성과 geometry 정밀도는 열려 있었다.
+- **새 결론:** 근사 geometry와 실제 접촉 형상의 차이를 F/T·Tactile로 보완하며 `Approach / Contact Formation → Rotation → Push`를 기본 동작으로 다룬다. 목적은 앞쪽 blocker를 재배치해 뒤쪽 target을 꺼낼 공간을 확보하는 것이다.
+- **변경 이유:** 손 구성 준비와 접촉 후 보정의 역할을 구분하고, 회전·병진이 최종 공간 확보에 기여하는 관계를 구체화하기 위함이다.
+- **영향:** Track B 문제 정의·관측·reward 후보·설명 그림. Track A의 관측 조건과 미결 상태는 변경하지 않는다.
+- **남은 질문:** 목표 orientation의 의미, 정확한 action·geometry 표현, contact formation·전환·종료 기준. Hooking과 좁은 면 Push는 현재 설명용 예시이며 모든 물체의 유일한 전략으로 고정하지 않는다.
+
+### Stage 6 — Low-level 실행을 우선 학습한 뒤 조작 의사결정 통합으로 확장
+
+- **날짜:** 2026-09-14
+- **논의 배경:** 사용자가 low-level action 학습을 먼저 진행하고, 이후 상위 추론기의 역할 일부를 정책으로 옮기는 end-to-end에 가까운 확장을 제안했다. 정리된 방향에 동의하고 본 문서 업데이트를 요청했다.
+- **이전 해석:** 상위 판단기는 조작 목표를 정하고 low-level policy는 이를 실행한다는 범위가 연구 전체의 고정된 경계처럼 읽힐 수 있었다.
+- **새 결론 [현재 합의]:** 1단계에서 주어진 회전·병진 목표의 접촉 실행 능력을 확보한다. 2단계에서는 공간 확보 목적을 입력받아 회전 필요성, 중간 자세, 이동 방향·거리, 동작 선택·전환과 완료 판단 등을 정책이 담당하는 방향으로 확장한다.
+- **변경 이유:** 실행 능력의 feasibility를 먼저 확보하고 이를 바탕으로 조작 목적에 맞는 의사결정을 학습하기 위함이다. 조작 제어와 의사결정의 모든 난점을 처음부터 동시에 해결하지 않는다.
+- **역할 경계:** 2단계의 첫 확장에서도 blocker 선택은 상위 판단기에 남긴다. Multi-blocker 선택·순서, 장거리 reaching과 실제 target 인출 전체의 통합은 추가 확장이다.
+- **영향:** 1절 요약, 3절 역할 분담, 5절 Track B, 9절 geometry, 10절 단계별 평가, 12절 대체 관계, 13절 결정·backlog, 14절 후속 작업 지침.
+- **남은 질문:** 1단계 goal/action/전환 규격, 2단계 목적·장면 표현과 success metric, hierarchical 호출 또는 공동 학습 구조, parameter 재사용·freeze·fine-tuning, novelty와 논문화 범위.
+- **해석상 주의:** 두 단계는 Track A/B와 대응하지 않는다. `End-to-end에 가까움`은 정책 역할의 확장을 뜻하며 raw sensor→action 단일 network를 확정한 것이 아니다. 성능 개선은 검증할 가설이다.
+
+---
+
 ## 12. 이전 자료와 최신 결론의 충돌 정리
 
 | 이전 기록 | 최신 상태 | 처리 |
@@ -596,6 +701,13 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | 장기적으로 반드시 Vision-Free goal-conditioned policy로 통합 | 이전 가능성일 뿐 최신 endpoint로 재확인되지 않음 | **[과거 제안]** |
 | Vision-Free이면 더 빠르고 적응적임 | 실험으로 검증할 가설 | **[작업 가설]** |
 | 넓은 workspace에서 EEF를 uniform randomize | 실제 planner 접근 오차 분포를 반영하는 방향 | 이전 randomization 해석은 **[대체됨]** |
+| Track B는 geometry를 안다는 availability만 정의 | 근사 geometry를 제공받고 정확한 접촉 표면의 불확실성은 남음 | **[구체화됨]** continuous Vision 조건은 유지 |
+| Vision이 있으므로 전체 상태가 fully observable | Pose·근사 geometry 관측과 접촉·물성의 완전 관측은 별개 | **[대체됨]** |
+| 상위 목표 설정과 low-level 실행의 경계를 연구 전체에 고정 | 1단계는 실행을 우선 학습하고 2단계는 목표 설정·동작 전환 일부까지 통합 | **[대체됨]** 우선 범위와 확장 범위를 분리 |
+| Approach → Rotation → Push를 모든 단계의 필수 순서로 해석 | 1단계 기본 순서이며 2단계에서는 필요 동작과 순서를 결정하는 방향 | **[범위 한정]** |
+| 피해야 할 오해: End-to-end에 가까운 확장 = raw sensor→action 단일 network | 목적에서 행동까지 역할 통합; perception·network·학습 구조는 미결 | **[해석 제한]** |
+| 회전·병진 정확도로 연구 전체의 성공 평가 | 1단계는 실행 성능, 2단계는 공간 확보 효과와 실행 안정성을 평가 | **[확장]** |
+| 피해야 할 오해: Track A/B = 1단계/2단계 | 연구축과 진행 단계는 별개; 이번 구체화는 Track B 중심 | **[해석 제한]** |
 
 ---
 
@@ -609,11 +721,18 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-002 | 현재 합의 | Track A/B는 서로 다른 동작이 아니라 유사한 시나리오의 서로 다른 연구 문제다. |
 | D-003 | 현재 합의 | Track A는 initial blocker pose에 Vision을 사용하고 manipulation 중 지속적인 visual pose update에 의존하지 않는다. |
 | D-004 | 현재 합의 | Track A의 manipulation feedback은 F/T와 tactile이 중심이며 RL policy를 학습한다. |
-| D-005 | 현재 합의 | Track B는 continuous Vision을 사용하며 current blocker pose와 geometry를 지속적으로 안다고 가정한다. |
+| D-005 | 현재 합의 · 2026-09-14 구체화 | Track B는 continuous Vision으로 current blocker pose와 근사 geometry를 제공받는다. 정확한 국소 접촉 형상까지 안다는 뜻은 아니다. |
 | D-006 | 현재 합의 | Track B는 Vision, F/T, tactile을 모두 사용하며 Vision이 main source가 될 수 있다. |
 | D-007 | 현재 합의 | Track B는 rotation과 다양한 방향의 translation을 지향하며 lateral pushing에만 한정하지 않는다. |
 | D-008 | 현재 합의 | Vision 조건과 Contribution 서술은 계속 구체화할 연구 framing이며 절대 전제로 고정하지 않는다. |
 | D-009 | 현재 합의 | 모든 세부 설계를 지금 한 번에 확정하지 않고 필요한 순서대로 구체화한다. |
+| D-010 | 현재 합의 · 2026-09-14 | Low-level 조작 실행 능력을 우선 학습한 뒤, 조작 목표 설정과 동작 전환 등 상위 판단기의 일부 역할을 정책으로 통합한다. 현재 구체화 대상은 Track B다. |
+| D-011 | 현재 합의 · 2026-09-14 | 1단계는 상위에서 blocker·목표 회전·이동을 제공하고 Approach / Contact Formation → Rotation → Push를 기본 순서로 수행한다. |
+| D-012 | 현재 합의 · 2026-09-14 | 2단계는 접근 공간 확보 목적에서 회전 필요성·중간 자세·이동 목표·동작 전환·완료 판단 등을 결정하는 방향이며, 정확한 통합 순서는 미결이다. |
+| D-013 | 현재 합의 · 2026-09-14 | 2단계의 첫 확장에서도 blocker 선택은 상위 판단기에 남긴다. Multi-blocker 선택·순서와 실제 target 인출 전체의 통합은 추가 확장이다. |
+| D-014 | 현재 합의 · 2026-09-14 | 1단계는 목표 조작 실행 성능을, 2단계는 target 접근 공간 확보 효과와 실행 안정성을 구분해 평가한다. |
+| D-015 | 현재 합의 · 2026-09-14 | End-to-end에 가까운 확장은 목적→행동의 역할 통합을 의미하며 raw sensor 입력, 단일 network, VLA 또는 특정 학습 알고리즘을 확정하지 않는다. |
+| D-016 | 현재 합의 · 2026-09-14 | Track A/B와 1단계/2단계는 별개다. 이번 변경이 Track A의 관측 조건 변경이나 두 Track의 Vision-Free 통합을 뜻하지 않는다. |
 
 ### 13.2 미결 Backlog
 
@@ -638,15 +757,30 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - F/T·Tactile representation 및 fusion 방식
 - 핵심 sensor ablation과 평가 metric
 
-#### Track B
+#### Track B — 1단계 우선 명세
 
-- `Omnidirectional`의 정확한 정의
-- Goal representation과 curriculum
-- Rotation/translation을 하나의 policy에 통합할 범위
-- Continuous Vision과 geometry의 representation
-- Pose/geometry noise 및 occlusion을 모델링할 범위
-- F/T·Tactile이 Vision을 보완하는 구체적 역할
-- 최종 Method novelty와 Contribution
+- Goal 표현: 회전각·축 / 목표 orientation, 방향·거리 / 목표 position, 기준 좌표계·시점
+- Orientation이 최종 배치 조건인지 병진을 위한 중간 자세인지
+- 평면 병진·yaw부터 시작할지와 feasible direction/rotation 범위
+- 물체 근처 시작 pose 분포, contact formation 범위, 손목·손가락 action 범위
+- 근사 geometry와 robot state, F/T·Tactile observation 및 history/fusion 표현
+- 단계 전환·완료·실패 기준과 reward 구성
+- 형상 불일치 및 물성 변화의 학습 분포, sensor·hand-configuration ablation
+
+#### Track B — 2단계 확장 명세
+
+- 확보할 접근 공간 또는 경로의 goal representation과 success metric
+- Target·주변 물체·선반 점유 정보를 제공할 범위와 observation 표현
+- 회전 필요성·중간 목표·동작 순서·완료 판단을 통합할 순서와 curriculum
+- 중간 목표를 명시적으로 출력할지, 행동 생성에 암묵적으로 통합할지
+- 상위 정책 + low-level 호출 또는 공동 학습 구조, 가중치 재사용·freeze·fine-tuning
+- Fixed-sequence / 상위 판단기 지시 방식 등 비교 baseline과 공간 확보 효과의 검증
+- Multi-blocker 선택·순서, 실제 target 인출까지 확장할 시점과 범위
+
+#### Track B — 공통 미결
+
+- Pose/geometry noise, occlusion, sensor calibration 및 Sim-to-Real 범위
+- 최종 Method novelty, Contribution 및 각 단계의 논문·졸업연구 구성
 
 ---
 
@@ -664,6 +798,10 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 6. 미결인 architecture, goal, metric을 확정된 Method처럼 꾸미지 않는다.
 7. 연구 동기와 실험으로 입증된 결과를 구분한다.
 8. 세부 질문을 한 번에 모두 요구하지 말고, 현재 작업에 필요한 것부터 단계적으로 확인한다.
+9. 1단계 low-level 실행의 우선 범위와 2단계 조작 의사결정 통합의 확장 범위를 구분한다. 고정 동작 순서를 후속 단계의 필수 제약으로 만들지 않는다.
+10. Track A/B를 1단계/2단계와 대응시키지 않는다. End-to-end에 가까운 방향을 raw sensor→action 단일 network나 두 Track 통합으로 바꾸지 않는다.
+11. Continuous Vision·근사 geometry의 availability와 정확한 접촉 상태의 완전 관측을 구분한다. 손목 자유도와 손가락 자유도, joint 관측과 action도 구분한다.
+12. 단계별 실행 성능과 공간 확보·실제 인출 성능을 혼동하지 않는다. 그림 속 시리얼 박스·hooking·선반 구성은 설명용 예시이며 자동으로 학습 명세가 되지 않는다.
 
 ### 14.2 문서를 갱신할 때
 
@@ -697,6 +835,8 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ## 15. 관련 자료와 Provenance
 
+- 2026-09-14 사용자 제안 및 후속 확인: low-level action 학습을 우선 수행하고 이후 상위 추론기의 일부 역할을 정책으로 통합하는 방향을 제안했다. 단계별 정리에 동의하고 `context.md` 업데이트를 요청했다.
+- 본 대화의 Track B 구체화: 근사 geometry, Approach / Contact Formation → Rotation → Push, F/T·Tactile 기반 접촉 보정, 뒤쪽 target 인출을 위한 blocker 재배치 목적과 설명 그림을 논의했다. 설계 후보와 그림 조건은 확정된 architecture·학습 명세와 구분했다.
 - [`docs/README.md`](../README.md): 전체 프로젝트의 기존 hand-off. Vision-based Sweeping의 한계, 두 Track으로의 decoupling, initial pose randomization, sequential manipulation, sensor/geometry 문제 등이 자세히 기록되어 있다.
 - 과거 대화 초안: `Sweeping vs Handling/Pivoting`, 두 Skill의 Vision 조건, geometry 문제, 역할 중복 및 비교 시나리오를 검토했다. 해당 첨부 원문은 다른 컴퓨터에서 접근할 수 없을 수 있으므로, 후속 작업에 필요한 결론과 사고 과정은 이 문서의 7절·9절·11절·12절에 내재화했다.
 - 2026-09-12 사용자 설명: Track A의 initial-Vision/contact-feedback 조건, Track B의 continuous-Vision/current-pose-and-geometry 조건, 그리고 두 Track이 다른 동작이 아닌 다른 연구 문제라는 점을 최신 결론으로 반영했다.
@@ -704,6 +844,15 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 ---
 
 ## 16. Change Log
+
+### 2026-09-14 — Track B의 Low-level 우선 학습과 조작 의사결정 통합 방향 반영
+
+- 사용자가 제안하고 확인한 **low-level 실행 능력 우선 확보 → 상위 조작 의사결정 일부를 정책으로 통합**하는 진행 방향을 기록했다.
+- 1단계의 상위 입력·정책 역할과 2단계의 목적 수준 입력·역할 확장을 구분했다. 첫 확장에서는 blocker 선택을 상위에 남기도록 정리했다.
+- Approach / Contact Formation → Rotation → Push의 기본 동작, 근사 geometry와 실제 접촉의 불확실성, 목표 표현과 reward의 설계 후보를 반영했다.
+- Execution 성능과 공간 확보 효과의 평가를 구분하고, phase별 goal·관측·action·학습 구조 backlog를 갱신했다.
+- `End-to-end에 가까움`의 의미, Track A/B와 진행 단계의 구분, 설명 그림과 학습 명세의 차이를 명시했다.
+- 현재 요약·역할 분담·Track B·Geometry·평가·결정 레지스터를 일관되게 갱신하고 Stage 5·6 및 대체 관계를 추가했다. 기존 Track A 내용과 과거 의사결정 기록은 보존했다.
 
 ### 2026-09-13 — 문서 최초 작성
 
