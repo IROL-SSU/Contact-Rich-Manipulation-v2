@@ -24,18 +24,18 @@
 
 ### 후속 작업자가 우선 읽을 부분
 
-1. `1. 현재 결론 요약`
-2. `3. 전체 시스템에서 두 Track의 위치`
-3. `4. Track A`
-4. `5. Track B`
-5. `6. Track A와 Track B의 관계`
-6. `11. 의사결정 과정`
-7. `14. 후속 Agent 작업 지침`
+1. `1. 현재 결론 요약` — 특히 1.5절의 현재 우선 작업
+2. `5. Track B` — 특히 5.10절의 GD2P 분석과 Approach reward 후보
+3. `15.2 참고 논문 목록과 DOI` — 읽기 순서·연결점·한계
+4. `3. 전체 시스템에서 두 Track의 위치`와 `6. Track A와 Track B의 관계`
+5. `11. 의사결정 과정`과 `13. 현재 결정 레지스터와 미결 Backlog`
+6. `14. 후속 Agent 작업 지침`
+7. `4. Track A` — 별도 연구축의 배경이 필요할 때
 
 최신 내용과 과거 기록이 충돌할 경우 다음 순서로 판단한다.
 
-1. 이 문서의 **현재 결론**과 **가장 최근 날짜의 결정 기록**
-2. 사용자가 후속 대화에서 직접 수정한 내용
+1. 사용자가 후속 대화에서 직접 수정한 최신 내용
+2. 이 문서의 **현재 결론**과 **가장 최근 날짜의 결정 기록**
 3. 이 문서의 과거 제안
 4. [`docs/README.md`](../README.md)의 이전 hand-off 내용
 
@@ -87,6 +87,14 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 여기서 `end-to-end에 가까운 정책`은 **공간 확보 목적에서 조작 행동까지 연결하는 범위를 넓힌다**는 뜻이다. Raw sensor부터 robot action까지의 완전한 end-to-end architecture를 확정한 것이 아니다. 두 단계는 학습·연구 범위의 구분이며, 두 개의 논문 또는 특정 수의 독립 정책으로 나눈다는 뜻도 아니다.
 
 **Track A/B는 서로 다른 연구축이고, 1단계/2단계는 Track B를 중심으로 구체화한 진행 단계다. `Track A = 1단계`, `Track B = 2단계`로 해석하지 않는다.**
+
+### 1.5 현재 우선 작업 — Track B 1단계의 hand configuration과 reward
+
+**[2026-09-14 현재 합의]** 사용자는 Track B를 본인의 연구주제로 삼는 방향이며, 현재는 **1단계 low-level policy 학습**을 우선 구체화한다. 특히 Approach에서 **이후 Rotation과 Push에 유리한 손 구성과 접촉 상태를 어떻게 학습할 것인가**를 중심으로 관련 문헌을 검토한다.
+
+GD2P의 geometry 기반 pre-contact pose 합성은 reward 설계의 참고이며 RL 방법 자체가 아니다. Geometric shaping, 실제 접촉 형성, task-specific wrench capability, 후속 정책의 수행 가능성을 구분해 검토한다. 특정 reward 수식·가중치·학습 구조·novelty는 아직 확정하지 않았다.
+
+2단계의 조작 의사결정 통합은 후속 확장으로 유지한다. 상세한 최신 분석은 **5.10절**, 논문 20편의 DOI·방법·연결점·한계는 **15.2절**에 기록한다.
 
 ---
 
@@ -410,6 +418,95 @@ Top view, 양옆이 개방된 선반, 주변 물체 배치는 **설명용 그림
 
 진행 방향은 정했지만 전체 세부 명세를 한 번에 확정하지 않는다. 핵심 미결 사항은 13.2절의 Track B backlog에서 관리한다. 특히 1단계 goal·action·전환 기준과 2단계 공간 확보 목적의 표현·평가 기준을 구분해 구체화한다.
 
+### 5.10 1단계 우선 연구 질문과 문헌 기반 설계 후보 — 2026-09-14
+
+#### 5.10.1 Approach의 목표를 후속 동작과 연결
+
+**[현재 연구 초점]** Approach에서 적절한 hand configuration을 형성하는 문제를 먼저 구체화한다. 단순히 물체에 가까워지거나 접촉 수를 늘리는 것보다, 주어진 명령 아래에서 **후속 Rotation과 Push를 수행하기 유리한 hand–object 상태를 만드는가**가 중요하다.
+
+**[작업 가설]** 이 상태의 적합성은 손목 pose·손가락 구성·실제 접촉·물체 상태·팔의 실행 여유를 함께 고려해 평가할 수 있다. Approach 종료 상태와 후속 정책의 성공 관계를 검증해야 하며, 지금 특정 평가함수로 확정한 것은 아니다.
+
+Rotation에 적합한 접촉과 Push에 적합한 접촉이 다를 수 있다. 초기 configuration을 전체 동작 내내 고정하거나, Approach부터 최종 Push용 palm alignment를 무조건 강제하지 않는다. 손목·손가락·접촉 위치를 재구성할 여지를 둔다.
+
+#### 5.10.2 GD2P에서 확인한 사실과 정정
+
+기준 원문은 *Learning Geometry-Aware Nonprehensile Pushing and Pulling with Dexterous Hands*, arXiv:2509.18455v4, ICRA 2026이다. 참고문헌 B01.
+
+- **RL 논문이 아니다.** 물체 geometry 표현으로 조건화한 diffusion model이 pre-contact hand pose를 생성한다.
+- Diffusion의 생성·denoising 대상은 **hand pose**다. Point cloud를 diffusion으로 augmentation하는 연구로 설명하지 않는다.
+- Hand pose는 손목 위치·자세와 손가락 관절 구성으로 이루어진다. Point cloud의 BPS 표현은 생성 조건으로 사용한다.
+- Grasp synthesis의 최적화 도구에서 출발하지만, 이 연구의 데이터는 **nonprehensile push/pull 성공 pose**를 생성·검증해 구축한다. 일반적인 파지 dataset만으로 push를 수행했다고 단순화하지 않는다.
+- 핵심 절차는 접촉 후보 기반 pose 최적화 → physics rollout으로 실제 동작 성공 판별 → 성공 pose 기반 생성 모델 학습 → 후보 생성·선택·실행이다.
+- Tactile·F/T closed-loop 적응 또는 정밀 Rotation→Push 정책 학습을 검증한 연구는 아니다. 주된 실제 실행은 open-loop이며, 다단계 예시의 재계획과 고주기 contact feedback을 구분한다.
+- 우리에게 유용한 점은 **기하학적 configuration 평가와 실제 동작 성공 검증을 연결하는 구조**다. GD2P energy를 그대로 RL reward로 전환한 효과는 별도로 검증해야 한다.
+
+[GD2P 원문 v4](https://arxiv.org/html/2509.18455v4)
+
+#### 5.10.3 GD2P energy 항별 의미와 reward로의 연결
+
+논문의 목적함수:
+
+$$
+E(H)=E_{\mathrm{fc}}+w_{\mathrm{dis}}E_{\mathrm{dis}}
++w_jE_j+w_{\mathrm{pen}}E_{\mathrm{pen}}
++w_{\mathrm{dir}}E_{\mathrm{dir}}+w_{\mathrm{arm}}E_{\mathrm{arm}}.
+$$
+
+| 항 | 논문 및 공개 구현의 역할 | 우리 연구의 reward 후보와 주의점 |
+| --- | --- | --- |
+| $E_{\mathrm{fc}}$ | 접촉 위치·법선으로 계산하는 force-closure 관련 surrogate | 안정 파지와 목표 힘·토크 전달 능력을 구분. Rotation/Push에는 task-specific wrench capability를 검토 |
+| $E_{\mathrm{dis}}$ | 선택된 hand contact candidate와 물체 표면의 거리 조절 | 손끝·손가락 링크·손바닥의 task-relevant surface proximity를 접근 shaping으로 활용 |
+| $E_j$ | Hand joint limit 위반 억제 | RH56E2의 실제 제어 자유도·관절 결합·가동 범위에 맞게 설계. Limit 만족 자체는 좋은 manipulability 보장이 아님 |
+| $E_{\mathrm{pen}}$ | Hand–object 침투 억제. 구현에는 self/table penetration 항도 별도 존재 | Intended contact와 금지 충돌을 구분하고 과도한 침투를 억제 |
+| $E_{\mathrm{dir}}$ | 논문에서는 palm normal과 moving direction의 정렬 유도 | 현재 phase의 요구 동작으로 조건화. Palm normal 정렬과 물체의 좁은 면 normal 정렬은 별개 |
+| $E_{\mathrm{arm}}$ | 논문에서는 palm의 위쪽 방향 성분을 억제하는 휴리스틱 | 실제 arm IK·충돌·Jacobian manipulability를 계산하는 항으로 오해하지 않음 |
+
+**공개 코드 분석 기록:** 검토 기준 commit은 `ff91191165f232ad0914e3c6e9f65f8bc1ef89fd`다. 다음은 공개 구현 관찰이며 논문의 모든 실험 설정을 재현했다는 뜻은 아니다.
+
+- `energy.py`의 force-closure 항은 $\|Gn\|^2=\|\sum_i n_i\|^2+\|\sum_i p_i\times n_i\|^2$ 형태다. 실제 F/T 측정값이 아니며, 마찰원뿔 안의 접촉력 크기를 최적화하는 exact force-feasibility 계산도 아니다. 작은 surrogate만으로 모든 방향에 대한 force closure를 보장하지 않는다.
+- Pushing에서 손이 물체에 가하는 wrench를 항상 0으로 만드는 것이 목적은 아니다. 준정적 물체의 전체 wrench는 지지면 마찰 등의 반력과 균형을 이룰 수 있다.
+- Object SDF는 내부 양수·외부 음수이며, distance 구현은 표면 접촉점 대신 바깥쪽 여유 거리 $-\delta$를 목표로 하는 SmoothL1 형태다. Helper의 기본 offset은 5 mm, generation script의 기본값은 15 mm였으며 실제 논문 실험값으로 단정하지 않는다.
+- Joint-limit penalty는 허용 범위 내부에서 0일 수 있어 관절 경계까지의 여유나 좋은 손 자세를 자동으로 보장하지 않는다.
+- Direction 항은 논문에서 음의 cosine이지만 공개 구현은 양의 cosine과 양의 weight를 사용한다. Arm 관련 항은 direction 항과 서로 다른 local axis를 사용한다. URDF·좌표계·이동 방향을 함께 추적하기 전에 단순한 부호 오류라고 확정하지 않는다.
+- Weight의 크기만으로 항의 중요도를 비교하지 않는다. 단위·정규화·샘플 개수에 따라 scale이 다르다.
+
+[고정 commit의 energy.py](https://github.com/Li-Yunshuang/GD2P/blob/ff91191165f232ad0914e3c6e9f65f8bc1ef89fd/gd2p/dataset_generation/utils/energy.py), [generation script](https://github.com/Li-Yunshuang/GD2P/blob/ff91191165f232ad0914e3c6e9f65f8bc1ef89fd/gd2p/dataset_generation/scripts/generate_hand_config_dicts.py)
+
+#### 5.10.4 Approach reward의 역할 구분
+
+아래는 **[작업 가설 / 설계 후보]**이며 확정 reward가 아니다.
+
+| 역할 | 후보 신호 | 주의점 |
+| --- | --- | --- |
+| 접근 진전 | 상대 pose, task-relevant surface proximity | 근사 geometry에서 얻은 자세 하나를 정답으로 강제하지 않음 |
+| 실제 접촉 형성 | Tactile의 접촉 영역·변화, F/T의 전체 부하 | 모든 접촉 수·압력·면적을 최대화하지 않음 |
+| 후속 동작 적합성 | 요구 wrench 생성 능력, 후속 정책의 value 또는 rollout 성공 | 정적 물리 surrogate와 실제 실행 성공을 구분 |
+| 실행 제약 | 관절 한계, 팔·손·선반 충돌, 과부하, 전도·낙하 | 필요한 접촉 전환이나 회전 토크를 일괄 억제하지 않음 |
+
+Tactile은 observation만으로도 기여할 수 있다. Reward에 반드시 센서값을 직접 넣어야 하는 것은 아니다. Simulation reward/evaluation용 privileged state와 실제 policy observation을 구분한다. 접촉 이력이나 recurrent state 사용 여부는 미결이다.
+
+#### 5.10.5 후속 동작 적합성을 평가하는 두 가지 후보
+
+| 후보 | 참고 문헌 | 평가하는 내용 | 남은 문제 |
+| --- | --- | --- | --- |
+| Task-specific wrench capability | B02 TaskDexGrasp | 요구 힘·토크 방향과 현재 접촉이 생성할 수 있는 wrench의 관계 | Friction·surface normal·지지면 접촉의 불확실성, force/torque scale 정규화, task prior 설정 |
+| Downstream execution value / success | B03 Critic 기반 선택, B08 Sequential Dexterity, B06 HANDFUL | 실제 후속 정책 관점에서 Approach 종료 상태의 유용성 | 학습 분포 밖 critic 신뢰도, reward로 이용할 때의 과대평가, rollout 검증 |
+
+TaskDexGrasp의 Task Wrench Space는 사전 지정하는 방향 집합이다. 목표 이동 거리·회전각만으로 필요한 wrench가 유일하게 결정되는 것은 아니다. 접촉·마찰·질량·지지면 조건이 함께 영향을 준다.
+
+B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. 이를 Approach reward로 직접 사용하는 것은 우리의 확장안이다. 할인된 value를 보정된 성공확률로 설명하지 않는다. 물체를 손 안에서 파지한 상태와 선반에 지지된 nonprehensile 상태의 차이도 검증해야 한다.
+
+#### 5.10.6 우선 확인할 사항
+
+1. Approach 종료 상태와 Rotation/Push의 실행 성공 기준을 정의한다.
+2. 접촉 가능한 기하 조건과 후속 조작 적합성을 구분한다.
+3. 여러 유효 configuration을 허용하고 phase 사이의 접촉 재구성을 검토한다.
+4. 같은 근사 bounding volume이지만 **실제 외부 접촉 형상**이 다른 물체군으로 geometry mismatch를 평가하는 안을 유지한다. 동일 외형·다른 질량 분포는 별도의 물성 variation이다.
+5. Geometry 정확도, F/T·tactile 입력, 고정/적응 hand configuration, 후속 적합성 항의 비교 실험을 검토한다. 최종 ablation 구성은 미결이다.
+6. 우선 읽기 순서: **B02 TaskDexGrasp → B03 RL critic → B04 GraspXL → B05 UniDexFPM → B06 HANDFUL**. GD2P는 이미 정독·energy 분석을 시작한 기준 논문이다.
+
+문헌의 모든 항을 한꺼번에 합치지 않는다. 각 항이 해결하는 실패 원인을 정의하고, 실제 후속 성공 개선 여부를 확인해 채택한다.
+
 ---
 
 ## 6. Track A와 Track B의 관계
@@ -686,6 +783,15 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **남은 질문:** 1단계 goal/action/전환 규격, 2단계 목적·장면 표현과 success metric, hierarchical 호출 또는 공동 학습 구조, parameter 재사용·freeze·fine-tuning, novelty와 논문화 범위.
 - **해석상 주의:** 두 단계는 Track A/B와 대응하지 않는다. `End-to-end에 가까움`은 정책 역할의 확장을 뜻하며 raw sensor→action 단일 network를 확정한 것이 아니다. 성능 개선은 검증할 가설이다.
 
+### Stage 7 — Track B 1단계 우선 구체화와 후속 동작을 고려한 Approach
+
+- **날짜:** 2026-09-14, Stage 6 이후 문헌 논의.
+- **논의 배경:** 사용자는 Track B를 본인의 연구주제로 삼는 방향을 제시하고 1단계 관련 문헌 조사를 요청했다. GD2P를 먼저 읽으며 energy 항별 의미와 Approach reward로의 연결을 논의했다.
+- **정정한 해석:** GD2P는 point-cloud diffusion augmentation이나 RL policy 학습이 아니라, geometry-conditioned hand pose 생성과 nonprehensile execution 검증을 결합한 연구다.
+- **현재 초점:** 좋은 Approach configuration을 후속 Rotation과 Push의 수행 가능성에 연결한다. 기하 거리·접촉 안정성만으로 충분한지 검토한다.
+- **검토 후보:** Wrench-space 적합성, 후속 RL critic 기반 평가, 목표 조건부 접촉 보상, 다목표 reward 결합, 후속 손가락 사용 여유.
+- **미결:** 실제 reward 수식, policy 구성, tactile 표현, phase 전환 및 contribution. 2단계 확장은 backlog로 유지한다.
+
 ---
 
 ## 12. 이전 자료와 최신 결론의 충돌 정리
@@ -708,6 +814,11 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | 피해야 할 오해: End-to-end에 가까운 확장 = raw sensor→action 단일 network | 목적에서 행동까지 역할 통합; perception·network·학습 구조는 미결 | **[해석 제한]** |
 | 회전·병진 정확도로 연구 전체의 성공 평가 | 1단계는 실행 성능, 2단계는 공간 확보 효과와 실행 안정성을 평가 | **[확장]** |
 | 피해야 할 오해: Track A/B = 1단계/2단계 | 연구축과 진행 단계는 별개; 이번 구체화는 Track B 중심 | **[해석 제한]** |
+| GD2P가 point cloud를 diffusion으로 augmentation | Geometry를 조건으로 hand pose를 생성 | **[대체됨]** |
+| GD2P가 RL 또는 일반 grasp dataset만을 활용한 push 연구 | Nonprehensile push/pull pose의 최적화·physics 검증·생성 모델 학습 | **[대체됨]** |
+| GD2P energy가 검증된 RL reward | 우리의 reward에 적용하는 것은 설계 후보이며 별도 검증 필요 | **[해석 제한]** |
+| Approach에서 접촉을 많이 만들면 후속 동작에도 유리 | Task-specific 접촉 능력과 실제 후속 성공을 함께 평가 | **[작업 가설]** |
+| Critic value를 그대로 성공확률로 사용 | 학습된 return 또는 ranking proxy이며 보정·검증 필요 | **[해석 제한]** |
 
 ---
 
@@ -733,6 +844,11 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-014 | 현재 합의 · 2026-09-14 | 1단계는 목표 조작 실행 성능을, 2단계는 target 접근 공간 확보 효과와 실행 안정성을 구분해 평가한다. |
 | D-015 | 현재 합의 · 2026-09-14 | End-to-end에 가까운 확장은 목적→행동의 역할 통합을 의미하며 raw sensor 입력, 단일 network, VLA 또는 특정 학습 알고리즘을 확정하지 않는다. |
 | D-016 | 현재 합의 · 2026-09-14 | Track A/B와 1단계/2단계는 별개다. 이번 변경이 Track A의 관측 조건 변경이나 두 Track의 Vision-Free 통합을 뜻하지 않는다. |
+| D-017 | 현재 합의 · 2026-09-14 후속 논의 | Track B를 사용자의 연구주제로 삼는 방향이며, 현재는 1단계 low-level policy와 관련 문헌 검토를 우선한다. |
+| D-018 | 현재 연구 초점 | Approach에서 이후 Rotation과 Push를 고려한 hand configuration reward를 구체화한다. 수식·architecture는 미결이다. |
+| D-019 | 문헌 확인 | GD2P는 geometry-conditioned pre-contact hand pose 생성이며 RL 또는 point-cloud diffusion augmentation이 아니다. |
+| D-020 | 작업 가설 | Task-specific wrench capability와 후속 정책의 execution value를 Approach 적합성의 평가 후보로 검토한다. |
+| D-021 | 문헌 해석 원칙 | 원 논문, 공개 구현, 우리의 reward 확장안을 구분하고 DOI 유형·출판 상태를 명시한다. |
 
 ### 13.2 미결 Backlog
 
@@ -758,6 +874,10 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - 핵심 sensor ablation과 평가 metric
 
 #### Track B — 1단계 우선 명세
+
+- Approach 종료 상태의 정의와 후속 Rotation/Push 성공률의 관계
+- Task-specific wrench prior의 표현·물리 가정과 downstream critic 평가의 신뢰도
+- Geometry 기반 접근 shaping과 실제 tactile 접촉 평가의 역할 분담
 
 - Goal 표현: 회전각·축 / 목표 orientation, 방향·거리 / 목표 position, 기준 좌표계·시점
 - Orientation이 최종 배치 조건인지 병진을 위한 중간 자세인지
@@ -803,6 +923,9 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 11. Continuous Vision·근사 geometry의 availability와 정확한 접촉 상태의 완전 관측을 구분한다. 손목 자유도와 손가락 자유도, joint 관측과 action도 구분한다.
 12. 단계별 실행 성능과 공간 확보·실제 인출 성능을 혼동하지 않는다. 그림 속 시리얼 박스·hooking·선반 구성은 설명용 예시이며 자동으로 학습 명세가 되지 않는다.
 
+13. 현재 우선 작업은 Track B 1단계의 Approach hand configuration과 reward 관련 문헌 분석이다. 2단계 전체 명세를 먼저 확정하지 않는다.
+14. 논문에 명시된 방법·공개 코드 관찰·우리 연구의 확장 후보를 구분한다. DOI 미확인을 DOI 부재로 단정하지 않는다.
+
 ### 14.2 문서를 갱신할 때
 
 중요한 판단이 바뀌면 과거 문장을 단순 삭제하지 않는다.
@@ -835,15 +958,256 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ## 15. 관련 자료와 Provenance
 
+### 15.1 연구 논의의 출처
+
 - 2026-09-14 사용자 제안 및 후속 확인: low-level action 학습을 우선 수행하고 이후 상위 추론기의 일부 역할을 정책으로 통합하는 방향을 제안했다. 단계별 정리에 동의하고 `context.md` 업데이트를 요청했다.
 - 본 대화의 Track B 구체화: 근사 geometry, Approach / Contact Formation → Rotation → Push, F/T·Tactile 기반 접촉 보정, 뒤쪽 target 인출을 위한 blocker 재배치 목적과 설명 그림을 논의했다. 설계 후보와 그림 조건은 확정된 architecture·학습 명세와 구분했다.
 - [`docs/README.md`](../README.md): 전체 프로젝트의 기존 hand-off. Vision-based Sweeping의 한계, 두 Track으로의 decoupling, initial pose randomization, sequential manipulation, sensor/geometry 문제 등이 자세히 기록되어 있다.
 - 과거 대화 초안: `Sweeping vs Handling/Pivoting`, 두 Skill의 Vision 조건, geometry 문제, 역할 중복 및 비교 시나리오를 검토했다. 해당 첨부 원문은 다른 컴퓨터에서 접근할 수 없을 수 있으므로, 후속 작업에 필요한 결론과 사고 과정은 이 문서의 7절·9절·11절·12절에 내재화했다.
 - 2026-09-12 사용자 설명: Track A의 initial-Vision/contact-feedback 조건, Track B의 continuous-Vision/current-pose-and-geometry 조건, 그리고 두 Track이 다른 동작이 아닌 다른 연구 문제라는 점을 최신 결론으로 반영했다.
 
+### 15.2 참고 논문 목록과 DOI — 2026-09-14 확인
+
+주요 관련 논문 **17편(B01–B17)**과 GD2P의 energy·데이터 생성 배경 논문 **3편(B18–B20)**을 수록한다. DOI는 앞선 문헌 조사에서 확인한 정보를 반영했다. **arXiv DOI는 정식 출판 DOI와 구분**한다. 정식 DOI 미확인은 DOI가 없다는 단정이 아니다.
+
+현재 읽기 우선순위는 **B02 → B03 → B04 → B05 → B06**이다. B01은 이미 분석을 시작한 기준 논문이다. B07–B16은 실행·센서·phase 연결, B17은 retrieval 목적과 후속 확장, B18–B20은 energy·데이터 평가의 배경으로 활용한다.
+
+| ID | 약칭 | 방법 / 주요 활용 |
+| --- | --- | --- |
+| B01 | GD2P | 기하 조건부 diffusion hand pose 생성; RL 아님 |
+| B02 | TaskDexGrasp | Task-oriented hand pose의 미분 가능한 최적화; RL 아님 |
+| B03 | RL critic으로 초기 grasp 선택 | 학습된 in-hand RL critic으로 초기 grasp 후보 선택 |
+| B04 | GraspXL | 목표 조건부 RL grasp-motion synthesis |
+| B05 | UniDexFPM | RL expert 학습과 diffusion policy distillation |
+| B06 | HANDFUL | 손가락별 접촉 보상과 순차 RL curriculum |
+| B07 | ExDex | RL 기반 arm–hand nonprehensile manipulation |
+| B08 | Sequential Dexterity | RL skill chaining |
+| B09 | DexTouch | Tactile RL와 sim-to-real |
+| B10 | Tactile Pushing | 촉각 기반 goal-conditioned model-based / model-free RL |
+| B11 | Bi-Touch | 양팔 tactile RL |
+| B12 | Visuotactile Estimation and Control | Visuotactile estimator + uncertainty-aware RL |
+| B13 | Coarse-to-Fine Pushing | Vision·touch·proprioception 기반 coarse-to-fine pushing |
+| B14 | Force Push | Force-feedback / admittance controller; RL 아님 |
+| B15 | RoboPack | Visuotactile recurrent dynamics model + MPC; RL 정책 학습 아님 |
+| B16 | Nonprehensile Pregrasp | Graph search·optimal control·학습된 graspability; RL 아님 |
+| B17 | RetrDex | Clutter clearing / retrieval RL |
+| B18 | Differentiable Force Closure Estimator | 미분 가능한 force-closure surrogate 기반 grasp 합성 |
+| B19 | DexGraspNet | Grasp pose 최적화·시뮬레이션 검증·대규모 데이터 생성 |
+| B20 | Get a Grip | 성공·실패 grasp 데이터 기반 evaluator 학습 |
+
+#### B01. GD2P
+
+- **정식 제목:** Learning Geometry-Aware Nonprehensile Pushing and Pulling with Dexterous Hands
+- **발표 정보:** ICRA 2026; arXiv 최초 공개 2025
+- **DOI:** [10.48550/arXiv.2509.18455](https://doi.org/10.48550/arXiv.2509.18455) — arXiv DOI; 정식 출판 DOI 미확인
+- **원문 / 공식 자료:** [GD2P](https://arxiv.org/html/2509.18455v4)
+- **방법:** 기하 조건부 diffusion hand pose 생성; RL 아님
+- **우리 연구와의 연결:** 손 전체의 접촉 후보, 기하 최적화와 physics rollout의 실제 동작 성공 검증
+- **적용 시 구분할 점:** Diffusion 대상은 hand pose. 주된 실제 실행은 open-loop이며 tactile/FT 적응 정책이나 정밀 rotation 학습이 아니다.
+
+#### B02. TaskDexGrasp
+
+- **정식 제목:** Task-Oriented Dexterous Hand Pose Synthesis Using Differentiable Grasp Wrench Boundary Estimator
+- **발표 정보:** IROS 2024; arXiv 최초 공개 2023
+- **DOI:** [10.1109/IROS58592.2024.10802652](https://doi.org/10.1109/IROS58592.2024.10802652) — 정식 출판 DOI
+- **원문 / 공식 자료:** [TaskDexGrasp](https://arxiv.org/html/2309.13586v3)
+- **방법:** Task-oriented hand pose의 미분 가능한 최적화; RL 아님
+- **우리 연구와의 연결:** Task Wrench Space와 Grasp Wrench Space의 관계로 목표 힘·토크 방향의 생성 능력 평가
+- **적용 시 구분할 점:** TWS는 사전 지정하는 task prior다. 회전각·거리만으로 필요한 wrench가 유일하게 결정되지 않으며, 정적 접촉 능력과 실제 동작 성공을 구분한다.
+
+#### B03. RL critic으로 초기 grasp 선택
+
+- **정식 제목:** Composing Dextrous Grasping and In-hand Manipulation via Scoring with a Reinforcement Learning Critic
+- **발표 정보:** ICRA 2025
+- **DOI:** [10.1109/ICRA55743.2025.11127792](https://doi.org/10.1109/ICRA55743.2025.11127792) — 정식 출판 DOI
+- **원문 / 공식 자료:** [RL critic으로 초기 grasp 선택](https://arxiv.org/abs/2505.13253)
+- **방법:** 학습된 in-hand RL critic으로 초기 grasp 후보 선택
+- **우리 연구와의 연결:** Approach 종료 상태를 후속 Rotation 또는 Rotation→Push 정책의 수행 가능성으로 평가하는 발상
+- **적용 시 구분할 점:** 원 논문은 후보 선택 연구다. Approach reward로 사용하는 것은 우리의 확장이다. Sparse-success value도 일반적으로 보정된 성공확률이 아니며, 선반 지지 nonprehensile 상황으로의 전이는 검증이 필요하다.
+
+#### B04. GraspXL
+
+- **정식 제목:** GraspXL: Generating Grasping Motions for Diverse Objects at Scale
+- **발표 정보:** ECCV 2024; Springer 인용 연도 2025, 온라인 공개 2024
+- **DOI:** [10.1007/978-3-031-73347-5_22](https://doi.org/10.1007/978-3-031-73347-5_22) — 정식 출판 DOI
+- **원문 / 공식 자료:** [GraspXL](https://arxiv.org/html/2403.19649v2)
+- **방법:** 목표 조건부 RL grasp-motion synthesis
+- **우리 연구와의 연결:** 접근 방향, wrist rotation, hand position, graspable region을 접촉·안정성 목표와 결합
+- **적용 시 구분할 점:** 목표가 reward와 wrist control guidance에 모두 반영된다. 모든 효과를 reward만의 결과로 해석하지 않는다.
+
+#### B05. UniDexFPM
+
+- **정식 제목:** Dexterous Functional Pre-Grasp Manipulation with Diffusion Policy
+- **발표 정보:** arXiv 2024; 이전 제목에 UniDexFPM 사용
+- **DOI:** [10.48550/arXiv.2403.12421](https://doi.org/10.48550/arXiv.2403.12421) — arXiv DOI; 정식 출판 DOI 미확인
+- **원문 / 공식 자료:** [UniDexFPM](https://arxiv.org/html/2403.12421v2)
+- **방법:** RL expert 학습과 diffusion policy distillation
+- **우리 연구와의 연결:** 위치·방향·손가락 구성의 목표 불균형을 완화하는 mutual reward
+- **적용 시 구분할 점:** 목표 functional grasp 자체는 주어진다. Contact distance로 표현한 항은 finger joint angle 오차이며 tactile 측정값이 아니다. 원문의 10.1109/LRA.2024.xxxxxx는 placeholder다. 순차 phase의 모든 목표를 동시에 충족시키도록 무조건 min gate를 적용하지 않는다.
+
+#### B06. HANDFUL
+
+- **정식 제목:** HANDFUL: Sequential Grasp-Conditioned Dexterous Manipulation with Resource Awareness
+- **발표 정보:** arXiv 2026
+- **DOI:** [10.48550/arXiv.2604.25126](https://doi.org/10.48550/arXiv.2604.25126) — arXiv DOI
+- **원문 / 공식 자료:** [HANDFUL](https://arxiv.org/html/2604.25126)
+- **방법:** 손가락별 접촉 보상과 순차 RL curriculum
+- **우리 연구와의 연결:** 현재 접촉만 최대화하지 않고 후속 동작에 사용할 손가락·운동 여유 보존
+- **적용 시 구분할 점:** 첫 물체를 잡은 채 다른 물체를 조작하는 설정이다. 손가락 집합을 지정·비교하며, 실제 시연은 성공 trajectory의 open-loop 재생이다.
+
+#### B07. ExDex
+
+- **정식 제목:** Dexterous Non-Prehensile Manipulation for Ungraspable Object via Extrinsic Dexterity
+- **발표 정보:** arXiv 2025
+- **DOI:** [10.48550/arXiv.2503.23120](https://doi.org/10.48550/arXiv.2503.23120) — arXiv DOI; 정식 출판 DOI 미확인
+- **원문 / 공식 자료:** [ExDex](https://arxiv.org/html/2503.23120v1)
+- **방법:** RL 기반 arm–hand nonprehensile manipulation
+- **우리 연구와의 연결:** Push 후 edge/wall을 활용한 grasp, phase 연결과 종료 상태 분포 재사용
+- **적용 시 구분할 점:** Tactile 기반 연구로 분류하지 않는다. 관측 표기의 F는 fingertip pose이며 force sensor를 뜻하지 않는다.
+
+#### B08. Sequential Dexterity
+
+- **정식 제목:** Sequential Dexterity: Chaining Dexterous Policies for Long-Horizon Manipulation
+- **발표 정보:** CoRL 2023
+- **DOI:** [10.48550/arXiv.2309.00987](https://doi.org/10.48550/arXiv.2309.00987) — arXiv DOI; 정식 proceedings DOI 미확인
+- **원문 / 공식 자료:** [Sequential Dexterity](https://sequential-dexterity.github.io/)
+- **방법:** RL skill chaining
+- **우리 연구와의 연결:** 이전 정책의 종료 상태와 다음 정책의 실행 가능성을 연결하는 전환 적합성
+- **적용 시 구분할 점:** 우리 접촉 상태·상위 명령 인터페이스에 맞는 transition criterion을 별도로 정의해야 한다.
+
+#### B09. DexTouch
+
+- **정식 제목:** DexTouch: Learning to Seek and Manipulate Objects with Tactile Dexterity
+- **발표 정보:** IEEE RA-L, 2024 온라인 출판
+- **DOI:** [10.1109/LRA.2024.3478571](https://doi.org/10.1109/LRA.2024.3478571) — 정식 출판 DOI
+- **원문 / 공식 자료:** [DexTouch](https://arxiv.org/html/2401.12496v2)
+- **방법:** Tactile RL와 sim-to-real
+- **우리 연구와의 연결:** 접촉 탐색·조작, tactile observation과 sensor ablation, UR5e 기반 실물 시스템
+- **적용 시 구분할 점:** Allegro hand의 FSR 이진 접촉 입력을 사용한다. 고해상도 압력 분포나 continuous Vision을 사용하는 우리 설정과 구분한다.
+
+#### B10. Tactile Pushing
+
+- **정식 제목:** Sim-to-Real Model-Based and Model-Free Deep Reinforcement Learning for Tactile Pushing
+- **발표 정보:** IEEE RA-L 2023
+- **DOI:** [10.1109/LRA.2023.3295236](https://doi.org/10.1109/LRA.2023.3295236) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Tactile Pushing](https://arxiv.org/abs/2307.14272)
+- **방법:** 촉각 기반 goal-conditioned model-based / model-free RL
+- **우리 연구와의 연결:** Push 실행 보상, 외란 대응, tactile 기반 sim-to-real 비교
+- **적용 시 구분할 점:** 단일 tactile pusher이며 다지 hand configuration 결정 문제와 다르다.
+
+#### B11. Bi-Touch
+
+- **정식 제목:** Bi-Touch: Bimanual Tactile Manipulation with Sim-to-Real Deep Reinforcement Learning
+- **발표 정보:** IEEE RA-L 2023
+- **DOI:** [10.1109/LRA.2023.3295991](https://doi.org/10.1109/LRA.2023.3295991) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Bi-Touch](https://sites.google.com/view/bi-touch/)
+- **방법:** 양팔 tactile RL
+- **우리 연구와의 연결:** Pushing·reorientation의 접촉 유지와 목표 갱신, sim-to-real reward 문제
+- **적용 시 구분할 점:** 두 tactile pusher를 사용하는 bimanual 시스템이다. 단일 다지 hand와 같은 실험 조건으로 취급하지 않는다.
+
+#### B12. Visuotactile Estimation and Control
+
+- **정식 제목:** Learning Visuotactile Estimation and Control for Non-prehensile Manipulation under Occlusions
+- **발표 정보:** CoRL 2024; PMLR 2025
+- **DOI:** [10.48550/arXiv.2412.13157](https://doi.org/10.48550/arXiv.2412.13157) — arXiv DOI; 정식 proceedings DOI 미확인
+- **원문 / 공식 자료:** [Visuotactile Estimation and Control](https://proceedings.mlr.press/v270/ferrandis25a.html)
+- **방법:** Visuotactile estimator + uncertainty-aware RL
+- **우리 연구와의 연결:** Pose 추정 불확실성과 contact feedback을 정책 학습에 연결
+- **적용 시 구분할 점:** 접촉 force 기반 추정과 다지 손가락의 tactile 배열을 동일한 sensing 설정으로 취급하지 않는다.
+
+#### B13. Coarse-to-Fine Pushing
+
+- **정식 제목:** Coarse-to-Fine Robotic Pushing Using Touch, Vision and Proprioception
+- **발표 정보:** IEEE RA-L 2025; 온라인 공개 2024
+- **DOI:** [10.1109/LRA.2024.3511378](https://doi.org/10.1109/LRA.2024.3511378) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Coarse-to-Fine Pushing](https://research-information.bris.ac.uk/en/publications/coarse-to-fine-robotic-pushing-using-touch-vision-and-propriocept/)
+- **방법:** Vision·touch·proprioception 기반 coarse-to-fine pushing
+- **우리 연구와의 연결:** 시각의 전역 위치 정보와 촉각의 국소 조절 역할 분담
+- **적용 시 구분할 점:** RL reward 논문으로 단정하지 않는다. 구체 학습·제어 구조는 추가 정독 대상이다.
+
+#### B14. Force Push
+
+- **정식 제목:** Force Push: Robust Single-Point Pushing with Force Feedback
+- **발표 정보:** IEEE RA-L 2024
+- **DOI:** [10.1109/LRA.2024.3414180](https://doi.org/10.1109/LRA.2024.3414180) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Force Push](https://arxiv.org/abs/2401.17517)
+- **방법:** Force-feedback / admittance controller; RL 아님
+- **우리 연구와의 연결:** 물성·pose 불확실성 아래 force로 pushing 방향·속도를 보정하는 control baseline
+- **적용 시 구분할 점:** Quasistatic planar single-point pushing의 가정을 확인하고 다지 hand와의 조건 차이를 반영해야 한다.
+
+#### B15. RoboPack
+
+- **정식 제목:** RoboPack: Learning Tactile-Informed Dynamics Models for Dense Packing
+- **발표 정보:** RSS 2024
+- **DOI:** [10.15607/RSS.2024.XX.130](https://doi.org/10.15607/RSS.2024.XX.130) — 정식 출판 DOI
+- **원문 / 공식 자료:** [RoboPack](https://www.roboticsproceedings.org/rss20/p130.html)
+- **방법:** Visuotactile recurrent dynamics model + MPC; RL 정책 학습 아님
+- **우리 연구와의 연결:** 접촉 이력으로 latent physics를 추정하고 미래 물체 운동을 예측
+- **적용 시 구분할 점:** Geometry 관측 가능성과 물성 관측 가능성이 다르다는 점, observation/history 설계의 참고다.
+
+#### B16. Nonprehensile Pregrasp
+
+- **정식 제목:** Synthesize Dexterous Nonprehensile Pregrasp for Ungraspable Objects
+- **발표 정보:** ACM SIGGRAPH Conference Proceedings 2023
+- **DOI:** [10.1145/3588432.3591528](https://doi.org/10.1145/3588432.3591528) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Nonprehensile Pregrasp](https://arxiv.org/abs/2305.04654)
+- **방법:** Graph search·optimal control·학습된 graspability; RL 아님
+- **우리 연구와의 연결:** 후속 grasp를 가능하게 만드는 사전 조작과 환경 제약 고려
+- **적용 시 구분할 점:** 뒤쪽 target의 clearance 확보와 조작 중인 물체 자체의 graspability 향상은 구분한다.
+
+#### B17. RetrDex
+
+- **정식 제목:** RetrDex: Efficient Object Retrieval in Cluttered Scenes with a Dexterous Hand
+- **발표 정보:** IROS 2026 accepted; arXiv 최초 공개 2025
+- **DOI:** [10.48550/arXiv.2502.18423](https://doi.org/10.48550/arXiv.2502.18423) — arXiv DOI; 정식 출판 DOI 미확인
+- **원문 / 공식 자료:** [RetrDex](https://arxiv.org/abs/2502.18423)
+- **방법:** Clutter clearing / retrieval RL
+- **우리 연구와의 연결:** Blocker 조작으로 target 접근성을 높이는 시스템 목적과 2단계 평가
+- **적용 시 구분할 점:** 이전 RetrievalDexterity 제목과 중복 등재하지 않는다. Tactile 활용 연구로 단정하지 않는다.
+
+#### B18. Differentiable Force Closure Estimator
+
+- **정식 제목:** Synthesizing Diverse and Physically Stable Grasps with Arbitrary Hand Structures using Differentiable Force Closure Estimator
+- **발표 정보:** IEEE RA-L 2022; 온라인 공개 2021
+- **DOI:** [10.1109/LRA.2021.3129138](https://doi.org/10.1109/LRA.2021.3129138) — 정식 출판 DOI
+- **원문 / 공식 자료:** [Differentiable Force Closure Estimator](https://arxiv.org/abs/2104.09194)
+- **방법:** 미분 가능한 force-closure surrogate 기반 grasp 합성
+- **우리 연구와의 연결:** GD2P의 E_fc 배경과 surrogate 가정 파악
+- **적용 시 구분할 점:** 작은 surrogate와 정확한 frictional force closure의 관계를 확인한다. [저자 erratum](https://yzhu.io/publication/grasp2021ral/erratum.pdf)도 함께 참고한다.
+
+#### B19. DexGraspNet
+
+- **정식 제목:** DexGraspNet: A Large-Scale Robotic Dexterous Grasp Dataset for General Objects Based on Simulation
+- **발표 정보:** ICRA 2023; arXiv 최초 공개 2022
+- **DOI:** [10.48550/arXiv.2210.02697](https://doi.org/10.48550/arXiv.2210.02697) — arXiv DOI; 앞선 검증에서 정식 출판 DOI를 1차 출처로 확정하지 못함
+- **원문 / 공식 자료:** [DexGraspNet](https://pku-epic.github.io/DexGraspNet/)
+- **방법:** Grasp pose 최적화·시뮬레이션 검증·대규모 데이터 생성
+- **우리 연구와의 연결:** Distance·joint-limit·penetration 항과 physics validation의 배경
+- **적용 시 구분할 점:** 주 대상은 grasp synthesis다. Stable grasp와 Rotation/Push용 접촉 적합성을 동일시하지 않는다.
+
+#### B20. Get a Grip
+
+- **정식 제목:** Get a Grip: Multi-Finger Grasp Evaluation at Scale Enables Robust Sim-to-Real Transfer
+- **발표 정보:** CoRL 2024
+- **DOI:** [10.48550/arXiv.2410.23701](https://doi.org/10.48550/arXiv.2410.23701) — arXiv DOI; 정식 proceedings DOI 미확인
+- **원문 / 공식 자료:** [Get a Grip](https://arxiv.org/abs/2410.23701)
+- **방법:** 성공·실패 grasp 데이터 기반 evaluator 학습
+- **우리 연구와의 연결:** 기하 surrogate와 실제 성공 평가를 분리하고 후보를 선택하는 설계
+- **적용 시 구분할 점:** Grasp 성공 evaluator를 우리의 후속 조작 성공 evaluator로 그대로 대체하지 않는다.
+
 ---
 
 ## 16. Change Log
+
+### 2026-09-14 — Track B 1단계 초점·GD2P 분석·DOI 참고문헌 보강
+
+- Track B의 1단계 low-level policy와 Approach hand configuration reward를 현재 우선 작업으로 명시했다.
+- GD2P의 생성 대상·학습 방식·실행 방식에 대한 정정, energy 6항의 의미와 공개 코드 차이를 기록했다.
+- Wrench-space 평가와 downstream execution value를 후속 동작 적합성의 작업 가설로 구분했다.
+- 관련 논문 17편과 배경 논문 3편의 DOI·출판 상태·방법·활용점·한계를 추가했다.
+- 현재 요약·우선 읽기 순서·Stage 7·대체 관계·결정 레지스터·미결 목록을 함께 갱신했다.
+- 문서와 후속 사용자 수정이 충돌하면 사용자의 최신 설명을 우선하도록 문서 해석 순서를 바로잡았다.
+- 기존 Track A, Track B의 2단계 확장 방향, 이전 의사결정 기록은 보존했다.
 
 ### 2026-09-14 — Track B의 Low-level 우선 학습과 조작 의사결정 통합 방향 반영
 
