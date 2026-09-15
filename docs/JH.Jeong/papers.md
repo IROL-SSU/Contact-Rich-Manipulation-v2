@@ -8,7 +8,7 @@
 
 ## 1. 문서 사용법
 
-이 문서는 먼저 전체 논문을 ID 순서로 제시하고, 이후 연구 목적별로 관련 논문을 다시 그룹핑한다. B01–B27은 [`context.md`](./context.md)의 기존 ID와 동일하며, 이후 새로 확인한 논문은 다음 번호부터 연속해서 추가한다.
+이 문서는 먼저 전체 논문을 ID 순서로 제시하고, 이후 연구 목적별로 관련 논문을 다시 그룹핑한다. B01–B40은 [`context.md`](./context.md)와 같은 ID 체계를 사용하며, 이후 새로 확인한 논문은 다음 번호부터 연속해서 추가한다.
 
 - 목록 포함은 최종 baseline 선정, 방법 채택 또는 실험 재현을 의미하지 않는다.
 - 목적별 그룹은 서로 배타적이지 않다. 한 논문이 여러 목적에 활용될 수 있다.
@@ -58,6 +58,10 @@
 | B34 | TacSL: A Library for Visuotactile Sensor Simulation and Learning | IEEE T-RO 2025; arXiv 2024 | GPU visuotactile image·force-field simulation; policy distillation | [Publication DOI](https://doi.org/10.1109/TRO.2025.3547267) | [Paper](https://arxiv.org/abs/2408.06506), [Project](https://iakinola23.github.io/tacsl/) |
 | B35 | Isaac Lab: A GPU-Accelerated Simulation Framework for Multi-Modal Robot Learning | arXiv 2025 | Multi-frequency sensors; observations; domain randomization | [arXiv DOI](https://doi.org/10.48550/arXiv.2511.04831) | [Paper](https://arxiv.org/abs/2511.04831), [Code](https://github.com/isaac-sim/IsaacLab) |
 | B36 | TacEx: GelSight Tactile Simulation in Isaac Sim — Combining Soft-Body and Visuotactile Simulators | arXiv 2024 | Isaac Sim GelSight image·deformation simulation; RL environments | [arXiv DOI](https://doi.org/10.48550/arXiv.2411.04776) | [Paper](https://arxiv.org/abs/2411.04776), [Project](https://sites.google.com/view/tacex) |
+| B37 | Goal-Driven Robotic Pushing Using Tactile and Proprioceptive Feedback | IEEE T-RO 2022; online 2021 | Tactile servoing; pusher–object relative pose; target alignment | [Publication DOI](https://doi.org/10.1109/TRO.2021.3104471) | [Paper](https://arxiv.org/abs/2012.01859), [Publication](https://research-information.bris.ac.uk/en/publications/goal-driven-robotic-pushing-using-tactile-and-proprioceptive-feed/) |
+| B38 | On the Continuity of Rotation Representations in Neural Networks | CVPR 2019 | 6D Gram–Schmidt representation; 5D normalized stereographic-projection representation | [Publication DOI](https://doi.org/10.1109/CVPR.2019.00589) | [Paper](https://openaccess.thecvf.com/content_CVPR_2019/html/Zhou_On_the_Continuity_of_Rotation_Representations_in_Neural_Networks_CVPR_2019_paper.html), [Project](https://zhouyisjtu.github.io/project_rotation/rotation.html) |
+| B39 | A System for General In-Hand Object Re-Orientation | CoRL 2021; PMLR 2022 | Arbitrary goal orientation; quaternion-difference observation; symmetry | 미확인 | [Paper](https://proceedings.mlr.press/v164/chen22a.html) |
+| B40 | General In-Hand Object Rotation with Vision and Touch (RotateIt) | CoRL 2023 | Hand-centric rotation-axis goal; visuotactile rotation | [arXiv DOI](https://doi.org/10.48550/arXiv.2309.09979) | [Paper](https://proceedings.mlr.press/v229/qi23a.html) |
 
 ---
 
@@ -88,6 +92,8 @@
 | B16 | Nonprehensile Pregrasp | 후속 grasp를 가능하게 하는 사전 nonprehensile manipulation planning |
 | B28 | Where to Touch, How to Contact | Contact location과 post-contact object subgoal을 연결하는 계층적 interface |
 | B31 | HACMan++ | Primitive type·location·parameter를 선택하고 여러 primitive를 순서대로 연결하는 방법 |
+| B39 | General In-Hand Object Re-Orientation | 임의의 SO(3) goal 도달에서 current–goal quaternion difference와 symmetry-aware success를 사용하는 방식 |
+| B40 | RotateIt | 최종 자세가 아니라 hand-centric rotation-axis를 목표로 연속 회전을 학습하는 방식 |
 
 ### 3.3 Tactile·F/T 기반 Closed-Loop Contact 형성·보정
 
@@ -107,6 +113,7 @@
 | B33 | Robot Synesthesia | Binary active sensor의 위치를 palm-frame tactile point cloud로 바꾸어 visual point cloud와 결합 |
 | B34 | TacSL | Visuotactile RGB와 per-taxel force field를 GPU에서 생성하는 고충실도 tactile simulation 후보 |
 | B36 | TacEx | Isaac Sim에서 GelSight deformation·RGB observation을 생성하는 외부 tactile simulation 후보 |
+| B37 | Goal-Driven Robotic Pushing | Tactile로 pusher–object 상대 pose를 안정화하고 proprioception으로 target bearing·distance를 정렬하는 역할 분담 |
 
 ### 3.4 Goal-Conditioned Nonprehensile Manipulation과 Contact 선택
 
@@ -157,19 +164,26 @@
 | B34 | TacSL | 고충실도 visuotactile image·force field를 사용할 때 필요한 별도 sensor simulation 경로와 비용 |
 | B35 | Isaac Lab | Camera, ContactSensor, FrameTransformer, joint wrench와 ObservationManager를 통한 구현 가능 범위 |
 | B36 | TacEx | Vanilla ContactSensor를 넘어 GelSight 영상까지 모사할 때의 외부 Isaac Sim 확장 후보 |
+| B37 | Goal-Driven Robotic Pushing | Local tactile pose와 global proprioceptive goal을 분리한 이유; binary tactile로 그대로 재현할 수 없는 정보의 경계 |
+| B38 | Continuity of Rotation Representations | 5D는 6D의 마지막 네 성분을 normalized stereographic projection으로 3D에 압축한 full-SO(3) 표현이며, 6D는 두 3D vector를 Gram–Schmidt로 복원하는 더 직접적인 표현이다. 원 논문은 point-cloud regression에서 5D의 gradient distortion 가능성을 지적하므로 현재 baseline은 6D, 5D는 ablation 근거로 사용 |
+| B39 | General In-Hand Object Re-Orientation | 임의 goal orientation에는 quaternion difference를, symmetric-object vision 평가에는 shape-equivalent criterion을 둔 사례 |
+| B40 | RotateIt | 연속 회전 task에서 hand-centric 3D rotation-axis vector를 observation에 추가한 이유 |
 
 ---
 
 ## 4. 현재 우선 독해 순서 — Observation formulation
 
-현재 Track B 1단계의 **coarse OBB + binary tactile + wrist F/T + MLP history** observation을 구체화하기 위한 순서다. 최종 실험 baseline 선정은 아니다. Point cloud·raw RGB·optical tactile는 현재 actor 최소안이 아니라 비교 배경 또는 후속 확장으로 읽는다.
+현재 Track B 1단계의 **coarse OBB + arm/hand q + binary tactile + wrist F/T + MLP history** observation을 구체화하기 위한 순서다. 최종 실험 baseline 선정은 아니다. Point cloud·raw RGB·optical tactile는 현재 actor 최소안이 아니라 비교 배경 또는 후속 확장으로 읽는다.
 
-1. **B09 DexTouch → B32 Rotating without Seeing:** ContactSensor로 재현 가능한 binary tactile, previous command와 finite history의 최소 구성
-2. **B35 Isaac Lab:** URDF link/pad ContactSensor, joint wrench와 ObservationManager history의 실제 구현 경계
-3. **B12 Visuotactile Estimation and Control:** Continuous vision의 occlusion·latency와 force/action history를 처리하는 이유
-4. **B27 VTDexManip:** Image–ResNet과 binary tactile–MLP를 분리한 근거 및 raw image를 현재안에서 제외할 근거
-5. **B33 Robot Synesthesia:** Spatial tactile/point-cloud 표현이 coarse binary보다 주는 정보와 추가 구현 비용의 비교 배경
-6. **B22 DexMove → B34 TacSL → B36 TacEx:** 고차원 tactile·optical tactile가 제공할 수 있는 상한과 현재 ContactSensor baseline의 차이
+1. **B09 DexTouch → B32 Rotating without Seeing:** Binary tactile와 spatial coverage의 이유를 B09에서, previous controller target과 finite history의 이유를 B32에서 확인
+2. **B10 Tactile Pushing → B37 Goal-Driven Robotic Pushing:** Pusher/EEF-relative goal과 local contact state를 분리하는 이유, raw tactile image와 contact-pose feature의 차이
+3. **B35 Isaac Lab:** URDF link/pad ContactSensor, joint wrench와 ObservationManager history의 실제 구현 경계
+4. **B12 Visuotactile Estimation and Control:** Continuous vision의 occlusion·latency와 force history, validity·uncertainty를 처리하는 이유
+5. **B27 VTDexManip:** Image–ResNet과 binary tactile–MLP를 분리한 근거 및 raw image를 현재안에서 제외할 근거
+6. **B33 Robot Synesthesia:** Spatial tactile/point-cloud 표현이 coarse binary보다 주는 정보와 추가 구현 비용의 비교 배경
+7. **B15 RoboPack → B26 DyWA:** Action–contact history로 관측되지 않는 물성·동역학을 추론하는 이유와 recurrent model의 역할
+8. **B22 DexMove → B34 TacSL → B36 TacEx:** 고차원 tactile·optical tactile가 제공할 수 있는 상한과 현재 ContactSensor baseline의 차이
+9. **B39 General In-Hand Re-Orientation → B40 RotateIt → B38 Rotation Representation:** Arbitrary orientation goal, continuous-axis rotation goal과 neural-network용 SO(3) 표현을 구분
 
 현재 tactile 관련 직접 ablation은 `F/T only`, `URDF coarse M-region binary + F/T`, `17-channel binary + F/T`다. 논문의 history 길이와 force threshold는 출발 근거일 뿐 그대로 복사하지 않고 실제 policy rate·sensor latency·hardware calibration으로 정한다.
 

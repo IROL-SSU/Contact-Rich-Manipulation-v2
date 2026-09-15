@@ -25,7 +25,7 @@
 ### 후속 작업자가 우선 읽을 부분
 
 1. `1. 현재 결론 요약` — 특히 1.5절의 정보·Action 명세 우선순위와 1.6절의 1단계 역할 경계
-2. `5. Track B` — 특히 5.3절의 실행 범위, **5.6.1.6절의 최신 observation**, 5.7절의 contribution 후보와 5.11절의 baseline 비교 관점
+2. `5. Track B` — 특히 5.3절의 실행 범위, **5.6.1.6절의 현재 최소 observation과 5.6.1.7절의 문헌 재검토**, 5.7절의 contribution 후보와 5.11절의 baseline 비교 관점
 3. `15.2 기존 참고 논문 목록과 DOI`와 `15.3 후속 baseline 탐색 자료` — 후보별 연결점·한계; 5.10절의 reward 분석은 이전 검토 이력
 4. `3. 전체 시스템에서 두 Track의 위치`와 `6. Track A와 Track B의 관계`
 5. `11. 의사결정 과정`과 `13. 현재 결정 레지스터와 미결 Backlog`
@@ -100,7 +100,7 @@ Track A와 Track B는 모두 이 blocker-handling 시나리오를 다룬다. 두
 
 **[2026-09-15 현재 진행 중]** 첫 번째 항목인 observation을 우선 구체화한다. 모든 후보 신호에 대해 `선행연구의 실제 입력·가공 → Isaac Lab 원천 데이터와 API → policy에 넣을 표현 → 실물에서의 대응 신호 → noise·latency·한계`를 함께 기록한다. 시뮬레이터가 제공한다는 이유만으로 실물에서 얻을 수 없는 exact state·contact를 actor observation에 포함하지 않는다.
 
-**[2026-09-15 사용자 검토 후 현재안]** MLP actor에는 phase ID를 주지 않고 reward gate로 sequence를 학습한다. 현재 최소 입력은 EEF-frame push-conditioned goal, current EEF–object pose, episode-consistent OBB extent, hand q와 binary tactile·wrist F/T·previous-action history다. 실제 17 tactile sensor는 URDF link/pad 기준 `M`개 coarse region으로 pooling하는 안을 기본으로 두고 17-channel 표현과 비교한다. History는 MLP observation에 flatten하며 modality별 길이를 같게 강제하지 않는다. 세부는 5.6.1.6과 Stage 13을 따른다.
+**[2026-09-15 사용자 검토 후 현재안]** MLP actor에는 phase ID를 주지 않고 reward gate로 sequence를 학습한다. 현재 최소 입력은 EEF-frame push-conditioned goal, current EEF–object pose, episode-consistent OBB extent, current arm q와 hand q, binary tactile·wrist F/T·previous-action history다. Shelf·workspace state는 actor에 주지 않고 collision penalty·termination으로 제약한다. Tactile은 상대 body identity와 무관한 any-contact binary이며 contact pair는 privileged information에서만 구분한다. History 길이는 실험으로 정하고 F/T preprocessing은 환경 구현 단계에서 확정한다. DiffIK/OSC의 delta action은 매 step measured state를 기준으로 새 command를 만들고 이전 target에 누적하지 않으므로 controller-target state는 추가하지 않는다. Simulation pose는 core manipulation 학습에서 GT를 사용할 수 있으나 Sim-to-Real에서는 실제 tracker log에 맞춘 noise·bias·latency·dropout을 observation에 적용한다. Vision tracking 개선은 연구 범위가 아니며 valid/age는 기본 입력이 아니라 deployment 옵션이다. 움직이는 EEF frame의 yaw 해석 문제를 고려해 current/target orientation은 EEF-relative 6D로 보존하고 reward는 shelf/task-frame yaw만 평가하는 조합을 Agent 권고안으로 두었다. 5D는 stereographic projection을 이용한 full-SO(3) 표현이지만 baseline이 아니라 ablation 후보다. 세부는 5.6.1.6–5.6.1.7과 Stage 13–17을 따른다.
 
 **[현재 합의: 연구 관점]** 단순히 회전과 밀기라는 서로 다른 동작을 나열하는 것이 아니라, 다양한 초기 물체 자세에서 **목표 방향의 pushing을 위해 물체를 주어진 자세로 돌려두고, 이에 필요한 hand configuration과 접촉 상태를 형성·조절하는 문제**로 이해한다. Contribution의 범위를 최초 Approach에만 한정하지 않는다.
 
@@ -331,7 +331,7 @@ Vision과 Low-level contact sensing은 서로 다른 주기로 병렬 사용할 
 | 근사 geometry | 접근 방향과 초기 hand configuration 준비 | Episode-consistent object-local OBB extent를 현재 actor 표현으로 사용 |
 | Tactile | 실제 접촉 위치·분포를 참고해 손 구성과 접촉 배치 조정 | 실제 17 sensor를 URDF 공통 `M`개 region의 binary로 pooling; granularity는 ablation |
 | Wrist F/T | 손에 전달되는 합력·모멘트를 참고해 전체 접촉 부하 조절 | Bias-compensated EEF-frame 6D wrench와 history 사용 방향 |
-| Robot/hand state | 현재 hand configuration 확인 | RH56E2 actuated `q_H` 6D를 현재 최소안에 포함; arm q·velocity·추가 kinematics는 초기 제외 |
+| Robot/hand state | 현재 arm posture와 hand configuration 확인 | UR5e measured `q_A` 6D와 RH56E2 actuated `q_H` 6D를 현재 최소안에 포함; arm/hand velocity와 추가 kinematics는 초기 제외 |
 
 접촉 전에는 해당 물체의 tactile 신호가 없으므로 **근사 geometry로 준비하고, 접촉 후 실제 feedback으로 보정**한다. 국소 법선·전단력·미끄러짐 등을 센서가 직접 제공한다고 임의로 가정하지 않는다.
 
@@ -411,13 +411,13 @@ Policy 개수, parameter freeze 여부, 공동 fine-tuning 방식, memory 구조
 
 - **Policy observation:** 실제 배포 시 얻을 수 있는 Vision·근사 geometry·F/T·Tactile·robot/hand state·goal 정보의 범위
 - **Privileged information:** Simulation의 정확한 물체 상태·접촉·충돌 등 policy 입력에는 넣지 않고 reward·termination·evaluation에만 사용할 정보의 범위
-- **Action 방향:** EEF frame에서 표현한 delta pose와 hand joint action. Delta rotation 표현, joint action의 position/delta/velocity 방식, scaling·clipping·control frequency와 controller interface는 미결이다.
+- **Action 방향:** EEF frame에서 표현한 delta pose와 hand joint action. EEF delta는 매 policy step의 measured state를 기준으로 새 command를 만들고 이전 desired target에 누적하지 않는다. DiffIK/OSC 중 선택, delta rotation 표현, joint action의 position/delta/velocity 방식, scaling·clipping과 control frequency는 미결이다.
 
 Privileged information은 학습 목표와 안전 조건을 정확히 평가하기 위한 용도로 구분한다. 실제 정책이 사용할 수 없는 정보를 observation에 섞거나, privileged state에만 의존하는 phase 전환 규칙을 실물 실행 규칙으로 간주하지 않는다.
 
 #### 5.6.1 Policy observation 정보 계약 초안
 
-5.6.1.1–5.6.1.5는 문헌·Isaac Lab 구현 조사 직후의 **초기 Agent 제안과 검토 이력**이다. 이후 사용자와 항목별로 논의하며 phase·goal·geometry·tactile·history 구성이 바뀌었다. 현재안은 **5.6.1.6**을 우선하며, 앞 절의 point cloud 우선 확장, phase 입력, 다수 kinematic feature와 모든 modality의 동일 history 등의 제안을 확정 명세로 사용하지 않는다.
+5.6.1.1–5.6.1.5는 문헌·Isaac Lab 구현 조사 직후의 **초기 Agent 제안과 검토 이력**이다. 이후 사용자와 항목별로 논의하며 phase·goal·geometry·tactile·history 구성이 바뀌었다. 현재 최소안은 **5.6.1.6**, 유사 연구의 채택 이유에 따른 재검토와 조건부 수정안은 **5.6.1.7**을 우선한다. 앞 절의 point cloud 우선 확장, phase 입력, 다수 kinematic feature와 모든 modality의 동일 history 등의 제안을 확정 명세로 사용하지 않는다.
 
 ##### 5.6.1.1 선택 원칙
 
@@ -523,7 +523,7 @@ Episode/reset 시의 zero bias, tool·hand의 gravity와 가능한 inertial comp
 - Arm과 hand `q/dq`는 실제 encoder가 제공하는 순서·zero·sign으로 정렬하고 joint/velocity limit로 정규화한다.
 - RH56E2의 hand observation과 action은 우선 실제 6 actuator coordinates를 기준으로 한다. Simulator의 12개 물리 joint가 6개 actuator에서 종속되는 경우, 실물 API로 동일하게 복원되지 않는 독립 joint 값을 actor에 추가하지 않는다.
 - EEF pose/twist와 fingertip/pad center는 `q`에서 계산 가능하지만, task geometry와 action frame의 관계를 쉽게 학습하도록 명시적으로 제공할 가치가 있다. 중복 효과는 ablation한다.
-- Delta-pose·delta-joint action을 쓰면 직전 action과 누적 desired target을 알아야 actuator lag·smoothing 아래의 상태 모호성을 줄일 수 있다. DexTouch와 Rotating without Seeing의 previous target 사용이 근거다.
+- Delta-pose·delta-joint action을 쓰면 누적 desired target을 알아야 actuator lag·smoothing 아래의 상태 모호성을 줄일 수 있다. `Rotating without Seeing`의 previous joint target 사용이 직접 근거다. DexTouch는 robot `q/dq`와 kinematics를 actor에 제공하지만 previous target을 사용한 근거로 인용하지 않는다.
 
 **E. History·sensor synchronization**
 
@@ -592,10 +592,12 @@ $$
 - Policy에는 object–goal error를 직접 넣기보다, 현재 EEF frame으로 변환한 `target object position + preparatory object orientation`을 goal로 주고 current EEF–object pose를 별도로 준다.
 
 $$
-g_t^E=[p_{O,g}^{E},\;\phi_{O,\mathrm{prep}}^{E}]\in\mathbb{R}^{6}
+g_t^E=\left[p_{O,g}^{E},\rho_6(R_{EG,t})\right]\in\mathbb{R}^{9}
 $$
 
 Position component는 pushing 목표를, rotation component는 preparatory/maintenance constraint를 나타낸다. Rotation gate 전에는 후자가 중심이고, gate 후에는 전자의 progress가 중심이며 orientation을 유지한다.
+
+이 절의 rotation 3D 표기는 초기 placeholder였다. Stage 17 이후의 working baseline에서는 task reward가 yaw-only이더라도 움직이는 EEF에서 orientation 문맥을 잃지 않도록 current와 target을 각각 6D continuous rotation representation으로 관측한다. EEF가 shelf normal에 고정 정렬되는 제한 조건의 `sin/cos yaw`는 ablation 후보다.
 
 **Unseen object와 coarse OBB**
 
@@ -625,42 +627,51 @@ $$
 
 - `M=17`의 세밀한 binary tactile와 `M<17`의 coarse pooling은 **실험적으로 비교할 observation granularity**다. 비교할 때 tactile encoder output과 나머지 policy 크기를 같게 유지한다.
 - 기본 조합은 `binary tactile + wrist F/T`다. Tactile는 접촉 위치/영역을, wrist wrench는 전체 force·moment 크기를 보완한다.
+- Actor binary tactile는 접촉 상대를 구분하지 않는다. Object, shelf 또는 다른 body와의 contact 중 어느 것이든 해당 region에서 threshold를 넘으면 `on`이다. Simulation contact-pair identity는 reward·termination·critic의 privileged information에서만 구분한다.
 - 논문의 `0.01 N`을 복사하지 않는다. 실제 sensor의 no-contact drift·접촉 분포·power cycle을 측정해 `τ_on>τ_off` hysteresis와 debounce를 정하고, 그 범위를 simulation threshold·delay·dropout randomization에 사용한다.
 - Simulation의 continuous per-region contact force는 actor tactile로 쓰지 않고 reward·asymmetric critic용 privileged information으로 활용하는 방향이다. 과부하·충격·접촉 부족을 평가하되 actor가 binary tactile와 하나의 wrist wrench로 구분할 수 없는 정확한 per-taxel force 분포를 목표로 강제하지 않는다.
 
-**현재 MLP observation 표**
+**현재 MLP observation working baseline**
 
-넣지 않기로 한 항목은 아래 표에서 제외했다. Rotation은 3D rotation vector 후보를 사용하며 정확한 representation은 action contract와 함께 최종 확인한다.
+넣지 않기로 한 항목은 아래 표에서 제외했다. Rotation은 최신 논의를 반영해 EEF-relative 6D를 current/target에 각각 사용한다. 이는 구현 기준안이며 최종 사용자 확정 전이다.
 
 | Observation | 표현 | 차원 | 시간 범위 | 역할 |
 | --- | --- | ---: | --- | --- |
-| Push-conditioned goal | EEF-frame target object position 3D + preparatory object rotation 3D | 6 | Current | Pushing 목표와 준비/유지 orientation 제공 |
-| Current object pose | EEF-frame estimated object position 3D + rotation 3D | 6 | Current | 현재 hand–object 관계 제공 |
+| Push-conditioned goal | EEF-frame target object position 3D + target orientation 6D | 9 | Current | Pushing 목표와 준비/유지 orientation 제공 |
+| Current object pose | EEF-frame estimated object position 3D + current orientation 6D | 9 | Current | 현재 hand–object 관계 제공 |
 | Coarse geometry | Episode-consistent object-local OBB extent `(l,w,h)` | 3 | Episode-fixed | Unseen object의 안정적인 근사 크기 제공 |
+| Arm configuration | UR5e measured joint position | 6 | Current | 동일 EEF pose에서 다른 arm posture·joint-limit 상태를 구분 |
 | Hand configuration | RH56E2 actuated joint position | 6 | Current | 현재 손가락 구성 제공 |
 | Binary tactile | Real 17 taxel 또는 URDF 공통 coarse region의 on/off | `K_b M` | 최근 `K_b` step | 접촉 영역과 접촉 전이 제공 |
 | Wrist F/T | Bias-compensated EEF-frame force 3D + torque 3D | `6K_w` | 최근 `K_w` step | 전체 접촉 부하와 변화 추세 제공 |
 | Previous action | EEF delta pose 6D + hand joint action 6D | `12K_a` | 최근 `K_a` step | 명령과 이후 contact response의 관계 제공 |
 
-단일 현재값만 사용할 때 `K_b=K_w=K_a=1`이며 차원은 `39+M`이다. History를 사용하는 MLP input은 다음과 같다.
+단일 현재값만 사용할 때 `K_b=K_w=K_a=1`이며 차원은 `51+M`이다. History를 사용하는 MLP input은 다음과 같다.
 
 $$
-o_t^{\mathrm{MLP}}=[g_t^E,T_{EO,t},d_O,q_{H,t},b_{t-K_b+1:t},w_{t-K_w+1:t},a_{t-K_a:t-1}]
+o_t^{\mathrm{MLP}}=[g_t^E,x_{O,t}^E,d_O,q_{A,t},q_{H,t},b_{t-K_b+1:t},w_{t-K_w+1:t},a_{t-K_a:t-1}]
 $$
 
 $$
-D_{\mathrm{MLP}}=21+K_bM+6K_w+12K_a
+D_{\mathrm{MLP}}=33+K_bM+6K_w+12K_a
+$$
+
+$$
+g_t^E=\left[p_{O,g}^{E},\rho_6(R_{EG,t})\right],\qquad
+x_{O,t}^E=\left[p_{EO,t}^{E},\rho_6(R_{EO,t})\right]
 $$
 
 History는 별도의 sensor가 아니라 **과거 sensor/action 값을 flatten하여 현재 actor observation에 추가하는 방식**이다. 현재 policy가 MLP이므로 recurrent hidden state에 맡기지 않는다. 모든 history에 같은 길이를 써야 할 이유는 없다.
 
 - 같은 `K`는 `[tactile_t,wrench_t,action_{t-1}]`을 정렬하기 쉽고 첫 baseline·ablation이 단순하다는 장점만 있다.
 - 최종 `K_b,K_w,K_a`는 step 수보다 실제 시간 범위로 정한다. Action-to-sensor latency, 접촉 transient와 policy frequency를 측정한다.
-- 첫 비교는 `K=1` 대 공통 `K=4`가 단순하며, 이후 불필요한 action history 등을 줄여 modality-specific window를 정한다.
+- 첫 비교의 history 길이는 구현 후 실제 policy rate와 sensor latency를 기준으로 설계한다. `K=1` 대 짧은 공통 window를 출발점으로 둘 수 있지만 구체적인 `K_b/K_w/K_a`는 실험으로 정한다.
 
 **현재 최소안에서 제외한 항목**
 
-Phase ID, object velocity, arm/hand joint velocity, absolute EEF pose와 twist, fingertip/pad position, vision confidence/age, arm joint position, raw RGB, point cloud와 mesh는 현재 최소 observation에서 제외한다. 이 중 arm joint position, tracker validity/age와 일부 kinematic feature는 실제 failure 분석에서 필요성이 확인될 때 추가·ablation한다. 제외는 정보가 물리적으로 무의미하다는 뜻이 아니라, 현재 MLP input의 중복과 sim-to-real 부담을 줄인다는 뜻이다.
+Phase ID, object velocity, arm/hand joint velocity, absolute EEF pose와 twist, fingertip/pad position, vision confidence/age, shelf·workspace state, raw RGB, point cloud와 mesh는 현재 최소 observation에서 제외한다. Arm joint position은 current 6D로 포함한다. Tracker validity/age와 일부 kinematic feature는 실제 failure 분석에서 필요성이 확인될 때 추가·ablation한다. 제외는 정보가 물리적으로 무의미하다는 뜻이 아니라, 현재 MLP input의 중복과 sim-to-real 부담을 줄인다는 뜻이다.
+
+Shelf collision은 actor scene observation으로 예측시키기보다 simulation의 exact contact pair·collision impulse로 penalty와 termination을 계산한다. 실제 실행의 강제 중단은 actor reward가 아니라 별도 safety supervisor가 담당해야 한다. Shelf-relative 정보가 없으므로 동일 actor observation에서 shelf clearance만 다른 상태를 완전히 구분할 수 없다는 한계는 고정·제한된 workspace와 초기 상태 분포로 관리한다.
 
 **Tactile granularity ablation**
 
@@ -671,6 +682,115 @@ Phase ID, object velocity, arm/hand joint velocity, absolute EEF pose와 twist, 
 | 17-channel binary + F/T | 실제 17 sensor에 대응하는 binary | 세밀한 접촉 위치 정보의 추가 이득과 구현 비용 |
 
 성공률뿐 아니라 Rotation/Push 단계별 성공, contact loss·재접촉, 과도한 force, sample efficiency, sensor noise/dropout robustness, simulation throughput과 sim-to-real gap을 함께 비교한다.
+
+##### 5.6.1.7 유사 과업·센서 연구와의 Observation 재검토 — 2026-09-15
+
+이번 검토에서는 논문이 사용한 observation의 목록보다 **왜 그 정보가 필요했는지**를 우선 확인했다. 같은 tactile, force 또는 pose라도 해결하려는 부분관측성과 action interface가 다르면 우리 policy로 그대로 옮길 수 없다. 아래 표의 `우리에게 주는 판단`은 논문의 직접 결론과 이를 Track B에 적용한 해석을 구분해 작성했다.
+
+| 연구 | Actor가 받은 핵심 observation | 그렇게 설정한 이유 | 우리에게 주는 판단 |
+| --- | --- | --- | --- |
+| [B09 DexTouch](https://arxiv.org/html/2401.12496v2) | UR5e+Allegro `q/dq`, 16D binary tactile, palm pose·twist, palm-relative fingertip positions, task prior | Vision이 없는 넓은 탐색 범위에서 robot configuration과 접촉 위치로 물체를 찾고 조작해야 했다. Exact object pose·velocity·물성·phase indicator는 actor가 아니라 asymmetric critic에 추가했다. Full-hand tactile가 F/T-only, fingertip-only, palm-only보다 높았던 ablation은 **접촉의 공간적 identity와 coverage**가 중요함을 보여준다. | Binary tactile와 robot proprioception을 지지한다. 우리는 current arm q와 hand q만 채택하고, joint-space arm action·blind search에 사용된 arm/hand dq, palm twist와 fingertip 위치는 자동 채택하지 않는다. |
+| [B32 Rotating without Seeing](https://roboticsproceedings.org/rss19/p036.html) | Hand q 16D, binary tactile 16D, previous joint-position target 16D, rotation axis 3D를 현재+과거 3 state로 stack | Object pose를 전혀 보지 않으므로 distributed contact pattern으로 in-hand 위치와 critical contact를 간접 추론했다. 저자들은 단일 step이 제어에 충분하지 않다고 명시했고, relative action을 누적해 PD target으로 쓰므로 previous target을 observation에 포함했다. Exact contact force·object pose·물성은 critic만 받았다. | MLP tactile history와 privileged contact force 분리는 직접 근거가 있다. 더 중요한 점은 이 논문이 raw previous action이 아니라 **현재 controller target state**를 넣었다는 것이다. 누적 delta controller를 쓸 경우 우리도 내부 target을 숨기면 안 된다. |
+| [B10 Tactile Pushing](https://arxiv.org/html/2307.14272) | Tactile image 또는 tactile에서 추정한 pusher–contact-surface relative pose와 pusher/object-relative goal | Vision 없이 object center를 알 수 없으므로 전역 object pose 대신 제어 가능한 local contact pose로 문제를 재정의했다. Raw image보다 contact-surface pose가 pushing 관련 feature를 더 직접 표현해 model-free 학습도 더 sample-efficient했다. | EEF-relative goal과 current EEF–object/contact state를 분리한 현재 표현을 지지한다. Raw tactile image가 항상 더 낫지 않으며, task-relevant 저차원 feature가 유리할 수 있다. 단, 이 연구의 연속 contact pose는 우리 binary tactile가 직접 제공하지 못한다. |
+| [B37 Goal-Driven Robotic Pushing](https://arxiv.org/abs/2012.01859) | Optical tactile CNN이 추정한 sensor–object relative pose + robot proprioception으로 계산한 sensor–target bearing·distance | Local tactile loop는 접촉 거리·각도를 안정화하고, global proprioceptive loop는 pusher와 목표를 정렬했다. 복잡하고 불확실한 pushing model을 직접 식별하기보다 안정 접촉을 feedback으로 탐색하려는 설계다. | 우리의 `current EEF–object pose + EEF-frame goal` 역할 분담과 가깝다. 그러나 binary tactile만으로 연속 contact angle/depth를 복원할 수 없으므로 continuous vision과 wrist F/T가 그 부족분을 보완해야 한다. |
+| [B12 Visuotactile Estimation and Control](https://arxiv.org/html/2412.13157) | Noise·occlusion이 있는 object pose, EEF pose·force, occlusion indicator의 sequence → recurrent pose estimator; policy에는 추정 pose와 covariance | Nonprehensile interaction 중 object motion이 robot과 독립적으로 변하고 onboard vision은 장시간 occlude될 수 있어, 마지막 pose를 그대로 쓰면 현재값처럼 보이는 ambiguity가 생긴다. Force history로 motion을 추정하고 uncertainty를 policy에 알려 보수적으로 제어했다. | Uncertainty-aware control의 근거지만 tracker 개선은 우리 범위가 아니다. Core actor에는 `valid/age`를 넣지 않고 tracker-shaped observation corruption으로 robustness를 평가하며, metadata는 실제 interface가 제공할 때의 deployment 옵션으로 둔다. |
+| [B27 VTDexManip](https://proceedings.iclr.cc/paper_files/paper/2025/file/e19b6f65791e350347bcff8a3955cb5b-Paper-Conference.pdf) | Ego-centric RGB 또는 20-channel binary tactile의 learned representation + hand joint angle·velocity | RGB는 전역 scene/object 정보를, sparse binary tactile는 접촉 순간과 finger gait를 제공한다. Pressure를 binary로 만든 직접 목적은 human–simulation–robot 사이의 gap을 줄이는 것이며, tactile을 vision에 더하면 unseen-object 성능도 개선됐다. | Binary tactile+vision 조합과 hand proprioception을 지지한다. 우리는 upstream에서 pose·OBB를 이미 받으므로 raw RGB encoder까지 중복할 필요는 없지만, `q_H`만 쓸지 `dq_H` 또는 짧은 q history가 필요한지는 ablation 가치가 있다. |
+| [B14 Force Push](https://arxiv.org/abs/2401.17517) | Robot/contact point의 global 위치, 원하는 path와 contact force; object pose·geometry·friction·inertia는 사용하지 않음 | Quasi-static single-point pushing에서는 force direction으로 slider의 상대 orientation과 contact stability를 간접 조절할 수 있어 unknown object parameter와 pose를 명시적으로 추정하지 않았다. | Wrist F/T가 unknown dynamics 아래의 closed-loop correction에 유용하다는 근거다. 하지만 single known contact의 힘과 여러 손가락 힘이 합쳐진 wrist wrench는 정보량이 다르므로 F/T가 spatial tactile를 대체한다는 근거는 아니다. |
+| [B15 RoboPack](https://arxiv.org/html/2407.01418) | Initial visual particles, tactile history와 과거 action을 recurrent estimator에 입력 | 질량 분포·마찰·compliance는 한 frame에서 관측되지 않으므로, 어떤 action 뒤에 어떤 tactile response가 왔는지를 누적해 latent physics를 추론했다. | Action history는 contact response와 함께 볼 때 hidden dynamics 추론에 의미가 있다. 다만 recurrent world model의 긴 history가 MLP actor의 동일한 `K`를 정당화하지는 않는다. |
+| [B25 CORN](https://arxiv.org/abs/2403.10760)·[B30 HACMan](https://proceedings.mlr.press/v229/zhou23a.html) | Object/background point cloud와 geometry-conditioned goal/contact representation | Unseen shape에서 surface contact location 또는 point-wise motion을 직접 선택하는 것이 action의 일부이므로 local surface geometry가 필요했다. HACMan은 goal flow를 각 object point에 붙여 contact와 목표 이동을 공간적으로 정렬했다. | OBB는 의도적인 저정보량 baseline으로 유지할 수 있지만, 같은 extent를 가진 box·cylinder·concave object를 구분하지 못한다. OBB만 쓰면서 fine surface-level geometry-aware contact selection까지 주장해서는 안 된다. |
+| [B39 General In-Hand Object Re-Orientation](https://proceedings.mlr.press/v164/chen22a.html) | Reduced student policy에 hand q, object position과 current–target orientation quaternion difference | 임의의 SO(3) goal 자세 도달이 목적이므로 목표까지 남은 회전을 직접 표현했다. Symmetric object는 여러 orientation이 같은 관측을 만들 수 있어 point-cloud Chamfer criterion도 병행했다. | Arbitrary reorientation에는 quaternion error가 흔한 선택이지만, 우리의 goal/current 분리와 OBB symmetry에는 그대로 복사하지 않는다. Symmetry-equivalent orientation을 같은 목표로 취급해야 한다는 근거로 사용한다. |
+| [B40 RotateIt](https://proceedings.mlr.press/v229/qi23a.html) | Hand-centric rotation axis `k`를 goal로 추가하고 visuotactile·proprioceptive history를 사용 | 특정 final pose가 아니라 지정 축으로 연속 회전하는 과업이므로 full goal orientation 대신 rotation-axis vector가 task command였다. | Rotation observation은 차원보다 task semantics가 먼저다. 우리의 preparatory pose goal은 continuous spin과 다르므로 axis vector를 그대로 쓰지 않되 EEF-centric goal 설계의 근거로 삼는다. |
+| [B38 Rotation Representation](https://openaccess.thecvf.com/content_CVPR_2019/html/Zhou_On_the_Continuity_of_Rotation_Representations_in_Neural_Networks_CVPR_2019_paper.html) | Full SO(3)를 neural network에 넣기 위한 5D/6D continuous representation | Quaternion·Euler 등 4D 이하의 전역 표현에는 불연속성이 있으며, 6D representation이 rotation regression에서 더 안정적임을 보였다. | Full 3D current/goal orientation을 MLP에 직접 넣는다면 각각 6D를 우선 후보로 둔다. Local action increment는 작은 범위의 3D rotation vector를 별도로 사용할 수 있다. |
+
+**현재 observation별 판정**
+
+| 현재 항목 | 판정 | 이유와 다음 검증 |
+| --- | --- | --- |
+| EEF-frame push-conditioned goal + current EEF–object pose | **유지** | Local action frame에서 목표와 현재 상태를 함께 표현하는 것은 tactile pushing 연구와 일치한다. 두 값을 분리하면 policy가 position progress와 preparatory orientation을 계산할 수 있다. |
+| Arm q | **유지** | 사용자는 arm joint state를 제외하려는 것이 아니었다. Current UR5e q 6D만 포함해 동일 EEF pose의 다른 arm configuration을 구분하고, arm dq·history는 초기안에서 제외한다. |
+| Object-local OBB extent | **유지하되 주장 범위 제한** | 안정적인 coarse prior라는 목적에는 맞지만 contact surface 자체를 표현하지 않는다. `no geometry / OBB`와 동일 OBB extent를 가진 서로 다른 shape split을 평가한다. |
+| Hand q | **유지** | Finger configuration은 contact geometry와 joint action 결과를 결정한다. 실제 값이 encoder 측정인지 command target인지 hardware에서 확인해야 한다. |
+| Binary tactile history | **유지** | Contact identity·전이를 실물과 simulation에서 가장 단순하게 맞춘다. 문헌상 sensor coverage가 중요하므로 `M`을 지나치게 줄이지 말고 contact-role을 보존한 grouping과 17-channel을 비교한다. |
+| Wrist F/T history | **유지** | Binary touch가 잃은 부하 크기·방향·moment와 transient를 보완한다. Tactile의 spatial identity를 대체하지 않고 함께 사용한다. |
+| Previous action history | **유지 후보 / ablation** | 최근 command와 tactile·wrench response의 관계 및 actuator lag를 해석하는 데 사용할 수 있다. 현재 action semantics에서는 controller target을 복원하기 위한 항목이 아니므로 history 유무와 `K_a`를 비교한다. |
+| Vision valid/age | **Core에서 제외, Sim-to-Real 확장** | Tracking 개선은 현재 contribution이 아니다. 실제 tracker가 dropout metadata를 제공하고 recovery가 필요할 때만 deployment observation으로 검토한다. |
+| Controller target state | **제외** | DiffIK/OSC command는 매 policy step의 measured state를 기준으로 이번 delta를 해석하고 새 command가 이전 command를 대체한다. 이전 desired target에 action을 누적하지 않으므로 별도 persistent target state가 없다. |
+| Hand dq 또는 q history | **Ablation** | DexTouch·VTDexManip은 dq를, Rotating without Seeing는 q history를 사용했다. Actual hand motion과 commanded motion의 차이가 failure 원인이 될 때 둘 중 하나를 추가한다. |
+| Object-pose history 또는 filtered twist | **조건부 ablation** | 현재안은 저속 quasi-static 조작을 전제로 할 때 방어 가능하다. Dynamic push, overshoot 또는 vision latency가 크면 current pose 하나로 운동 방향을 구별할 수 없으므로 GT velocity 대신 실제 tracker pose history부터 비교한다. |
+| Phase ID | **계속 제외** | DexTouch처럼 reward를 단계화하면서 actor에 phase를 주지 않는 사례가 있다. 단, gate가 actor observation으로 복원할 수 없는 latched memory를 가지면 안 된다. |
+| Arm dq·absolute EEF pose·fingertip 위치·raw RGB/point cloud | **현재는 제외 유지** | Arm q는 포함하되 velocity와 추가 kinematics를 한꺼번에 넣지 않는다. 나머지는 failure가 관찰되기 전 자동 추가할 근거가 약하다. |
+
+**EEF-frame Rotation Observation 후보**
+
+대부분의 관측을 EEF frame으로 두려는 방향은 action frame과 일치하므로 타당하다.
+
+$$
+R_{EO,t}=R_{WE,t}^{T}R_{WO,t},\qquad
+R_{EG,t}=R_{WE,t}^{T}R_{WG,t}
+$$
+
+- Shelf-plane yaw만 task goal이면 current와 preparatory target yaw를 각각 `[\cos\psi,\sin\psi]`로 주는 2D 표현이 가장 작고 angle wrap을 피한다.
+- Moving EEF의 full orientation 문맥을 보존하려면 `R_{EO}`와 `R_{EG}`의 첫 두 column을 각각 펼친 6D continuous representation을 사용한다. 이것은 reward까지 full SO(3)로 정의한다는 뜻이 아니다.
+- Observation의 full rotation representation과 action의 3D local rotation-vector increment는 같을 필요가 없다.
+- 어느 표현도 OBB symmetry를 자동으로 해결하지 않는다. Episode-local axes의 temporal continuity를 유지하고, 현재 yaw-only reward·goal error는 shelf/task frame에서 symmetry-equivalent orientation 중 최소 wrapped yaw error를 사용한다. Full geodesic SO(3) error는 roll/pitch까지 목표로 하는 확장에만 사용한다.
+
+여기서 EEF frame의 yaw를 직접 뽑는 2D 표현은 EEF z-axis가 shelf normal과 정렬되어 있을 때만 shelf-plane yaw와 같은 의미를 갖는다. EEF가 roll/pitch까지 움직이면 Euler decomposition은 좌표계에 의존하므로 task-relevant yaw 정보가 섞일 수 있다. 따라서 현재 권고안은 `R_{EO}`와 `R_{EG}`를 각각 6D로 관측하고, reward에서는 shelf/task-frame normal 주위의 yaw error만 계산하는 것이다. 이는 full SO(3)를 목표로 제어한다는 뜻이 아니라 moving reference frame에서 필요한 orientation 문맥을 보존한다는 뜻이다.
+
+Zhou et al.의 5D는 6D 중 한 성분을 버리는 방식이 아니다. 첫 두 rotation-matrix column을 `c_1=(x_1,y_1,z_1)`, `c_2`라 하면 `x_1,y_1`을 그대로 두고 unit vector `c_2`와 scalar `z_1`을 다음 normalized stereographic projection으로 3D에 넣어 총 5D를 만든다.
+
+$$
+P(c_2,z_1)=c_2\left(z_1+\sqrt{z_1^2+1}\right)
+$$
+
+Decoding은 inverse projection으로 두 3D vector를 복원한 뒤 6D와 같은 Gram–Schmidt map을 사용한다. 5D는 full SO(3)의 continuous representation이지만 projection의 비선형성과 gradient distortion 가능성이 있고 차원 절감은 orientation 하나당 1뿐이다. 이 연구에서는 해석과 구현이 직접적인 6D를 baseline으로 두고 5D는 필요할 때 representation ablation으로만 비교한다.
+
+Arm q를 포함한 전체 MLP 차원은 제한된 planar ablation에서 `25+K_bM+6K_w+12K_a`, 현재 EEF-relative 6D working baseline에서 `33+K_bM+6K_w+12K_a`다. 과거 3D rotation placeholder의 `27+K_bM+6K_w+12K_a`는 current specification이 아니다.
+
+**Action–controller 의미의 사용자 확인**
+
+현재 delta action은 persistent desired target에 누적하는 residual command가 아니다. DiffIK 또는 OSC가 policy step의 measured EEF state에서 이번 delta를 적용할 command를 만들고, 다음 action이 들어오면 그 시점의 measured state를 기준으로 새 command를 만든다.
+
+$$
+T^{\mathrm{cmd}}_{WE,t}
+=T^{\mathrm{meas}}_{WE,t}
+\operatorname{Exp}\!\left(\widehat{\Delta\xi_t^E}\right)
+$$
+
+따라서 이전 command가 완전히 달성되지 않았더라도 새 action을 이전 desired target에 더하지 않는다. Controller target error를 actor에 추가할 이유는 사라진다. Previous-action history를 유지한다면 그 목적은 최근 command에 대한 actuator motion과 tactile·wrench response를 MLP가 해석하도록 하는 것이며, `history 없음 / 짧은 K_a` ablation으로 필요성을 확인한다.
+
+**Vision은 observation corruption 문제로 분리**
+
+Simulation ground-truth pose를 쓰는 것은 manipulation policy의 feasibility와 contact-rich 학습 난이도를 perception failure와 분리하기 위한 선택이다. 안정적인 tracking을 가정해도 회전–병진 결합, hybrid contact transition과 불확실한 마찰·접촉 때문에 과업이 쉬워지는 것은 아니다. 다만 noise-free GT에서 성공한 결과를 실제 tracking 입력에서도 그대로 재현된다고 해석해서는 안 된다.
+
+Tracking algorithm 자체의 안정성 개선은 현재 연구 contribution에서 제외한다. 대신 Sim-to-Real 단계에서 GT pose·OBB를 실제 tracker output처럼 보이게 만드는 observation corruption layer를 둔다.
+
+- Translation·orientation의 zero-mean noise와 episode-level bias
+- 시간적으로 상관된 drift
+- Vision update-rate 저하, latency와 zero-order hold
+- 간헐적 dropout과 outlier
+- OBB symmetry에서의 axis permutation·sign ambiguity
+
+분포와 크기는 실제 tracker log로 calibration한다. `valid/age`는 기본 observation이 아니라, 실제 tracker가 해당 metadata를 출력하고 dropout recovery까지 평가할 때만 추가하는 선택적 deployment signal이다. Metadata를 쓰지 않는 기본 실험에서도 noise·bias·latency robustness는 별도로 평가한다.
+
+**Phase gate와 observation의 조건**
+
+Actor에 phase ID를 주지 않는 방향은 유지 가능하다. 다만 `한 번 Rotation 성공 → 이후 영구히 Push gate on` 같은 latch가 actor에게 보이지 않으면, 동일한 current observation에 서로 다른 reward가 대응한다. 따라서 우선안은 gate를 current estimated object pose·goal error·contact state의 함수로 정의하는 것이다. 꼭 latch가 필요하다면 짧은 actor history로 통과 여부가 실제로 복원되는지 검증해야 하며, 그렇지 않으면 phase ID를 주지 않는 결정과 충돌한다.
+
+**문헌 재검토 후의 핵심 결론**
+
+현재 최소안은 다음 조건 아래에서 일관된 저차원 baseline이다.
+
+1. 조작이 저속·quasi-static 범위에 있어 current object pose만으로 생기는 동역학 ambiguity가 작다.
+2. Coarse tactile grouping이 finger/pad별 contact-role identity를 보존한다.
+3. Tactile on/off는 상대 body identity와 무관한 any-contact이며 desired/undesired contact pair는 privileged reward에서만 구분한다.
+4. Current arm q와 hand q만 proprioception으로 사용하고 velocity·추가 kinematics는 자동 추가하지 않는다.
+5. Shelf·workspace state를 주지 않는 대신 workspace와 초기 상태 분포를 제한하고 collision penalty·termination을 사용한다.
+6. DiffIK/OSC delta action은 measured state 기준의 one-step command이며 이전 desired target에 누적하지 않는다.
+7. Sim-to-Real 학습·평가에서는 tracker log에 맞춘 pose·OBB corruption을 적용한다.
+8. Phase reward gate는 actor가 받은 현재 observation에서 결정 가능하다.
+9. OBB는 coarse preparation prior이며 fine surface geometry를 안다는 주장에 사용하지 않는다.
+
+따라서 기존 5.6.1.6 최소안에서 controller target state와 vision valid/age를 추가하지 않는다. `previous action history의 유무·길이`, `hand dq/q history`와 `object pose history`는 동역학·latency failure를 기준으로 ablation한다. Vision robustness는 tracker 개선이 아니라 calibrated observation corruption과 실제 deployment 평가로 다룬다.
 
 #### 5.6.2 Reward·termination·evaluation용 privileged information 초안
 
@@ -707,20 +827,22 @@ $$
 - `a_t^R`: EEF frame의 3D rotation increment. Euler angle보다 rotation vector / exponential-coordinate 후보를 우선 검토
 - `a_t^H`: 제어할 hand joint의 action
 
-현재 desired EEF pose를 `T^d_{WE,t}=(R^d_{WE,t},p^d_{WE,t})`라 할 때 local increment를 다음처럼 합성하는 안이 명확하다.
+현재 measured EEF pose를 `T^{\mathrm{meas}}_{WE,t}=(R^{\mathrm{meas}}_{WE,t},p^{\mathrm{meas}}_{WE,t})`라 할 때, 이번 policy step의 local increment로 새 command를 다음처럼 만든다.
 
 $$
-p^d_{WE,t+1}=p^d_{WE,t}+R^d_{WE,t}\Delta p_t^E,\qquad
-R^d_{WE,t+1}=R^d_{WE,t}\operatorname{Exp}([\Delta\phi_t^E]_\times)
+p^{\mathrm{cmd}}_{WE,t}=p^{\mathrm{meas}}_{WE,t}+R^{\mathrm{meas}}_{WE,t}\Delta p_t^E,\qquad
+R^{\mathrm{cmd}}_{WE,t}=R^{\mathrm{meas}}_{WE,t}\operatorname{Exp}([\Delta\phi_t^E]_\times)
 $$
 
-Hand는 우선 **bounded joint-position increment + 하위 impedance/PD controller**를 후보로 둔다.
+Command는 control decimation 동안 유지할 수 있지만, 다음 policy action에서는 당시 measured pose를 기준으로 다시 계산하며 이전 command에 delta를 누적하지 않는다. DiffIK는 이 task-space command를 joint target으로 변환하고, OSC는 task-space command를 직접 추종하는 후보로 둔다.
+
+Hand가 joint-position delta를 사용한다면 같은 one-step 의미를 적용하는 안은 다음과 같다. Absolute joint target 또는 joint velocity action은 여전히 비교 후보다.
 
 $$
-q^d_{H,t+1}=\operatorname{clip}(q^d_{H,t}+s_H\odot a_t^H, q_{H,\min}, q_{H,\max})
+q^{\mathrm{cmd}}_{H,t}=\operatorname{clip}(q^{\mathrm{meas}}_{H,t}+s_H\odot a_t^H, q_{H,\min}, q_{H,\max})
 $$
 
-Position increment는 phase 사이에서 연속적으로 손 구성을 바꾸기 쉽고, 실제 joint limit를 명시하기 용이하다는 장점이 있다. Absolute target·velocity·torque action과의 비교 및 실제 hand의 coupling·underactuation은 확인해야 한다. Translation, rotation과 hand component의 scale, clip, smoothing, policy/control frequency, OSC/IK/impedance interface를 함께 고정해야 action 정의가 완성된다.
+Position increment는 phase 사이에서 연속적으로 손 구성을 바꾸기 쉽고, 실제 joint limit를 명시하기 용이하다는 장점이 있다. Absolute target·velocity·torque action과의 비교 및 실제 hand의 coupling·underactuation은 확인해야 한다. Translation, rotation과 hand component의 scale, clip, smoothing, policy/control frequency 및 DiffIK/OSC·hand impedance interface를 함께 고정해야 action 정의가 완성된다.
 
 세 phase가 이 action space를 공유하되 **phase별 action masking은 기본안으로 두지 않는다.** Rotation 중 필요한 병진과 Push 중의 orientation correction을 허용해야 하기 때문이다. Phase는 task subgoal과 reward·success 의미를 구분하는 것이며, 물리적으로 결합된 운동 자유도를 강제로 분리하는 뜻이 아니다.
 
@@ -1235,6 +1357,66 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **초기 제외:** Phase ID, object velocity, joint velocity, EEF twist, fingertip 위치, vision confidence/age, arm q, raw RGB, point cloud와 mesh. 실제 failure가 근거를 제공하면 다시 추가한다.
 - **남은 질문:** 실제 17 sensor의 URDF/packet mapping과 coarse group `M`, `K_b/K_w/K_a`, rotation representation, OBB tracker와 symmetry 처리, F/T preprocessing, exact Isaac Lab version.
 
+### Stage 14 — 유사 과업·센서 연구의 Observation 채택 이유를 기준으로 재검토
+
+- **날짜:** 2026-09-15.
+- **사용자 지시:** 현재까지 결정한 observation을 비슷한 과업·센서를 사용한 연구와 비교하되, 논문이 무엇을 입력했는지보다 **왜 그 입력이 필요했는지**를 중점적으로 검토한다.
+- **비교 범위:** DexTouch, Rotating without Seeing, Tactile Pushing, Goal-Driven Robotic Pushing, Visuotactile Estimation and Control, VTDexManip, Force Push, RoboPack과 point-cloud 기반 nonprehensile manipulation을 비교했다.
+- **지지된 구성:** EEF-relative goal과 current object state의 분리, hand q, spatial identity를 보존한 binary tactile, wrist F/T history는 현재 과업의 부분관측성과 접촉 feedback 요구에 직접 대응한다.
+- **표현 한계:** OBB는 occlusion에 비교적 안정적인 coarse size·axis prior지만 surface contact point를 선택할 정도의 fine geometry를 제공하지 않는다. Geometry-aware라는 표현을 쓰더라도 이 범위를 넘겨 주장하지 않는다.
+- **첫 번째 hidden-state 위험:** 누적 delta action으로 desired target을 갱신하는 controller에서는 raw previous action history가 현재 target을 유일하게 나타내지 못할 수 있다. Persistent target을 쓰면 desired–actual EEF/hand target error를 조건부 필수 observation으로 검토한다.
+- **두 번째 hidden-state 위험:** Vision tracker가 invalid frame에서 last pose를 hold하면 pose 값만으로 freshness를 알 수 없다. 이 동작을 사용하면 valid/fresh indicator와 measurement age를 조건부 필수로 검토한다.
+- **Phase 제약:** Phase ID를 주지 않는 방향은 유지한다. 다만 reward gate가 observation으로 복원할 수 없는 latched phase memory를 가지면 같은 observation에 서로 다른 행동이 요구될 수 있으므로, gate는 current observation과 제공된 history에서 진행 상태를 판별할 수 있게 설계한다.
+- **Ablation 후보:** Previous-action-only / controller-target-only / both, hand dq / hand-q history, object pose history / filtered twist를 failure-driven ablation으로 둔다. 모든 modality의 history 길이를 같게 만들 근거는 없다.
+- **영향:** 5.6.1.7에 논문별 비교와 observation별 판정을 기록하고, `research_topic.md` 5.4절에 현재 설계에 대한 요약을 추가했으며, `papers.md`에 B37과 observation 독해 순서를 반영했다.
+- **남은 확인:** 실제 controller가 delta를 누적하는지 매 step measured state 기준으로 target을 재설정하는지, tracker의 dropout 처리, phase gate의 모든 상태 변수가 actor 관측으로 복원 가능한지.
+
+### Stage 15 — DiffIK/OSC Action 의미와 Vision Sim-to-Real 범위 확인
+
+- **날짜:** 2026-09-15.
+- **사용자 확인 — Action:** Delta action은 그 순간의 measured state에서 다음 상태를 의미한다. 이전 command가 만족되지 않았더라도 새 action을 이전 desired target에 누적하지 않고, 새 action에 맞춰 DiffIK 또는 OSC가 움직인다.
+- **Observation 영향:** Persistent controller target이라는 hidden state가 없으므로 controller-target error를 observation에 추가하지 않는다. Previous-action history를 유지한다면 그 목적은 command–motion–contact response와 actuator lag의 해석이며, 필수성은 `history 없음 / 짧은 K_a` ablation으로 확인한다.
+- **사용자 확인 — Vision 범위:** 실제 tracking은 안정적이어도 별도의 난점이 있지만, tracker 안정성 개선은 현재 연구의 contribution이 아니다. Simulation GT pose를 사용한다고 manipulation 학습이 자동으로 쉬워진다고 보지 않으며, perception 문제와 manipulation 문제를 분리한다.
+- **Sim-to-Real 처리:** 초기 feasibility는 GT pose·OBB로 수행할 수 있다. 이후 실제 tracker log를 이용해 translation/orientation noise, episode bias, temporally correlated drift, update-rate·latency·hold, dropout·outlier와 OBB symmetry error를 observation에 주입한다.
+- **Validity metadata:** `valid/age`는 core observation에서 계속 제외한다. 실제 tracker가 metadata를 제공하고 dropout recovery까지 deployment 범위에 포함할 때만 선택적으로 추가한다.
+- **영향:** 최신 요약, 5.6.1.7의 observation 판정, `research_topic.md` 5.4절, 결정 레지스터, backlog와 후속 Agent 지침을 갱신했다.
+- **남은 질문:** DiffIK와 OSC 중 최종 controller 선택, delta rotation의 합성 convention, policy/control frequency와 decimation, 실제 tracker error log 수집 절차와 corruption curriculum.
+
+### Stage 16 — Shelf·Tactile·History·Arm Observation 범위와 Rotation 표현 검토
+
+- **날짜:** 2026-09-15.
+- **Shelf 결정:** Shelf·workspace 정보를 actor observation으로 별도 제공하지 않는다. 불필요한 shelf contact는 simulation privileged contact pair·impulse를 이용한 penalty 또는 termination으로 제약한다. 실제 강제 중단은 외부 safety supervisor의 역할로 구분한다.
+- **Tactile 결정:** Actor tactile은 contact 상대의 identity를 구분하지 않는다. Object, shelf 또는 다른 body 중 무엇과 닿았든 해당 sensor/region은 `contact on`이다. Contact pair identity는 reward·termination·critic에서만 privileged하게 사용한다.
+- **History 상태:** `K_b/K_w/K_a`와 multi-rate 정렬은 구현·실험으로 결정한다. 모든 modality에 같은 길이를 확정하지 않는다.
+- **F/T 상태:** Frame·bias·gravity/inertia compensation, clipping과 normalization은 중요하지만 현재 observation 항목 논의에서 수치까지 확정하지 않고 학습환경 구성 단계로 이관한다.
+- **Arm 정정:** 사용자는 arm joint state를 제외하려던 것이 아니며, 이전 Agent안이 과도한 kinematic 정보를 담은 것이 문제였음을 명확히 했다. 현재 최소안에는 UR5e measured q 6D를 넣고 arm dq·history, absolute EEF pose·twist와 fingertip feature는 제외한다.
+- **Rotation 문헌 검토:** Arbitrary final orientation 연구는 current–goal quaternion difference를, continuous rotation 연구는 hand-centric rotation-axis vector를, planar pushing은 local planar angle을 사용한다. Full SO(3)의 neural input에는 6D continuous representation이 유력하다.
+- **Agent 추천 / 사용자 확인 전:** 대부분의 관측을 EEF frame으로 둔다. Shelf-plane yaw만 목표이면 current/target을 각각 `sin/cos` 2D로, full SO(3)이면 current/target을 각각 6D로 표현한다. 3D rotation-vector는 작은 EEF-local action increment에 계속 사용할 수 있다.
+- **Symmetry 원칙:** Episode-local OBB axes는 이전 frame과 가장 가까운 symmetry-equivalent orientation을 선택하고, reward·success는 symmetry-equivalent goal 중 최소 rotation error를 사용한다. 6D 표현만으로 symmetry가 해결되지는 않는다.
+- **영향:** 5.6.1.6–5.6.1.7, `research_topic.md` 5절, 결정 레지스터, backlog, 후속 Agent 지침과 `papers.md` B38–B40을 갱신했다.
+- **당시 남은 질문 / Stage 17에서 구체화:** Preparatory objective는 shelf-plane yaw지만 moving EEF의 observation은 full orientation 6D를 보존하는 조합으로 구체화했다. Symmetry group의 object별 정의는 여전히 미결이다.
+
+### Stage 17 — 5D Rotation 표현과 Moving EEF에서의 Yaw 해석
+
+- **날짜:** 2026-09-15.
+- **사용자 문제 제기:** Task objective는 yaw rotation이지만 관측 기준이 고정 world/task frame이 아니라 움직이는 EEF frame이므로, current/target orientation을 full 3D로 제공하는 편이 낫지 않은지 검토했다.
+- **5D 해석:** Zhou et al.의 5D는 yaw·pitch·roll 중 한 축을 제거하는 표현이 아니다. 6D의 첫 두 rotation-matrix column을 flatten한 뒤, 두 성분은 유지하고 나머지 네 성분의 제약을 normalized stereographic projection으로 3D에 압축하는 full SO(3) 표현이다.
+- **문헌상 trade-off:** 5D와 6D 모두 continuous representation이지만 원 논문의 point-cloud regression에서는 5D가 6D보다 낮았고, 저자들은 stereographic projection에 따른 gradient distortion을 가능한 원인으로 제시했다.
+- **좌표계 분석:** EEF z-axis가 shelf normal에 고정 정렬되지 않는다면 EEF-frame Euler yaw는 shelf-plane yaw와 동일하지 않다. Current와 target을 같은 EEF frame의 full orientation으로 보존하면 moving frame 때문에 손실되는 문맥을 줄일 수 있다.
+- **Agent 권고 / 사용자 확인 전:** Actor에는 current `R_{EO}`와 target `R_{EG}`를 각각 6D로 제공한다. Reward·success는 arbitrary SO(3) 자세가 아니라 shelf/task-frame normal 주위의 preparatory yaw error를 symmetry-aware하게 평가한다. Action은 EEF-local 3D rotation-vector increment를 유지한다.
+- **5D 위치:** Baseline에는 6D를 사용하고 5D는 필요할 때 representation ablation으로만 둔다. 5D를 쓰더라도 OBB symmetry 문제는 별도 처리해야 한다.
+- **차원 영향:** 권고안을 채택하면 전체 MLP observation은 `33+K_bM+6K_w+12K_a`다.
+
+### Stage 18 — 최신 Rotation 논의의 현재 명세 동기화
+
+- **날짜:** 2026-09-15.
+- **사용자 요청:** Stage 17까지의 대화 내용을 `JH.Jeong` 내부 문서 전반에 반영한다.
+- **현재 표 동기화:** `research_topic.md` 5.1·5.3절과 `context.md` 5.6.1.6절의 과거 rotation 3D placeholder를 working baseline인 current/target EEF-relative 6D로 교체했다.
+- **차원 정정:** Goal과 current object state는 각각 position 3D + rotation 6D의 9D다. 고정 부분은 총 33D이고 history를 포함한 전체 차원은 `33+K_bM+6K_w+12K_a`다. 모든 history가 한 step이면 `51+M`이다.
+- **목표·표현 분리:** Full 3D orientation observation은 moving EEF의 문맥 보존용이며 task reward·success는 shelf/task-frame yaw-only다. Roll/pitch까지 arbitrary target을 추종하는 문제로 변경하지 않는다.
+- **비교 표현:** EEF가 shelf normal에 고정 정렬되는 경우의 `sin/cos yaw`는 제한 조건 ablation, Zhou et al.의 5D는 representation ablation으로 둔다. 기본 working baseline은 6D다.
+- **상태:** 위 rotation 조합은 구현 가능한 최신 working baseline이지만 최종 사용자 확정 전이다. 기존 Stage 13·16의 수치와 후보 표현은 의사결정 이력으로 보존한다.
+
 ---
 
 ## 12. 이전 자료와 최신 결론의 충돌 정리
@@ -1266,6 +1448,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | Contribution이 처음 Approach 단계에만 있음 | 접근·회전·밀기 과정의 접촉 형성·전환·보정이 후보 범위 | **[대체됨]** 각 phase의 독립 novelty를 주장하는 것도 아님 |
 | 1단계 policy가 밀기에 적합한 물체 자세를 스스로 선택 | 목표 물체 orientation·병진은 상위가 지정; policy는 손 구성·접촉을 조절하며 실행 | **[명시적 정정 · 2026-09-15]** 물체 자세의 선택과 달성을 구분 |
 | 요구 orientation이 왜 필요한지 자체가 미결 | 현재 동기는 후속 pushing 준비; 목표는 상위가 지정 | **[구체화됨]** Push 중·최종 orientation 제약의 수치·표현은 미결 |
+| Current/goal rotation을 3D placeholder로 두고 전체 observation을 `27+K_bM+6K_w+12K_a`로 계산 | Moving EEF의 문맥을 위해 current/goal rotation을 각각 6D로 두는 working baseline | **[D-054로 대체]** 현재 차원은 `33+K_bM+6K_w+12K_a`; reward는 yaw-only |
 | 새 contribution 후보 문장에 동의 = 신규성과 성능이 입증됨 | 연구 framing·역할 경계에 동의; 구체 method와 실험 검증은 남음 | **[해석 제한]** |
 | Baseline의 전체 해결 방식 검토를 reward 이전의 단독 최우선으로 둠 | Observation·privileged information·action을 먼저 정리한 뒤 전체 phase reward를 근거와 함께 설계; baseline은 근거 수집으로 병행 | **[우선순위 변경 · 2026-09-15]** Stage 8–10의 분석은 보존 |
 | Tactile 입력의 raw/feature 형태를 먼저 정하지 않음 | Core Isaac Lab에서는 ContactSensor-derived binary tactile를 최소안으로 검토하고, spatial binary와 optical tactile를 확장으로 분리 | **[작업 가설 · 2026-09-15]** 실제 hand variant·calibration과 ablation 후 확정 |
@@ -1312,7 +1495,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-025 | 합의된 framing / 검증 전 후보 · 2026-09-15 | Contribution 후보는 주어진 물체 목표를 위한 다지 손 접촉 구성의 형성·전환·피드백 보정 방법이다. 구체 method와 신규성·성능은 미결이다. |
 | D-026 | Agent 추천 / 미선정 | GD2P·Hermans et al.·TaskDexGrasp를 관점별 우선 독해 후보로 두고, 단순 회전 정책+GD2P 등의 비교를 검토한다. 사용자가 실험 baseline을 확정한 것은 아니다. |
 | D-027 | 현재 합의 · 2026-09-15 | 전체 phase reward formulation 전에 policy observation과 reward·termination·evaluation용 privileged information을 구분해 정리한다. |
-| D-028 | 현재 action 방향 · 2026-09-15 | Action은 EEF frame의 delta pose와 hand joint action으로 구성한다. 세부 표현·scale·controller interface는 미결이다. |
+| D-028 | 현재 action 방향 · D-045로 구체화 | Action은 EEF frame의 delta pose와 hand joint action으로 구성한다. EEF delta의 measured-state-referenced one-step semantics는 확정했고, 세부 rotation 표현·scale·DiffIK/OSC 선택과 hand action mode는 미결이다. |
 | D-029 | 현재 합의 · 2026-09-15 | Approach·Rotation·Push 전체를 고려해 reward를 설계하고, 각 term의 목적·물리·안전·failure 또는 문헌 근거를 명시한다. |
 | D-030 | 현재 합의 · 2026-09-15 | 각 observation 신호는 선행연구의 입력·가공, Isaac Lab 원천 데이터·구현, policy 표현, 실물 대응, noise·latency·한계를 함께 검토한다. |
 | D-031 | 이전 Agent 추천 · D-037–D-039로 구체화 | ContactSensor-derived binary tactile 최소안을 제안했다. 이후 binary tactile+wrist F/T, URDF coarse pooling과 privileged continuous force로 구체화했다. |
@@ -1325,7 +1508,20 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-038 | 실험 설계 · 2026-09-15 | F/T only, coarse `M<17` binary+F/T와 17-channel binary+F/T를 비교해 tactile granularity의 이득·비용·sim-to-real robustness를 검증한다. |
 | D-039 | 현재 방향 · 2026-09-15 | Simulation continuous contact force는 reward·asymmetric critic의 privileged information으로 사용하되, actor가 구분할 수 없는 정밀 국소 force 분포를 목표로 강제하지 않는다. |
 | D-040 | 현재 방향 · 2026-09-15 | MLP history는 tactile·wrist F/T·previous action의 과거값을 actor observation에 flatten한 것이다. `K_b/K_w/K_a`는 같을 필요가 없고 실제 latency·transient로 정한다. |
-| D-041 | 현재 최소안 · 2026-09-15 | Actor input은 goal 6D, current EEF–object pose 6D, OBB extent 3D, hand q 6D와 tactile/wrench/action history다. 차원은 `21+K_bM+6K_w+12K_a`다. |
+| D-041 | 이전 최소안 · D-052로 대체 | Actor input에서 arm q를 제외한 `21+K_bM+6K_w+12K_a`를 제안했으나, 사용자는 arm joint state를 제외하려던 것이 아니었음을 명확히 했다. |
+| D-042 | 이전 Agent 조건부 제안 · D-045–D-046으로 대체 | 5.3절 최소안에 controller-target error와 vision valid/age를 조건부로 추가하는 안을 제시했다. 사용자 확인 후 controller target은 제외하고 vision metadata는 deployment 옵션으로 한정했다. |
+| D-043 | 설계 제약 · 2026-09-15 | Phase ID를 제외하려면 reward gate에 actor observation과 history로 복원할 수 없는 hidden latch를 두지 않는다. OBB는 coarse size·axis prior로만 해석하고 surface-level geometry awareness를 주장하지 않는다. |
+| D-044 | 이전 Agent 실험 후보 · D-045로 대체 | Previous-action-only / controller-target-only / both를 제안했으나, current-state-referenced one-step delta semantics에서는 controller-target comparison이 불필요해졌다. Hand dq/q history와 object pose history/filtered twist ablation은 유지한다. |
+| D-045 | 현재 합의 · 2026-09-15 | EEF delta action은 매 policy step의 measured state를 기준으로 DiffIK/OSC command를 만들며 새 action이 이전 command를 대체한다. 이전 desired target에 누적하지 않으므로 controller-target state는 observation에서 제외한다. Previous-action history는 action–response와 lag를 위한 ablation 후보로만 둔다. |
+| D-046 | 현재 합의 · 2026-09-15 | Vision tracking 개선은 현재 contribution이 아니다. Core simulation은 GT pose·OBB로 manipulation을 분리해 학습할 수 있고, Sim-to-Real에서는 실제 tracker log로 calibration한 noise·bias·drift·latency·hold·dropout·outlier·OBB symmetry error를 observation에 적용한다. |
+| D-047 | 현재 방향 · 2026-09-15 | Vision valid/age는 core observation에서 제외한다. 실제 tracker가 metadata를 제공하고 dropout recovery를 deployment 범위에 포함할 때만 선택적으로 추가한다. |
+| D-048 | 현재 합의 · 2026-09-15 | Shelf·workspace state는 actor observation에 제공하지 않는다. 불필요한 shelf collision은 privileged contact state 기반 penalty·termination으로 제약하고 실제 강제 중단은 safety supervisor와 구분한다. |
+| D-049 | 현재 합의 · 2026-09-15 | Actor binary tactile은 접촉 상대와 무관한 any-contact signal이다. Simulation에서 blocker contact만 골라 actor에 제공하지 않으며 contact pair identity는 reward·termination·critic에서만 사용한다. |
+| D-050 | 실험 설계 · 2026-09-15 | `K_b/K_w/K_a`와 sensor/action time alignment는 학습환경에서 실험해 정한다. 같은 history 길이를 강제하지 않는다. |
+| D-051 | 구현 단계로 이관 · 2026-09-15 | Wrist F/T와 전체 observation의 frame, bias·gravity/inertia compensation, clipping·normalization 수치는 학습환경을 구성할 때 확정한다. |
+| D-052 | Arm 항목은 유지 · rotation 차원은 D-054로 대체 | Actor에 UR5e current measured q 6D를 포함한다. Arm dq·history와 추가 EEF/fingertip kinematics는 제외한다. 이 결정 당시 rotation 3D placeholder로 계산한 `27+K_bM+6K_w+12K_a`는 current specification이 아니다. |
+| D-053 | Agent 추천 · D-054로 구체화 | Rotation observation은 EEF frame을 사용한다. Planar yaw task이면 current/target 각각 `sin/cos` 2D, full SO(3)이면 각각 6D continuous representation을 우선 후보로 두고 OBB symmetry는 equivalent-orientation error로 별도 처리한다. Moving EEF에서 planar yaw를 정의하는 조건은 D-054에서 보완했다. |
+| D-054 | 현재 working baseline · 최종 사용자 확인 전 · 2026-09-15 | 움직이는 EEF frame을 고려해 current/target orientation은 각각 EEF-relative 6D로 관측하고, reward·success는 shelf/task-frame normal 주위의 task-relevant yaw만 평가한다. 전체 차원은 `33+K_bM+6K_w+12K_a`다. 5D는 normalized stereographic projection 기반 full-SO(3) 표현이지만 baseline이 아니라 representation ablation 후보로 둔다. |
 
 ### 13.2 미결 Backlog
 
@@ -1352,18 +1548,24 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 #### Track B — 1단계 우선 명세
 
-- 현재 최소 MLP observation `21+K_bM+6K_w+12K_a`의 구현·학습 검증
+- 현재 working baseline인 MLP observation `33+K_bM+6K_w+12K_a`의 구현·학습 검증. Goal/current는 각각 EEF-relative position 3D + rotation 6D이며 최종 사용자 확정 전
+- DiffIK 또는 OSC의 최종 선택, measured-state-referenced delta pose의 rotation 합성 convention과 policy/control frequency·decimation 확정
+- Previous-action history 없이 학습한 baseline과 짧은 `K_a` history를 비교해 action–response 정보의 실제 이득 검증
+- 실제 tracker log에서 translation/orientation error, bias·drift, update rate, latency, dropout·outlier와 OBB axis ambiguity를 측정하고 observation corruption 분포 설정
+- Noise-free GT feasibility / calibrated corruption training / real tracker deployment를 분리해 보고하고, tracker 개선을 method contribution으로 포함하지 않기
+- Phase reward gate가 actor observation으로 복원 불가능한 latch·counter·privileged transition state를 사용하는지 점검
+- OBB를 coarse size·axis prior로 제한하고, 동일 extent이지만 표면 형상이 다른 unseen object에서 생기는 failure를 별도 평가
 - 사용 중인 Isaac Lab·Isaac Sim 정확한 version과 ContactSensor·JointWrench API 경로
 - 실제 RH56E2 17 tactile sensor의 위치·단위·noise floor·packet rate와 dead/invalid 표시
 - 실제 17 sensor→URDF link/pad의 grouping `G_j/L_j`와 coarse region 수 `M`
 - F/T only / coarse `M<17` binary+F/T / 17-channel binary+F/T의 granularity ablation
-- Tactile `τ_on/τ_off`, filter·debounce와 blocker-only contact filtering
+- Tactile `τ_on/τ_off`, filter·debounce와 접촉 상대에 무관한 any-contact aggregation
 - Wrist F/T의 frame·sign·range·bias·gravity/inertia compensation과 simulation joint reaction wrench 대응
 - Policy/control frequency, modality별 aggregation·zero-order hold·latency와 `K_b/K_w/K_a`
 - Phase ID 없는 reward gate의 latch/history 조건과 전환·완료 기준
 - Initial OBB template fitting, axis permutation·sign continuity, occlusion과 symmetry 처리
 - EEF-frame target position·preparatory orientation의 정확한 rotation 표현과 갱신 방식
-- 초기 제외한 arm q, validity/age, fingertip feature가 실제 failure에서 필요한지 여부
+- 포함한 current arm q의 normalization과 초기 제외한 arm/hand dq, validity/age, fingertip feature가 실제 failure에서 필요한지 여부
 - Policy observation과 privileged information의 항목별 구분, 사용 목적과 실물 가용성
 - 각 정보의 표현, 좌표계, 단위, update rate, noise, normalization과 history 범위
 - EEF-frame delta pose의 translation·rotation 표현과 합성 방식, scale·clipping·control frequency
@@ -1432,12 +1634,23 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 20. Observation을 추가할 때 sensor raw data, 전처리 결과와 learned feature를 구분하고, 선행연구·Isaac Lab API·실물 대응을 함께 기록한다.
 21. ContactSensor의 force를 optical tactile image, exact contact point·normal·shear 또는 slip으로 확대 해석하지 않는다. Binary threshold는 문헌값 복사가 아니라 실제 sensor calibration과 domain randomization으로 정한다.
 22. Isaac Lab/Isaac Sim 버전과 실제 RH56E2 17 sensor의 위치·packet이 확인되기 전에는 wrench API, coarse region `M`과 최종 observation dimension을 확정하지 않는다.
-23. 최신 observation은 5.6.1.6을 따른다. 이전 5.6.1.1–5.6.1.5의 phase·point-cloud·다수 kinematic feature 제안을 현재안으로 되돌리지 않는다.
+23. 현재 최소 observation은 5.6.1.6을, 문헌 비교에 따른 조건부 수정과 ablation 판정은 5.6.1.7을 따른다. 이전 5.6.1.1–5.6.1.5의 phase·point-cloud·다수 kinematic feature 제안을 현재안으로 되돌리지 않는다.
 24. Actor에 phase ID를 자동으로 추가하지 않는다. Phase별 reward gate와 action masking을 구분하고, latch가 있다면 MLP history로 추론 가능한지 확인한다.
 25. Goal을 일반적인 final object pose reaching으로 단순화하지 않는다. Target position은 pushing direction·distance에서 나오며 preparatory orientation은 후속 Push를 위한 중간·유지 조건이다.
 26. Unseen object의 OBB를 매 frame 재추정하지 않는다. Episode-local template의 axes·extent 일관성과 symmetry를 관리하고 pose만 tracking하는 방향을 유지한다.
 27. Real 17 taxel과 simulation URDF link/pad는 공통 `M`개 region으로 mapping한다. Taxel별 collision body 구현을 기본안으로 두지 않으며 17-channel 대 coarse tactile는 ablation으로 구분한다.
 28. MLP에서 history는 actor observation tensor의 일부다. 모든 modality에 같은 window를 강제하지 않고 `K_b/K_w/K_a`와 실제 시간 범위를 기록한다.
+29. DexTouch를 previous controller target 사용의 근거로 인용하지 않는다. Binary tactile와 robot proprioception의 근거로 사용하고, previous target과 finite history의 직접 근거는 `Rotating without Seeing`에서 가져온다.
+30. 현재 delta action은 매 policy step의 measured state를 기준으로 DiffIK/OSC command를 만들고 새 action이 이전 command를 대체한다. Persistent target 또는 controller-target observation을 다시 추가하지 않는다. Previous action은 command–contact response를 위한 history 후보로만 해석한다.
+31. Vision tracking 개선을 현재 method contribution으로 가져오지 않는다. Core simulation의 GT pose·OBB와 real observation 사이에는 tracker log로 calibration한 noise·bias·drift·latency·hold·dropout·outlier·OBB symmetry corruption을 적용한다. `valid/age`는 기본 입력이 아니라 실제 interface가 제공할 때의 deployment 옵션이다.
+32. Phase ID를 주지 않는 reward gate는 actor가 볼 수 없는 latch·counter·privileged transition state에 의존하지 않는다. OBB는 coarse geometry이며 point cloud 기반 surface-level geometry와 동등하다고 서술하지 않는다.
+33. Shelf·workspace state를 actor observation에 다시 추가하지 않는다. Simulation shelf collision은 privileged contact pair·impulse 기반 penalty·termination으로 제약하고, 실제 강제 중단은 별도 safety supervisor로 구분한다.
+34. Actor tactile은 접촉 상대에 무관한 any-contact binary다. Simulation에서 blocker-only contact를 filtering하지 않으며 collider identity는 reward·termination·critic에만 사용한다.
+35. History 길이와 time alignment는 구현·실험 항목이다. `K_b/K_w/K_a`를 임의의 공통 상수로 확정하지 않는다.
+36. F/T frame·bias·gravity/inertia compensation과 전체 observation normalization의 수치는 학습환경 구성 단계에서 정한다. 중요도가 낮아진 것이 아니라 논의 시점을 이관한 것이다.
+37. Current UR5e arm q 6D는 actor observation에 포함한다. Arm dq·history, absolute EEF pose·twist와 fingertip feature를 함께 자동 추가하지 않는다.
+38. Rotation observation은 EEF frame을 기본으로 하되 planar yaw와 full SO(3) 과업을 구분한다. Planar이면 `sin/cos`, full SO(3)이면 6D continuous representation을 검토하고, OBB symmetry는 별도 equivalent-orientation 처리 없이 해결됐다고 간주하지 않는다.
+39. Yaw-only task라도 EEF가 shelf normal에 고정 정렬되지 않으면 EEF-frame yaw scalar만으로 축소하지 않는다. Current/target full orientation의 EEF-relative 6D observation과 shelf/task-frame yaw-only reward를 분리해 설계한다. 5D는 기본안이 아니라 representation ablation이다.
 
 ### 14.2 문서를 갱신할 때
 
@@ -1473,6 +1686,9 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ### 15.1 연구 논의의 출처
 
+- 2026-09-15 Observation 범위 후속 확인: 사용자는 shelf·workspace state를 actor에 주지 않고 collision penalty·termination으로 제약하며, tactile은 접촉 상대에 상관없이 any-contact on으로 처리한다고 확인했다. History는 test로 정하고 F/T preprocessing은 학습환경 구성 단계에서 논의하기로 했다. Arm joint state 자체를 제외하려던 것이 아니라 과도한 kinematic feature가 문제였음을 정정했다. Rotation 연구의 통상적 표현과 EEF-frame 적용도 추가 검토했다.
+- 2026-09-15 Action·Vision 후속 확인: 사용자는 delta action이 이전 desired target에 누적되지 않고 매 순간의 current state를 기준으로 DiffIK/OSC가 새 command를 수행한다고 명확히 했다. 또한 vision tracker 안정성 개선은 연구 범위가 아니며, simulation GT observation과 real tracker 사이의 차이는 Sim-to-Real noise 주입으로 다룰 것을 제안했다. 이를 Stage 15와 최신 observation 판정에 반영했다.
+- 2026-09-15 Observation 후속 검토: 사용자는 현재까지 결정된 observation을 유사 과업·센서 연구와 비교하고, 각 논문이 해당 입력을 택한 이유를 중심으로 타당성을 검토하도록 요청했다. 이에 binary tactile의 공간적 coverage, EEF-relative goal/contact 역할 분담, controller target과 finite history, stale vision의 uncertainty, action–response history와 unseen-object geometry의 목적을 비교해 5.6.1.7과 Stage 14에 반영했다.
 - 2026-09-15 정리한 Stage 8–10의 후속 사용자 대화: reward보다 baseline 접근 방식 검토를 우선하도록 변경했고, pushing을 위한 물체 자세·hand configuration으로 관점을 좁혔다. 이어 Approach에만 contribution이 있는지 논의하고, 1단계 목표 물체 자세 선택은 상위 모듈의 역할임을 재확인했다. 사용자는 정정된 contribution 후보 표현이 합리적이라고 확인하고 두 문서의 업데이트를 요청했다.
 - 2026-09-14 사용자 제안 및 후속 확인: low-level action 학습을 우선 수행하고 이후 상위 추론기의 일부 역할을 정책으로 통합하는 방향을 제안했다. 단계별 정리에 동의하고 `context.md` 업데이트를 요청했다.
 - 본 대화의 Track B 구체화: 근사 geometry, Approach / Contact Formation → Rotation → Push, F/T·Tactile 기반 접촉 보정, 뒤쪽 target 인출을 위한 blocker 재배치 목적과 설명 그림을 논의했다. 설계 후보와 그림 조건은 확정된 architecture·학습 명세와 구분했다.
@@ -1769,6 +1985,47 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 ---
 
 ## 16. Change Log
+
+### 2026-09-15 — Stage 17까지의 Observation 명세 전반 동기화
+
+- `research_topic.md`와 `context.md`의 current observation 표·goal 수식에서 rotation 3D placeholder를 EEF-relative 6D working baseline으로 교체했다.
+- 전체 MLP 차원을 `33+K_bM+6K_w+12K_a`, 모든 history가 한 step일 때를 `51+M`으로 정정했다.
+- Full orientation observation과 shelf/task-frame yaw-only reward를 분리하고, symmetry-aware yaw error를 current criterion으로 명시했다.
+- 과거 `27+...` 차원과 planar/full 양자택일 제안은 Stage·결정 레지스터의 이력으로 남기고 current specification이 아님을 표시했다.
+- Robot/hand state 표의 arm q 제외 문장을 최신 합의에 맞게 정정하고 `papers.md` B38에 5D/6D 구현 차이와 공식 project link를 추가했다.
+
+### 2026-09-15 — 5D Rotation 해석과 Moving EEF의 Yaw Observation 검토
+
+- Zhou et al.의 5D가 6D 성분 하나를 삭제하는 방식이 아니라 normalized stereographic projection으로 constrained four-tuple을 3D에 압축하는 full-SO(3) 표현임을 수식과 함께 기록했다.
+- EEF가 roll/pitch까지 움직일 때 EEF-frame yaw가 shelf-plane yaw와 같지 않다는 좌표계 조건을 명시했다.
+- Current/target orientation은 EEF-relative 6D로 관측하고 reward·success는 shelf/task-frame yaw만 평가하는 조합을 Agent 권고안으로 추가했다.
+- 6D를 baseline, 5D를 representation ablation 후보로 구분하고 전체 observation 차원 영향을 기록했다.
+- `research_topic.md`의 rotation 검토와 `papers.md` B38 활용 근거를 함께 갱신했다.
+
+### 2026-09-15 — Shelf·Tactile·Arm 범위 확정과 Rotation 표현 검토
+
+- Shelf·workspace state를 actor observation에서 제외하고 collision penalty·termination 및 실제 safety supervisor로 제약하는 방향을 기록했다.
+- Binary tactile를 접촉 상대에 무관한 any-contact signal로 확정하고 contact pair identity를 privileged information으로 한정했다.
+- UR5e current arm q 6D를 최소 observation에 복원해 차원식을 `27+K_bM+6K_w+12K_a`로 갱신했다.
+- History 길이는 실험 항목으로, F/T preprocessing과 normalization 수치는 학습환경 구현 단계로 이관했다.
+- Arbitrary reorientation, continuous-axis rotation과 planar pushing의 goal 표현을 비교하고 EEF-frame planar `sin/cos` 및 full-SO(3) 6D 후보를 정리했다.
+- `papers.md`에 B38–B40을 추가했다.
+
+### 2026-09-15 — DiffIK/OSC Delta Action과 Vision Sim-to-Real 범위 정정
+
+- Delta action이 매 step measured state를 기준으로 새 command를 만들고 이전 desired target에 누적되지 않는다는 사용자 설명을 반영했다.
+- Controller-target state를 observation 후보에서 제외하고 previous-action history를 action–response·lag ablation으로 재정의했다.
+- Vision tracking 개선을 core contribution에서 제외하고, GT pose·OBB를 실제 tracker log 기반 noise·bias·drift·latency·dropout·OBB ambiguity로 훼손하는 Sim-to-Real 절차를 추가했다.
+- Vision valid/age를 core observation이 아니라 실제 tracker interface가 제공할 때의 선택적 deployment signal로 변경했다.
+
+### 2026-09-15 — 유사 연구의 Observation 채택 이유를 기준으로 재검토
+
+- 유사 연구가 사용한 observation 목록뿐 아니라 각 항목이 해결한 부분관측성·제어 요구를 5.6.1.7과 Stage 14에 비교했다.
+- EEF-relative goal/current state, hand q, spatial binary tactile와 wrist F/T history를 유지할 근거를 정리했다.
+- 누적 delta controller의 current target과 stale vision의 valid/age를 조건부 필수 후보로 분리했다.
+- Previous action, controller target, hand motion과 object motion history를 확정 추가하지 않고 failure-driven ablation으로 구분했다.
+- Phase-free actor의 gate observability 조건과 OBB의 coarse-geometry 주장 범위를 명시했다.
+- DexTouch가 previous controller target을 사용한다는 잘못된 귀속을 수정하고, 해당 근거를 `Rotating without Seeing`로 한정했다.
 
 ### 2026-09-15 — 사용자 검토를 반영한 최소 MLP Observation 구체화
 
