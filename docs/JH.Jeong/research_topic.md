@@ -89,17 +89,64 @@ Approach는 준비의 시작이며, Rotation과 Push에서도 접촉 구성의 �
 
 Track B는 manipulation 전 과정에서 Vision, wrist F/T와 tactile sensing을 함께 사용한다.
 
-| 정보 | 현재 역할 |
-| --- | --- |
-| Current blocker pose | 회전·병진 goal error와 조작 진행 상태 확인 |
-| Approximated geometry | 접근 방향과 초기 hand configuration 준비에 사용할 근사 외형·점유 정보 제공 |
-| Tactile feedback | 실제 접촉 위치와 분포를 참고하여 손 구성과 접촉 배치 보정 |
-| Wrist F/T feedback | 손에 전달되는 합력과 모멘트를 참고하여 전체 접촉 부하 조절 |
-| Robot/hand state | 기본 관측 후보이며 정확한 관측 항목은 아직 확정하지 않음 |
+각 신호는 **선행연구의 raw input·전처리·representation, Isaac Lab의 원천 데이터와 가공 가능성, 실물 대응, 좌표계·주기·noise·latency와 history**를 함께 검토한다. Simulation의 exact state·contact를 실제 sensor observation과 구분하지 않고 actor에 넣지 않는다.
 
-Continuous Vision을 사용하더라도 실제 국소 접촉 표면, 마찰, 질량 분포 등 전체 물리 상태를 정확히 안다고 가정하지 않는다. 접촉 전에는 근사 geometry로 hand configuration을 준비하고, 접촉 후에는 F/T·Tactile feedback으로 실제 상호작용에 맞게 보정한다.
+현재 policy는 MLP이며 actor에 phase ID를 주지 않는다. `Approach / Contact Formation → Rotation → Push`의 진행은 phase별 gate가 reward term을 활성화하는 방식으로 학습한다. Gate가 action 자유도를 phase별로 mask한다는 뜻은 아니다.
 
-손목의 6자유도와 손가락의 제어 자유도는 별개의 대상으로 구분한다. 또한 joint state를 관측하는 것과 해당 joint를 policy action으로 직접 제어하는 것도 구분한다.
+### 5.1 Goal과 Vision·Geometry
+
+Goal은 일반적인 final object-pose reaching이 아니다. Primary objective는 지정 방향·거리의 pushing이고, 상위가 제공하는 object orientation은 그 pushing을 위한 준비 및 Push 중 유지 조건이다.
+
+$$
+p_{O,g}^{W}=p_{O,0}^{W}+s_{\mathrm{push}}d_{\mathrm{push}}^{W}
+$$
+
+Policy에는 현재 EEF frame으로 변환한 target object position과 preparatory object orientation을 goal로 주고, current EEF–object pose를 별도로 준다.
+
+$$
+g_t^E=[p_{O,g}^{E},\phi_{O,\mathrm{prep}}^{E}]\in\mathbb{R}^{6}
+$$
+
+Unseen object와 occlusion을 고려해 raw RGB, point cloud와 mesh 대신 3D OBB를 coarse geometry로 사용한다. 조작 전 initial OBB의 object-local axes·extent를 episode template으로 고정하고 manipulation 중에는 pose만 tracking한다. Observation에는 object-local extent만 넣으며, EEF에서의 box-axis 방향은 current object orientation으로 결정한다.
+
+$$
+d_O=[l_O,w_O,h_O]\in\mathbb{R}^{3}
+$$
+
+### 5.2 Tactile와 Wrist F/T
+
+기본 actor 조합은 **binary tactile + wrist F/T**다.
+
+- 실제 RH56E2는 총 17개 tactile sensor를 사용하는 것으로 파악한다. 정확한 위치·packet은 장비와 URDF에서 확인한다.
+- Taxel별 collision body 17개를 만드는 방법은 simulation 연산량 때문에 기본안에서 제외한다.
+- 실제 17 sensor와 simulation의 contact-bearing URDF link/pad를 동일한 `M`개 coarse region으로 pooling한다.
+- `M=17`의 세밀한 binary tactile와 `M<17`의 coarse binary tactile는 성능·robustness·simulation cost를 실험적으로 비교한다.
+- Threshold는 문헌의 `0.01 N`을 복사하지 않고 실제 sensor의 no-contact/contact 분포에서 `τ_on>τ_off` hysteresis와 debounce를 정한다.
+- Simulation continuous contact force는 actor tactile가 아니라 reward·asymmetric critic용 privileged information으로 사용한다. 과부하·충격·접촉 부족을 평가하되 관측 불가능한 정확한 국소 force 분포를 강제하지 않는다.
+
+### 5.3 현재 최소 MLP Observation
+
+| Observation | 표현 | 차원 | 시간 범위 |
+| --- | --- | ---: | --- |
+| Push-conditioned goal | EEF-frame target object position 3D + preparatory rotation 3D | 6 | Current |
+| Current object pose | EEF-frame estimated object position 3D + rotation 3D | 6 | Current |
+| Coarse geometry | Episode-consistent object-local OBB extent | 3 | Episode-fixed |
+| Hand configuration | RH56E2 actuated joint position | 6 | Current |
+| Binary tactile | Real 17 sensor 또는 공통 coarse region의 on/off | `K_bM` | 최근 `K_b` step |
+| Wrist F/T | Bias-compensated EEF-frame force·torque | `6K_w` | 최근 `K_w` step |
+| Previous action | EEF delta pose 6D + hand joint action 6D | `12K_a` | 최근 `K_a` step |
+
+MLP에는 history를 recurrent state로 숨기지 않고 과거 sensor/action 값을 flatten하여 observation으로 넣는다.
+
+$$
+D_{\mathrm{MLP}}=21+K_bM+6K_w+12K_a
+$$
+
+모든 modality에 같은 history window를 적용할 필연성은 없다. 공통 `K`는 시간 정렬과 첫 비교가 단순하다는 장점이 있으며, 최종 `K_b,K_w,K_a`는 실제 action-to-sensor latency와 contact transient의 시간 범위로 정한다.
+
+현재 최소안에서는 phase ID, object velocity, joint velocity, absolute EEF pose·twist, fingertip position, vision confidence/age, arm joint position, raw RGB, point cloud와 mesh를 제외한다. 실제 failure 분석에서 필요성이 확인되면 추가·ablation한다.
+
+Continuous Vision을 사용하더라도 실제 국소 접촉 표면, 마찰, 질량 분포 등 전체 물리 상태를 정확히 안다고 가정하지 않는다. 접촉 전에는 OBB로 hand configuration을 준비하고, 접촉 후에는 binary tactile와 wrist F/T로 실제 상호작용에 맞게 보정한다.
 
 ---
 
@@ -151,6 +198,9 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 - 다양한 초기 자세·방향을 지향한다는 것이 모든 SE(3) 자세에서의 실행 가능성을 보장한다는 뜻은 아니다. 실제 학습·평가 범위는 미결이다.
 - Continuous Vision과 근사 geometry의 사용을 정확한 접촉 상태의 완전 관측과 동일시하지 않는다.
 - F/T와 tactile은 Track B의 관측에서 제외하거나 임의로 optional로 바꾸지 않는다.
+- Actor에 phase ID를 주지 않는다는 현재 방향을 shared policy가 없거나 phase 구분이 없다는 뜻으로 해석하지 않는다. Phase별 reward gate는 별도로 존재한다.
+- OBB는 exact geometry가 아니라 unseen object·occlusion에서 안정성을 우선한 coarse representation이다. Global semantic/canonical object frame을 안다고 가정하지 않는다.
+- 실제 tactile sensor가 17개라는 사실과 policy가 반드시 17차원을 써야 한다는 주장을 구분한다. Coarse `M<17`과 17-channel 표현은 비교 대상이다.
 - 세 가지 동작 구분을 세 개의 독립 network 또는 policy가 필요하다는 뜻으로 해석하지 않는다.
 - 특정 시리얼 박스, hooking 동작, 동일한 회전각과 선반 구성은 설명용 예시이지 전체 학습 명세가 아니다.
 - 현재 방향은 연구 문제와 진행 범위를 정의한 것이며, 최종 Method novelty나 논문 Contribution이 확정된 것은 아니다.
@@ -161,20 +211,58 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 
 다음 항목은 추가 논의와 실험을 통해 구체화한 뒤 이 문서에 반영한다.
 
-- Goal, observation과 action의 정확한 표현
+- 현재 최소 MLP observation의 실제 구현과 각 항목의 정규화·noise
+- 사용 중인 Isaac Lab·Isaac Sim 버전과 이에 맞는 ContactSensor·joint-wrench API
+- 실제 RH56E2 17 sensor의 위치·단위·noise floor·packet/update rate
+- 실제 17 sensor와 URDF link/pad의 coarse grouping, 최종 `M`과 17-channel 비교 구현
+- Binary contact threshold·hysteresis·filter와 blocker-only contact filtering
+- Initial OBB template tracking, axis continuity, occlusion과 symmetry 처리
+- Goal rotation representation과 EEF-frame target의 갱신 방식
+- `K_b`, `K_w`, `K_a` 및 policy/control frequency
+- 현재 제외한 arm q·validity/age·kinematic feature를 failure 기반으로 추가할 조건
+- Reward·termination·evaluation에만 사용할 simulation privileged information의 목록과 사용 범위
+- EEF-frame `delta pose`의 회전 표현, 합성 방식, component별 scale·clip과 하위 EEF controller
+- Hand joint action의 대상 DoF, absolute/delta/velocity 의미, coupling과 하위 joint controller
 - 상위가 지정한 pushing 준비 orientation을 Push 중·종료 시 유지할 허용 오차와 별도 최종 orientation 조건 여부
 - Phase 전환, 완료와 실패 조건
 - Reward 수식과 학습 curriculum
 - Policy 및 network의 개수와 계층 구조
-- Sensor fusion, history와 memory 구조
-- Geometry와 perception error의 표현 및 분포
+- Sensor fusion과 modality별 history window
+- OBB pose·extent의 perception error 분포
 - Sim-to-Real 범위와 sensor calibration
 - 공간 확보의 정량적 success metric과 비교 baseline
 - 최종 Method novelty, Contribution과 논문화 범위
 
 ---
 
-## 10. 현재 Contribution 후보와 문헌 검토 우선순위
+## 10. 현재 작업 우선순위
+
+전체 `Approach / Contact Formation → Rotation → Push` 실행을 하나의 학습 문제로 고려하는 reward를 설계한다. 다만 reward term을 먼저 나열하지 않고 다음 정보 계약을 우선 정리한다.
+
+1. 실제 실행 시 policy가 받을 **observation**
+2. 시뮬레이션에서 reward, termination과 evaluation 계산에만 사용할 **privileged information**
+3. Policy가 출력할 **action**과 하위 controller 사이의 의미
+4. 위 정의에 기초한 전체 phase reward와 각 term의 근거
+
+Action은 현재 다음 형태를 유력한 방향으로 둔다.
+
+> **EEF frame에서 표현한 `delta pose`와 hand joint action**
+
+이는 세 phase가 같은 action interface를 공유하도록 하기 위한 방향이다. 다만 `delta pose`의 회전 표현과 pose 합성, hand action의 control mode, 차원, scale, frequency 및 하위 controller는 아직 확정하지 않는다.
+
+Reward의 각 term은 단순 shaping 편의가 아니라 다음 중 하나 이상의 근거와 연결한다.
+
+- 과업 목표와 phase별 성공 조건
+- 접촉 및 물체 운동의 물리적 의미
+- 충돌, 낙하와 과도한 힘을 포함한 안전 조건
+- 관찰된 학습 실패 mode
+- 관련 선행 연구 또는 검증 가능한 설계 가설
+
+Baseline 문헌 검토는 중단하지 않으며, observation·privileged information의 선택과 reward term의 근거를 마련하는 병행 작업으로 사용한다. Observation의 현재 최소 구성은 5.3절과 같으며, tactile region `M`, modality별 history, rotation encoding과 preprocessing은 아직 실험 전 명세다. Reward 수식은 확정하지 않았다.
+
+---
+
+## 11. 현재 Contribution 후보와 문헌 검토 방향
 
 **2026-09-15 확인한 framing:** 다음 표현은 사용자가 합리적이라고 확인한 1단계 contribution 후보다. 역할 경계와 연구 관점에 대한 합의이며, 새로운 method나 성능 우위가 입증되었다는 뜻은 아니다.
 
@@ -182,7 +270,7 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 
 접촉 준비의 유효성은 후속 pushing의 성공과 연결해 검증한다. 이 방향을 어떤 접촉 표현·평가·학습·제어 방법으로 실현할지는 미결이며, Push controller 자체에도 별도의 novelty가 있어야 한다고 정한 것은 아니다. 중간 목표 물체 orientation의 자율 선택은 2단계 확장으로 남긴다.
 
-**현재 작업 순서:** Reward formulation을 먼저 정하기보다 baseline의 전체 문제 정의와 해결 방식을 먼저 살펴본다. `회전 후 밀기`, 작업별 손 자세 합성, 촉각 기반 다지 손 제어, 후속 성공을 고려한 skill 연결에는 선행 연구가 있으므로, 이 요소들의 사용·결합만으로 신규성을 주장하지 않는다.
+**현재 문헌 검토의 역할:** Baseline의 전체 문제 정의와 해결 방식을 살피면서 observation, privileged signal과 reward term의 근거를 수집한다. `회전 후 밀기`, 작업별 손 자세 합성, 촉각 기반 다지 손 제어, 후속 성공을 고려한 skill 연결에는 선행 연구가 있으므로, 이 요소들의 사용·결합만으로 신규성을 주장하지 않는다.
 
 Agent가 제안한 우선 독해 후보는 다음과 같다. 사용자가 최종 실험 baseline을 선정한 것은 아니다.
 
@@ -190,4 +278,4 @@ Agent가 제안한 우선 독해 후보는 다음과 같다. 사용자가 최종
 - **Hermans et al., 2013:** 안정적인 접촉 위치가 목표 밀기 방향과 정렬되도록 준비 회전을 사용하는 관점.
 - **TaskDexGrasp:** 작업에 필요한 힘·모멘트를 가할 수 있는 hand configuration의 평가·합성 방법.
 
-DexMove 등의 촉각 제어 연구와 Sequential Dexterity 등의 phase 연결 연구도 차별성 검토에 포함한다. 논문별 출처·한계, 단순 결합 baseline 등의 비교 후보와 판단 과정은 [`context.md`](./context.md)의 **5.11절·11절 Stage 8–10·15.2–15.3절**에 보존한다. 기존 reward 분석은 폐기하지 않고 후속 설계 후보로 유지한다.
+DexMove 등의 촉각 제어 연구와 Sequential Dexterity 등의 phase 연결 연구도 차별성 검토에 포함한다. 논문별 출처·한계, 단순 결합 baseline 등의 비교 후보와 판단 과정은 [`context.md`](./context.md)의 **5.11절·11절 Stage 8–10·15.2–15.3절**에 보존한다. 기존 reward 분석은 폐기하지 않고, 새 정보 계약에 맞춰 근거와 계산 가능성을 재검토할 설계 후보로 유지한다.

@@ -53,6 +53,11 @@
 | B29 | Enhancing Exploration with Diffusion Policies in Hybrid Off-Policy RL: Application to Non-Prehensile Manipulation (HyDo) | IEEE RA-L accepted; arXiv 2024 | Hybrid contact-point/motion-parameter diffusion RL | [arXiv DOI](https://doi.org/10.48550/arXiv.2411.14913) | [Paper](https://arxiv.org/abs/2411.14913) |
 | B30 | HACMan: Learning Hybrid Actor-Critic Maps for 6D Non-Prehensile Manipulation | CoRL 2023 | Point-cloud contact selection; motion parameters; RL | 미확인 | [Paper](https://proceedings.mlr.press/v229/zhou23a/zhou23a.pdf), [Code](https://github.com/HACMan-2023/HACMan) |
 | B31 | HACMan++: Spatially-Grounded Motion Primitives for Manipulation | RSS 2024 | Primitive type·location·parameter selection; RL chaining | 미확인 | [Paper/Project](https://sgmp-rss2024.github.io/), [Code](https://github.com/JiangBowen0008/HACManPP) |
+| B32 | Rotating without Seeing: Towards In-hand Dexterity through Touch | RSS 2023 | Binary tactile·proprioception history; tactile RL | [Publication DOI](https://doi.org/10.15607/RSS.2023.XIX.036) | [Paper](https://roboticsproceedings.org/rss19/p036.html), [Project](https://touchdexterity.github.io/) |
+| B33 | Robot Synesthesia: In-Hand Manipulation with Visuotactile Sensing | ICRA 2024 | Camera·robot·tactile point-cloud fusion; teacher–student | [Publication DOI](https://doi.org/10.1109/ICRA57147.2024.10610532) | [Paper](https://arxiv.org/abs/2312.01853), [Project](https://yingyuan0414.github.io/visuotactile/) |
+| B34 | TacSL: A Library for Visuotactile Sensor Simulation and Learning | IEEE T-RO 2025; arXiv 2024 | GPU visuotactile image·force-field simulation; policy distillation | [Publication DOI](https://doi.org/10.1109/TRO.2025.3547267) | [Paper](https://arxiv.org/abs/2408.06506), [Project](https://iakinola23.github.io/tacsl/) |
+| B35 | Isaac Lab: A GPU-Accelerated Simulation Framework for Multi-Modal Robot Learning | arXiv 2025 | Multi-frequency sensors; observations; domain randomization | [arXiv DOI](https://doi.org/10.48550/arXiv.2511.04831) | [Paper](https://arxiv.org/abs/2511.04831), [Code](https://github.com/isaac-sim/IsaacLab) |
+| B36 | TacEx: GelSight Tactile Simulation in Isaac Sim — Combining Soft-Body and Visuotactile Simulators | arXiv 2024 | Isaac Sim GelSight image·deformation simulation; RL environments | [arXiv DOI](https://doi.org/10.48550/arXiv.2411.04776) | [Paper](https://arxiv.org/abs/2411.04776), [Project](https://sites.google.com/view/tacex) |
 
 ---
 
@@ -98,6 +103,10 @@
 | B22 | DexMove | Tactile 기반 wrist–finger 공동 nonprehensile control |
 | B24 | Tactile-Based Negotiation | Contact location과 force/proximity feedback을 이용한 표면 정렬·순응 제어 |
 | B27 | VTDexManip | Visual–tactile representation pretraining과 dexterous RL sensor 표현 |
+| B32 | Rotating without Seeing | Sensor-link contact-force norm을 threshold한 16D binary tactile와 4-step state stack |
+| B33 | Robot Synesthesia | Binary active sensor의 위치를 palm-frame tactile point cloud로 바꾸어 visual point cloud와 결합 |
+| B34 | TacSL | Visuotactile RGB와 per-taxel force field를 GPU에서 생성하는 고충실도 tactile simulation 후보 |
+| B36 | TacEx | Isaac Sim에서 GelSight deformation·RGB observation을 생성하는 외부 tactile simulation 후보 |
 
 ### 3.4 Goal-Conditioned Nonprehensile Manipulation과 Contact 선택
 
@@ -135,15 +144,33 @@
 | B19 | DexGraspNet | Distance·joint-limit·penetration energy와 physics validation 기반 pose generation |
 | B20 | Get a Grip | 정적 geometry surrogate와 실제 rollout 성공 evaluator를 분리하는 방식 |
 
+### 3.7 Policy Observation 표현과 Isaac Lab 구현 근거
+
+| ID | 논문 | 이 목적에서 확인할 내용 |
+| --- | --- | --- |
+| B09 | DexTouch | Arm·hand q/dq, palm pose·velocity, fingertip relative positions, task prior와 16D binary tactile의 구성; wrist F/T ablation |
+| B12 | Visuotactile Estimation and Control | Object-pose observation의 occlusion·noise, EEF pose·wrench history, recurrent pose estimator와 uncertainty-conditioned policy |
+| B22 | DexMove | Wrist·finger·object·contact state의 5-frame history와 marker-level normal/shear tactile field를 쓰는 고정보량 상한선 |
+| B27 | VTDexManip | 224×224 RGB–ResNet 계열과 force-threshold binary tactile–MLP를 proprioception과 결합하는 구조 |
+| B32 | Rotating without Seeing | Binary tactile, hand q, previous joint target, rotation axis를 4-step stack하여 MLP에 입력하는 최소 tactile policy |
+| B33 | Robot Synesthesia | Depth-camera point cloud, robot mesh point cloud와 active tactile-sensor point cloud를 palm frame에서 융합하는 표현 |
+| B34 | TacSL | 고충실도 visuotactile image·force field를 사용할 때 필요한 별도 sensor simulation 경로와 비용 |
+| B35 | Isaac Lab | Camera, ContactSensor, FrameTransformer, joint wrench와 ObservationManager를 통한 구현 가능 범위 |
+| B36 | TacEx | Vanilla ContactSensor를 넘어 GelSight 영상까지 모사할 때의 외부 Isaac Sim 확장 후보 |
+
 ---
 
-## 4. 현재 우선 독해 순서
+## 4. 현재 우선 독해 순서 — Observation formulation
 
-현재 Track B 1단계의 문제 정의와 baseline을 구체화하기 위한 우선순위다. 최종 실험 baseline 선정은 아니다.
+현재 Track B 1단계의 **coarse OBB + binary tactile + wrist F/T + MLP history** observation을 구체화하기 위한 순서다. 최종 실험 baseline 선정은 아니다. Point cloud·raw RGB·optical tactile는 현재 actor 최소안이 아니라 비교 배경 또는 후속 확장으로 읽는다.
 
-1. **B01 GD2P:** 주어진 pushing direction에 적합한 다지 손 configuration 생성과 실행 검증
-2. **B21 Hermans et al.:** Pushing을 위한 준비 회전과 contact-location 선택의 고전적 문제 구조
-3. **B02 TaskDexGrasp:** 목표 wrench에 적합한 다지 손 contact configuration 평가
-4. **B30 HACMan → B29 HyDo:** 학습 기반 contact-location 및 motion-parameter 선택의 발전 관계
-5. **B22 DexMove:** Tactile wrist–finger contact control
-6. **B28 Where to Touch, How to Contact:** Contact selection과 object subgoal을 결합한 최신 계층적 구조
+1. **B09 DexTouch → B32 Rotating without Seeing:** ContactSensor로 재현 가능한 binary tactile, previous command와 finite history의 최소 구성
+2. **B35 Isaac Lab:** URDF link/pad ContactSensor, joint wrench와 ObservationManager history의 실제 구현 경계
+3. **B12 Visuotactile Estimation and Control:** Continuous vision의 occlusion·latency와 force/action history를 처리하는 이유
+4. **B27 VTDexManip:** Image–ResNet과 binary tactile–MLP를 분리한 근거 및 raw image를 현재안에서 제외할 근거
+5. **B33 Robot Synesthesia:** Spatial tactile/point-cloud 표현이 coarse binary보다 주는 정보와 추가 구현 비용의 비교 배경
+6. **B22 DexMove → B34 TacSL → B36 TacEx:** 고차원 tactile·optical tactile가 제공할 수 있는 상한과 현재 ContactSensor baseline의 차이
+
+현재 tactile 관련 직접 ablation은 `F/T only`, `URDF coarse M-region binary + F/T`, `17-channel binary + F/T`다. 논문의 history 길이와 force threshold는 출발 근거일 뿐 그대로 복사하지 않고 실제 policy rate·sensor latency·hardware calibration으로 정한다.
+
+기존 GD2P·Hermans et al.·TaskDexGrasp 중심의 baseline 독해는 폐기하지 않으며, observation 명세 후 reward와 접촉 구성 설계를 진행할 때 이어간다.
