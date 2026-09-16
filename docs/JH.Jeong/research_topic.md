@@ -4,13 +4,15 @@
 >
 > **현재 중심 Track:** Track B
 >
-> **최종 갱신:** 2026-09-15
+> **최종 갱신:** 2026-09-16
 
 ---
 
 ## 1. 문서 목적
 
 이 문서는 연구 과정에서 **구체화되었거나 확인된 현재 내용**을 간결하게 정리한다. 논의의 흐름, 과거 제안, 작업 가설과 미결 사항의 상세한 기록은 [`context.md`](./context.md)에서 관리한다.
+
+Research motivation의 문헌 비교, gap, 가설과 논문용 서술 초안은 [`motivation.md`](./motivation.md)에서 별도로 발전시킨다. 이 문서에는 그중 연구 범위와 역할 경계에 영향을 주는 현재 결론만 유지한다.
 
 새로운 아이디어나 설계 후보는 합의되기 전까지 이 문서의 확정 내용으로 추가하지 않는다. 중요한 결정이 변경되면 `context.md`에 변경 배경과 의사결정 과정을 먼저 기록하고, 이 문서를 최신 결론에 맞게 갱신한다.
 
@@ -27,6 +29,12 @@
 이를 한 문장으로 정리하면 다음과 같다.
 
 > **지속적인 시각·근사 기하 관측과 접촉 감각을 이용해 blocker의 목표 조건부 회전·병진 조작을 학습하고, 이를 target 접근 공간 확보를 위한 조작 의사결정과 실행의 통합으로 확장한다.**
+
+### 2.1 Motivation과의 연결
+
+Preparatory rotation은 독립적인 자세 맞춤이 아니라 후속 pushing에 유효한 object–hand 관계와 접촉 배치를 만드는 수단으로 본다. 따라서 Rotation의 terminal contact와 Push의 initial contact를 연결해 평가하며, coarse OBB로 알 수 없는 접촉·물성 차이는 binary tactile와 wrist F/T feedback으로 보정하는지를 검증한다.
+
+이 문제 정의의 배경, research gap, MH1–MH4와 claim–evidence 구조는 [`motivation.md`](./motivation.md), 이를 뒷받침하는 논문과 baseline 후보는 [`papers.md`](./papers.md), 이 결론에 도달한 과정은 [`context.md`](./context.md)를 따른다.
 
 ---
 
@@ -154,67 +162,13 @@ $$
 
 Continuous Vision을 사용하더라도 실제 국소 접촉 표면, 마찰, 질량 분포 등 전체 물리 상태를 정확히 안다고 가정하지 않는다. 접촉 전에는 OBB로 hand configuration을 준비하고, 접촉 후에는 binary tactile와 wrist F/T로 실제 상호작용에 맞게 보정한다.
 
-### 5.4 선행연구 비교 후 검토 결과
+### 5.4 Observation 결정 근거의 위치
 
-아래 판정은 5.3절의 현재 최소안을 즉시 대체하는 확정 명세가 아니라, 유사 과업에서 각 observation을 넣은 **이유**를 기준으로 한 설계 검토 결과다.
+Observation의 **현재 채택 결과**는 5.1–5.3절을 따른다. 각 항목을 유지·제외하거나 ablation으로 남긴 이유, 관련 논문과 Isaac Lab 구현 검토는 [`context.md`](./context.md)의 5.6.1.7절과 [`papers.md`](./papers.md)의 3.7·4.2절에서 관리한다.
 
-| 검토 대상 | 문헌에서 필요했던 이유 | 현재 판단 |
-| --- | --- | --- |
-| EEF-frame goal + current EEF–object pose | Tactile pushing 연구는 global target 정렬과 local contact regulation을 분리했다. 상대 표현은 task-relevant error를 직접 제공하고 world-frame 의존성을 줄인다. | **유지** |
-| Arm joint position | 동일한 EEF pose라도 arm configuration에 따라 joint-limit·singularity와 가능한 motion이 다르다. DiffIK/OSC가 하위 제어를 담당하더라도 actor가 configuration 차이를 구별할 최소 proprioception이 된다. | **유지**: current `q_A` 6D만 사용; `dq_A`와 history는 제외 |
-| Hand joint position | Binary contact만으로는 같은 접촉에서도 손 형상을 구분할 수 없다. Dexterous tactile 연구는 접촉 위치와 hand configuration을 함께 사용했다. | **유지** |
-| Spatial binary tactile history | Vision이 직접 보지 못하는 접촉 발생 위치와 contact transition을 보완한다. Full-hand coverage의 이득도 보고되었다. | **유지**. 다만 `M=17`과 coarse `M<17`을 비교 |
-| Wrist F/T history | Binary tactile가 잃는 접촉 강도·방향과 action–response dynamics를 보완한다. | **유지**. Multi-contact hand에서는 tactile의 공간 identity를 대체하지는 않음 |
-| OBB extent | Unseen shape를 위한 point cloud 연구는 surface-level action selection에 geometry가 필요했다. OBB는 그보다 안정적인 coarse prior지만 같은 extent의 서로 다른 형상을 구분하지 못한다. | **유지하되 주장 범위 제한**: coarse size·axis prior이며 fine geometry-aware 표현은 아님 |
-| Previous action history | 최근 어떤 EEF/hand 명령 뒤에 tactile·wrench와 실제 motion이 어떻게 변했는지 해석하는 데 유용하다. 현재 action은 measured state 기준의 one-step delta이며 새 command가 이전 command를 대체하므로, controller 내부 target을 복원하기 위한 입력은 아니다. | **유지 후보 / ablation**: history 유무와 `K_a` 비교 |
-| Vision validity·age | Tracker가 occlusion 중 마지막 pose를 유지할 때는 fresh/stale 구분에 유용하지만, tracking 성능 개선 자체는 현재 연구 범위가 아니다. | **Core observation에서 제외 유지**. 실제 tracker가 metadata를 제공하고 dropout 대응이 필요할 때 Sim-to-Real 확장으로 검토 |
-| Hand velocity 또는 hand-q history | 실제 손 motion과 command의 차이를 구별해 actuator lag를 보완한다. | **Ablation**: `dq_H`와 q-history 중 작은 쪽부터 비교 |
-| Object pose history 또는 filtered twist | Occlusion 중 물체 운동이나 동적 pushing을 추정할 때 유용하다. | **Ablation**: quasi-static baseline의 failure가 근거를 제공할 때 추가 |
-| Shelf·workspace state | 경계 위치에 따른 collision 가능성을 사전에 구분할 수 있지만, 현재 policy에는 별도 scene observation을 제공하지 않기로 했다. | **제외**: shelf collision은 privileged penalty·termination으로 제약 |
+### 5.5 Rotation Observation 현재 명세
 
-Action은 DiffIK 또는 OSC가 현재 measured state에서 이번 step의 delta를 해석하고, 다음 policy action이 들어오면 새 command로 교체하는 one-step interface로 둔다. 이전 command가 만족되지 않았더라도 새 delta를 이전 desired target에 누적하지 않는다. 따라서 별도의 controller-target state는 현재 observation에서 제외한다. Previous-action history는 오직 actuator lag와 contact response를 해석하는 효과를 검증하기 위한 항목이다.
-
-Simulation에서는 정확한 object pose·OBB를 observation 원천으로 사용할 수 있지만, 이것이 실제 배치 난이도가 낮다는 뜻은 아니다. 초기 feasibility에서는 ground truth로 manipulation 자체를 분리해 확인하고, Sim-to-Real 단계에서는 tracker를 새로 개선하는 대신 다음 observation corruption을 적용한다.
-
-- Translation·orientation noise와 episode bias
-- 시간적으로 상관된 drift와 낮은 perception update rate
-- Latency와 zero-order hold
-- 간헐적 dropout·outlier
-- OBB symmetry에 따른 axis permutation·sign ambiguity
-
-Noise 범위는 임의로 크게 정하지 않고 실제 tracker log에서 측정한다. `valid/age`는 기본 입력이 아니라 실제 tracker가 해당 metadata를 제공하고 dropout recovery 실험이 필요할 때 추가하는 deployment 옵션이다.
-
-Phase ID는 계속 제외한다. 단, reward gate는 actor가 보는 current observation과 그 history에서 진행 상태를 판별할 수 있어야 하며, observation으로 복원할 수 없는 hidden latch를 사용해서는 안 된다. Arm은 current `q_A`만 포함하고 `dq_A`·history는 제외한다. Absolute EEF pose, fingertip positions, raw RGB, point cloud와 mesh도 현재 action interface와 upstream perception 조건에서는 계속 제외한다.
-
-### 5.5 Rotation Observation 표현 검토
-
-회전을 다루는 연구의 goal 표현은 과업 의미에 따라 달라진다.
-
-- [A System for General In-Hand Object Re-Orientation](https://proceedings.mlr.press/v164/chen22a.html)은 임의의 final SO(3) 자세에 도달해야 하므로 current–target orientation의 quaternion difference를 정책에 제공했다.
-- [Rotating without Seeing](https://roboticsproceedings.org/rss19/p036.html)과 [RotateIt](https://proceedings.mlr.press/v229/qi23a.html)은 특정 final orientation이 아니라 지정 축으로 계속 회전하는 과업이므로 hand-centric rotation-axis vector를 goal로 제공했다.
-- Planar tactile pushing은 pusher/sensor-local pose의 planar angle을 사용한다. 이때 full SO(3)를 제공할 이유가 없다.
-- [On the Continuity of Rotation Representations in Neural Networks](https://openaccess.thecvf.com/content_CVPR_2019/html/Zhou_On_the_Continuity_of_Rotation_Representations_in_Neural_Networks_CVPR_2019_paper.html)은 full SO(3)를 MLP가 직접 처리할 때 5D/6D continuous representation이 quaternion·Euler보다 학습에 유리할 수 있음을 보였다.
-
-Zhou et al.의 5D는 6D에서 한 성분을 임의로 삭제한 표현이 아니다. 회전행렬의 첫 두 column을 `c_1=(x_1,y_1,z_1)`, `c_2=(x_2,y_2,z_2)`라 두면 6D 표현은 `[c_1,c_2]`다. 5D 표현은 `x_1,y_1`을 남기고, unit vector `c_2`와 scalar `z_1`을 normalized stereographic projection으로 하나의 3D vector에 넣는다.
-
-$$
-P(c_2,z_1)=c_2\left(z_1+\sqrt{z_1^2+1}\right)
-$$
-
-따라서 개념적인 5D encoding은 다음과 같다.
-
-$$
-r_{5D}=\left[x_1,y_1,P(c_2,z_1)^{T}\right]
-$$
-
-복원할 때 `v=P(c_2,z_1)`에 대해 다음 inverse projection으로 `c_2,z_1`을 되찾고, 복원된 두 3D vector를 Gram–Schmidt orthogonalization에 넣어 rotation matrix를 만든다.
-
-$$
-c_2=\frac{v}{\|v\|},\qquad
-z_1=\frac{\|v\|^2-1}{2\|v\|}
-$$
-
-즉 5D도 full SO(3) 표현이며 yaw·pitch·roll 중 하나를 제거한 표현이 아니다. 6D보다 한 차원 작지만 projection/unprojection이 추가되고 물리적 해석이 덜 직접적이다. 원 논문의 point-cloud rotation regression에서도 저자들은 stereographic projection의 gradient distortion을 5D가 6D보다 낮은 성능을 보인 가능한 원인으로 들었다. 따라서 5D는 representation ablation 후보로만 두고, baseline에는 6D를 우선한다.
+현재 baseline은 full SO(3) 문맥을 보존하는 6D continuous representation을 사용한다. Planar `sin/cos yaw`와 5D representation은 ablation으로만 남긴다. 표현 선택의 문헌 근거와 5D의 유도는 [`papers.md`](./papers.md)의 3.7절과 [`context.md`](./context.md)의 Stage 17–18에 기록한다.
 
 우리의 current와 goal frame은 다음처럼 EEF 기준으로 맞추는 것이 자연스럽다.
 
@@ -334,49 +288,10 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 
 ---
 
-## 10. 현재 작업 우선순위
+## 10. 관련 문서
 
-전체 `Approach / Contact Formation → Rotation → Push` 실행을 하나의 학습 문제로 고려하는 reward를 설계한다. 다만 reward term을 먼저 나열하지 않고 다음 정보 계약을 우선 정리한다.
-
-1. 실제 실행 시 policy가 받을 **observation**
-2. 시뮬레이션에서 reward, termination과 evaluation 계산에만 사용할 **privileged information**
-3. Policy가 출력할 **action**과 하위 controller 사이의 의미
-4. 위 정의에 기초한 전체 phase reward와 각 term의 근거
-
-Action은 현재 다음 형태를 유력한 방향으로 둔다.
-
-> **EEF frame에서 표현한 `delta pose`와 hand joint action**
-
-이는 세 phase가 같은 action interface를 공유하도록 하기 위한 방향이다. 다만 `delta pose`의 회전 표현과 pose 합성, hand action의 control mode, 차원, scale, frequency 및 하위 controller는 아직 확정하지 않는다.
-
-EEF delta pose는 매 policy step의 measured EEF pose에서 다음 command를 생성하며, 새 action이 이전 command를 대체한다. 이전 desired target에 delta를 누적하지 않는다. 하위 controller는 DiffIK 또는 OSC를 후보로 두고, command는 control decimation 동안만 유지한다. Hand가 joint-position delta를 사용한다면 마찬가지로 measured joint position 기준의 one-step command로 정의한다.
-
-Reward의 각 term은 단순 shaping 편의가 아니라 다음 중 하나 이상의 근거와 연결한다.
-
-- 과업 목표와 phase별 성공 조건
-- 접촉 및 물체 운동의 물리적 의미
-- 충돌, 낙하와 과도한 힘을 포함한 안전 조건
-- 관찰된 학습 실패 mode
-- 관련 선행 연구 또는 검증 가능한 설계 가설
-
-Baseline 문헌 검토는 중단하지 않으며, observation·privileged information의 선택과 reward term의 근거를 마련하는 병행 작업으로 사용한다. Observation의 현재 최소 구성은 5.3절과 같으며, tactile region `M`, modality별 history, rotation encoding과 preprocessing은 아직 실험 전 명세다. Reward 수식은 확정하지 않았다.
-
----
-
-## 11. 현재 Contribution 후보와 문헌 검토 방향
-
-**2026-09-15 확인한 framing:** 다음 표현은 사용자가 합리적이라고 확인한 1단계 contribution 후보다. 역할 경계와 연구 관점에 대한 합의이며, 새로운 method나 성능 우위가 입증되었다는 뜻은 아니다.
-
-> **주어진 물체 회전·병진 목표를 수행하기 위해, 접근부터 회전과 밀기까지 다지 손의 접촉 구성을 형성·전환하고 접촉 피드백으로 보정하는 조작 방법.**
-
-접촉 준비의 유효성은 후속 pushing의 성공과 연결해 검증한다. 이 방향을 어떤 접촉 표현·평가·학습·제어 방법으로 실현할지는 미결이며, Push controller 자체에도 별도의 novelty가 있어야 한다고 정한 것은 아니다. 중간 목표 물체 orientation의 자율 선택은 2단계 확장으로 남긴다.
-
-**현재 문헌 검토의 역할:** Baseline의 전체 문제 정의와 해결 방식을 살피면서 observation, privileged signal과 reward term의 근거를 수집한다. `회전 후 밀기`, 작업별 손 자세 합성, 촉각 기반 다지 손 제어, 후속 성공을 고려한 skill 연결에는 선행 연구가 있으므로, 이 요소들의 사용·결합만으로 신규성을 주장하지 않는다.
-
-Agent가 제안한 우선 독해 후보는 다음과 같다. 사용자가 최종 실험 baseline을 선정한 것은 아니다.
-
-- **GD2P:** 주어진 물체 상태·밀기 방향에 맞는 손 구성을 생성하고 실제 push 성공으로 검증하는 방법.
-- **Hermans et al., 2013:** 안정적인 접촉 위치가 목표 밀기 방향과 정렬되도록 준비 회전을 사용하는 관점.
-- **TaskDexGrasp:** 작업에 필요한 힘·모멘트를 가할 수 있는 hand configuration의 평가·합성 방법.
-
-DexMove 등의 촉각 제어 연구와 Sequential Dexterity 등의 phase 연결 연구도 차별성 검토에 포함한다. 논문별 출처·한계, 단순 결합 baseline 등의 비교 후보와 판단 과정은 [`context.md`](./context.md)의 **5.11절·11절 Stage 8–10·15.2–15.3절**에 보존한다. 기존 reward 분석은 폐기하지 않고, 새 정보 계약에 맞춰 근거와 계산 가능성을 재검토할 설계 후보로 유지한다.
+| 필요한 정보 | 기준 문서 |
+| --- | --- |
+| 정리된 research motivation·gap·가설·contribution 후보 | [`motivation.md`](./motivation.md) |
+| 참고 논문·서지정보·선별 평가·baseline 후보 | [`papers.md`](./papers.md) |
+| 결정 근거·변경 이력·미결 backlog·작업 우선순위 | [`context.md`](./context.md) |

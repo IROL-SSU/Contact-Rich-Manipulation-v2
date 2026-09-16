@@ -2,18 +2,19 @@
 
 > **범위:** Track B 연구를 위해 현재까지 확인하거나 검토 후보로 수집한 논문
 >
-> **최종 갱신:** 2026-09-15
+> **최종 갱신:** 2026-09-16
 
 ---
 
 ## 1. 문서 사용법
 
-이 문서는 먼저 기존 핵심 논문을 ID 순서로 제시하고, 이후 연구 목적별로 관련 논문을 다시 그룹핑한다. B01–B40은 [`context.md`](./context.md)와 같은 ID 체계를 사용한다. `docs/ICRA&IROS`의 전수 screening 결과는 5절에서 학회별로 분리하고 `ICRAyy-NNN`/`IROSyy-NNN` ID를 사용한다. 이 corpus에서 핵심 목록으로 승격할 논문은 후속 검토 후 B41부터 번호를 부여한다.
+이 문서는 **참고 문헌에 관한 단일 기준 문서**다. 먼저 핵심 논문을 ID 순서로 제시하고, 이후 연구 목적별 그룹, 논문별 relevance·한계, 영향력·게재 상태, baseline 역할과 우선 독해 순서를 정리한다. B01–B80은 기존 문서와 같은 ID 체계를 사용한다. `docs/ICRA&IROS`의 전수 screening 결과는 5절에서 학회별로 분리하고 `ICRAyy-NNN`/`IROSyy-NNN` ID를 사용한다. 이 corpus에서 핵심 목록으로 승격할 논문은 후속 검토 후 B81부터 번호를 부여한다.
 
 - 목록 포함은 최종 baseline 선정, 방법 채택 또는 실험 재현을 의미하지 않는다.
 - 목적별 그룹은 서로 배타적이지 않다. 한 논문이 여러 목적에 활용될 수 있다.
 - arXiv DOI와 정식 출판 DOI를 구분한다. 정식 DOI 미확인은 DOI가 없다는 뜻이 아니다.
-- 논문별 상세 해석, 연구와의 연결점과 주의사항은 [`context.md`](./context.md)에서 관리한다.
+- 논문별 상세 해석, Track B와의 연결점, 선별 평가와 baseline 역할은 이 문서에서 관리한다. [`context.md`](./context.md)에는 특정 문헌 때문에 연구 결정이 바뀐 경우의 **결정 근거와 변경 이력**만 남긴다.
+- 정리된 research storyline과 gap은 [`motivation.md`](./motivation.md), 현재 연구 명세는 [`research_topic.md`](./research_topic.md)를 따른다.
 - 후속 문헌 탐색에서 관련 논문을 새로 확인하면 이 목록과 해당 목적별 그룹을 함께 갱신한다.
 - 5절의 항목은 CSV의 제목·초록·Author Keywords·IEEE Terms를 모두 확인한 **전수 1차 screening 결과**다. 원문 전체를 독해하거나 방법을 재현했다는 뜻은 아니며, 논문 claim·baseline 채택 전에는 원문을 다시 확인한다.
 
@@ -63,6 +64,46 @@
 | B38 | On the Continuity of Rotation Representations in Neural Networks | CVPR 2019 | 6D Gram–Schmidt representation; 5D normalized stereographic-projection representation | [Publication DOI](https://doi.org/10.1109/CVPR.2019.00589) | [Paper](https://openaccess.thecvf.com/content_CVPR_2019/html/Zhou_On_the_Continuity_of_Rotation_Representations_in_Neural_Networks_CVPR_2019_paper.html), [Project](https://zhouyisjtu.github.io/project_rotation/rotation.html) |
 | B39 | A System for General In-Hand Object Re-Orientation | CoRL 2021; PMLR 2022 | Arbitrary goal orientation; quaternion-difference observation; symmetry | 미확인 | [Paper](https://proceedings.mlr.press/v164/chen22a.html) |
 | B40 | General In-Hand Object Rotation with Vision and Touch (RotateIt) | CoRL 2023 | Hand-centric rotation-axis goal; visuotactile rotation | [arXiv DOI](https://doi.org/10.48550/arXiv.2309.09979) | [Paper](https://proceedings.mlr.press/v229/qi23a.html) |
+| B41 | OpenVLA: An Open-Source Vision-Language-Action Model | CoRL 2024 | 7B generalist VLA; large-scale robot demonstrations | [arXiv DOI](https://doi.org/10.48550/arXiv.2406.09246) | [Paper](https://arxiv.org/abs/2406.09246), [Project](https://openvla.github.io/) |
+| B42 | π0: A Vision-Language-Action Flow Model for General Robot Control | RSS 2025; arXiv 2024 | Flow-matching generalist VLA; multi-robot dexterous control | [arXiv DOI](https://doi.org/10.48550/arXiv.2410.24164) | [Paper](https://arxiv.org/abs/2410.24164) |
+| B43 | π0.5: a Vision-Language-Action Model with Open-World Generalization | CoRL 2025 | Heterogeneous co-training; open-world long-horizon transfer | 미확인 | [Paper](https://proceedings.mlr.press/v305/black25a.html) |
+| B44 | Fine-Tuning Vision-Language-Action Models: Optimizing Speed and Success (OpenVLA-OFT) | RSS 2025; arXiv 2025 | Parallel decoding; continuous action chunking; faster VLA control | [Publication DOI](https://doi.org/10.15607/RSS.2025.XXI.017) | [Paper](https://www.roboticsproceedings.org/rss21/p017.html), [Project](https://openvla-oft.github.io/) |
+| B45 | RDT-1B: a Diffusion Foundation Model for Bimanual Manipulation | ICLR 2025; arXiv 2024 | Large-scale diffusion foundation policy; bimanual demonstrations | [arXiv DOI](https://doi.org/10.48550/arXiv.2410.07864) | [Paper](https://arxiv.org/abs/2410.07864), [Project](https://rdt-robotics.github.io/rdt-robotics/) |
+| B46 | ForceVLA: Enhancing VLA Models with a Force-aware MoE for Contact-rich Manipulation | NeurIPS 2025 | 6-axis force as a first-class VLA modality | [Publication DOI](https://doi.org/10.52202/085713-3124) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/8633b46e12cc5f2ee1f05a6ca2c65b38-Abstract-Conference.html) |
+| B47 | TLA: Tactile-Language-Action Model for Contact-Rich Manipulation | arXiv 2025 | Sequential tactile–language grounding; insertion | [arXiv DOI](https://doi.org/10.48550/arXiv.2503.08548) | [Paper](https://arxiv.org/abs/2503.08548) |
+| B48 | Tactile-VLA: Unlocking Vision-Language-Action Model's Physical Knowledge for Tactile Generalization | arXiv 2025 | Tactile-conditioned VLA generalization | [arXiv DOI](https://doi.org/10.48550/arXiv.2507.09160) | [Paper](https://arxiv.org/abs/2507.09160) |
+| B49 | VTLA: Vision-Tactile-Language-Action Model with Preference Learning for Insertion Manipulation | arXiv 2025 | Visuotactile VLA; preference learning; insertion | [arXiv DOI](https://doi.org/10.48550/arXiv.2505.09577) | [Paper](https://arxiv.org/abs/2505.09577) |
+| B50 | Learning to Feel the Future: DreamTacVLA for Contact-Rich Manipulation | arXiv 2025 | Future tactile prediction; contact-rich VLA | [arXiv DOI](https://doi.org/10.48550/arXiv.2512.23864) | [Paper](https://arxiv.org/abs/2512.23864) |
+| B51 | TaF-VLA: Tactile-Force Alignment in Vision-Language-Action Models for Force-aware Manipulation | arXiv 2026 | Tactile–force alignment; history-dependent contact dynamics | [arXiv DOI](https://doi.org/10.48550/arXiv.2601.20321) | [Paper](https://arxiv.org/abs/2601.20321) |
+| B52 | HapticVLA: Contact-Rich Manipulation via Vision-Language-Action Model without Inference-Time Tactile Sensing | arXiv 2026 | Haptic supervision without deployment-time tactile input | [arXiv DOI](https://doi.org/10.48550/arXiv.2603.15257) | [Paper](https://arxiv.org/abs/2603.15257) |
+| B53 | TORL-VLA: Tactile Guided Online Reinforcement Learning for Contact-Rich Manipulation | arXiv 2026 | Tactile-guided online RL refinement of VLA | [arXiv DOI](https://doi.org/10.48550/arXiv.2606.09337) | [Paper](https://arxiv.org/abs/2606.09337) |
+| B54 | Learning Fine-Grained Bimanual Manipulation with Low-Cost Hardware (ACT) | RSS 2023 | Action chunking Transformer; low-cost demonstrations | [arXiv DOI](https://doi.org/10.48550/arXiv.2304.13705) | [Paper](https://arxiv.org/abs/2304.13705) |
+| B55 | Diffusion Policy: Visuomotor Policy Learning via Action Diffusion | RSS 2023 | Multimodal action distribution; receding-horizon IL | [arXiv DOI](https://doi.org/10.48550/arXiv.2303.04137) | [Paper](https://arxiv.org/abs/2303.04137) |
+| B56 | Reactive Diffusion Policy: Slow-Fast Visual-Tactile Policy Learning for Contact-Rich Manipulation | RSS 2025 | Slow–fast tactile IL; high-frequency reactive branch | [Publication DOI](https://doi.org/10.15607/RSS.2025.XXI.052) | [Paper](https://www.roboticsproceedings.org/rss21/p052.html) |
+| B57 | FoAR: Force-Aware Reactive Policy for Contact-Rich Robotic Manipulation | IEEE RA-L 2025 | High-frequency F/T fusion; future-contact predictor | [Publication DOI](https://doi.org/10.1109/LRA.2025.3560871) | [Paper](https://arxiv.org/abs/2411.15753) |
+| B58 | 3D-ViTac: Learning Fine-Grained Manipulation with Visuo-Tactile Sensing | CoRL 2024; PMLR 2025 | Visuotactile imitation learning; fine-grained and fragile-object tasks | 미확인 | [Paper](https://proceedings.mlr.press/v270/huang25e.html) |
+| B59 | Fast-in-Slow: A Dual-System VLA Model Unifying Fast Manipulation within Slow Reasoning | NeurIPS 2025 | Slow semantic reasoning plus high-frequency action system | [Publication DOI](https://doi.org/10.52202/085713-3276) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/8cf3760422b9d4505589a97c8f9569e7-Abstract-Conference.html) |
+| B60 | SafeVLA: Towards Safety Alignment of Vision-Language-Action Model via Constrained Learning | NeurIPS 2025 | Constrained safe RL for VLA | [Publication DOI](https://doi.org/10.52202/085713-5128) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/e185c7be603426028c32ae1003a59d78-Abstract-Conference.html) |
+| B61 | VLA-Cache: Efficient Vision-Language-Action Manipulation via Adaptive Token Caching | NeurIPS 2025 | Training-free inference acceleration | [Publication DOI](https://doi.org/10.52202/085713-5484) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/f062da1973ac9ac61fc6d44dd7fa309f-Abstract-Conference.html) |
+| B62 | VLA-OS: Structuring and Dissecting Planning Representations and Paradigms in Vision-Language-Action Models | NeurIPS 2025 | Controlled comparison of hierarchical VLA planning paradigms | [Publication DOI](https://doi.org/10.52202/085713-4561) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/c7af751b5e0a407c62ac023e3cb381f9-Abstract-Conference.html) |
+| B63 | BridgeVLA: Input-Output Alignment for Efficient 3D Manipulation Learning with Vision-Language Models | NeurIPS 2025 | Data-efficient 3D VLA alignment | [Publication DOI](https://doi.org/10.52202/085713-2137) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/5c1a8aa04c1a2cf5013f28831870dafa-Abstract-Conference.html) |
+| B64 | Real-Time Execution of Action Chunking Flow Policies | NeurIPS 2025 | Asynchronous real-time chunking; inference-delay robustness | [Publication DOI](https://doi.org/10.52202/085713-1122) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/300ccb2187dedd4edcc07f7e76d8e553-Abstract-Conference.html) |
+| B65 | PAC Bench: Do Foundation Models Understand Prerequisites for Executing Manipulation Policies? | NeurIPS 2025 Datasets and Benchmarks | Physical property·affordance·constraint understanding benchmark | [Publication DOI](https://doi.org/10.52202/085713-3671) | [Paper](https://papers.nips.cc/paper_files/paper/2025/hash/9ecafb09de180aaad7b7205be7eb24a4-Abstract-Datasets_and_Benchmarks_Track.html) |
+| B66 | IndustReal: Transferring Contact-Rich Assembly Tasks from Simulation to Reality | RSS 2023 | Simulation RL; contact-rich assembly; sim-to-real | [Publication DOI](https://doi.org/10.15607/RSS.2023.XIX.039) | [Paper](https://roboticsproceedings.org/rss19/p039.html) |
+| B67 | Towards Tight Convex Relaxations for Contact-Rich Manipulation | RSS 2024 | Global contact planning; graph of convex sets; planar pushing | [Publication DOI](https://doi.org/10.15607/RSS.2024.XX.132) | [Paper](https://www.roboticsproceedings.org/rss20/p132.html) |
+| B68 | Distributionally Robust Control via Stein Variational Inference for Contact-rich Manipulation | RSS 2026 | Model-based robust control under parametric contact uncertainty | [Publication DOI](https://doi.org/10.15607/RSS.2026.XXII.061) | [Paper](https://www.roboticsproceedings.org/rss22/p061.html) |
+| B69 | Certifiable Gradient-Based Contact-Rich Manipulation via Smoothing-Error Reachable Tubes | RSS 2026 | Hybrid contact dynamics; smoothing error; certified robust policy synthesis | [Publication DOI](https://doi.org/10.15607/RSS.2026.XXII.190) | [Paper](https://www.roboticsproceedings.org/rss22/p190.html) |
+| B70 | MimicTouch: Leveraging Multi-modal Human Tactile Demonstrations for Contact-rich Manipulation | CoRL 2024; PMLR 2025 | Human tactile demonstrations; IL; online residual RL | 미확인 | [Paper](https://proceedings.mlr.press/v270/yu25c.html) |
+| B71 | Semantic Contact Fields for Category-Level Generalizable Tool Manipulation | RSS 2026 | Semantic–contact 3D representation; sim pretraining; diffusion policy | [Publication DOI](https://doi.org/10.15607/RSS.2026.XXII.004) | [Paper](https://www.roboticsproceedings.org/rss22/p004.html) |
+| B72 | Should We Learn Contact-Rich Manipulation Policies from Sampling-Based Planners? | arXiv 2024; revised 2025 | Planner-generated demonstrations; goal-conditioned diffusion BC | [arXiv DOI](https://doi.org/10.48550/arXiv.2412.09743) | [Paper](https://arxiv.org/abs/2412.09743) |
+| B73 | FORGE: Force-Guided Exploration for Robust Contact-Rich Manipulation Under Uncertainty | IEEE RA-L 2025 | Force-threshold-conditioned simulation RL; dynamics randomization; Sim-to-Real | [Publication DOI](https://doi.org/10.1109/LRA.2025.3551637) | [Publication](https://ieeexplore.ieee.org/document/10925874/), [Paper](https://arxiv.org/abs/2408.04587) |
+| B74 | Learning Long-Horizon Robot Manipulation Skills via Privileged Action | CoRL 2025 Spotlight | Privileged-action curriculum; multi-stage contact-rich RL; parsimonious reward | 미확인 | [Paper](https://proceedings.mlr.press/v305/mao25a.html), [arXiv](https://arxiv.org/abs/2502.15442) |
+| B75 | Emergent Dexterity via Diverse Resets and Large-Scale Reinforcement Learning | ICLR 2026 | Diverse simulation resets; scalable on-policy RL; emergent multi-phase recovery | 미확인 | [Paper](https://proceedings.iclr.cc/paper_files/paper/2026/hash/8e3e3488623d64c493a7f11cf1f2e49f-Abstract-Conference.html), [OpenReview](https://openreview.net/forum?id=nAO9LcV7nE) |
+| B76 | Refinery: Active Fine-tuning and Deployment-time Optimization for Contact-Rich Policies | ICRA 2026 | Bayesian-optimization-guided policy fine-tuning; deployment initial-state selection; policy chaining | [arXiv DOI](https://doi.org/10.48550/arXiv.2510.11019) | [Paper](https://arxiv.org/abs/2510.11019), [Project](https://research.nvidia.com/labs/lpr/publication/tang2026refinery/) |
+| B77 | A Hybrid Framework Using Diffusion Policy and Residual RL for Force-Sensitive Robotic Manipulation (DP-RRL) | IEEE RA-L 2025 | Demonstration diffusion policy; residual RL force adaptation; multimodal contact control | [Publication DOI](https://doi.org/10.1109/LRA.2025.3596487) | [Publication](https://ieeexplore.ieee.org/document/11114901/) |
+| B78 | Self-Supervised Multisensory Pretraining for Contact-Rich Robot Reinforcement Learning (MSDP) | IEEE RA-L 2026 | Vision·force·proprioception masked pretraining; asymmetric actor–critic; real-world RL | [Publication DOI](https://doi.org/10.1109/LRA.2026.3681156) | [Paper](https://arxiv.org/abs/2511.14427), [Project](https://msdp-pearl.github.io/) |
+| B79 | ConRFT: A Reinforced Fine-tuning Method for VLA Models via Consistency Policy | RSS 2025 | Offline BC+Q learning; online RL; human intervention; VLA adaptation | [Publication DOI](https://doi.org/10.15607/RSS.2025.XXI.019) | [Paper](https://www.roboticsproceedings.org/rss21/p019.html), [arXiv](https://arxiv.org/abs/2502.05450) |
+| B80 | TRANSIC: Sim-to-Real Policy Transfer by Learning from Online Correction | CoRL 2024; PMLR 2025 | Simulation base policy; human correction; gated residual policy; contact-rich assembly | [arXiv DOI](https://doi.org/10.48550/arXiv.2405.10315) | [Paper](https://proceedings.mlr.press/v270/jiang25a.html), [Project](https://transic-robot.github.io/) |
 
 ---
 
@@ -95,6 +136,9 @@
 | B31 | HACMan++ | Primitive type·location·parameter를 선택하고 여러 primitive를 순서대로 연결하는 방법 |
 | B39 | General In-Hand Object Re-Orientation | 임의의 SO(3) goal 도달에서 current–goal quaternion difference와 symmetry-aware success를 사용하는 방식 |
 | B40 | RotateIt | 최종 자세가 아니라 hand-centric rotation-axis를 목표로 연속 회전을 학습하는 방식 |
+| B74 | Privileged Action | Virtual force·constraint relaxation curriculum으로 phase label 없이 push·pivot·grasp를 포함한 long-horizon behavior를 탐색하는 방식 |
+| B75 | Emergent Dexterity / OmniReset | Diverse reset state가 multi-phase contact behavior와 recovery 탐색을 단순화하는 방식 |
+| B76 | Refinery | 개별 contact policy의 취약한 initial-state 영역을 fine-tuning하고 policy chaining 성공률을 높이는 방식 |
 
 ### 3.3 Tactile·F/T 기반 Closed-Loop Contact 형성·보정
 
@@ -115,6 +159,12 @@
 | B34 | TacSL | Visuotactile RGB와 per-taxel force field를 GPU에서 생성하는 고충실도 tactile simulation 후보 |
 | B36 | TacEx | Isaac Sim에서 GelSight deformation·RGB observation을 생성하는 외부 tactile simulation 후보 |
 | B37 | Goal-Driven Robotic Pushing | Tactile로 pusher–object 상대 pose를 안정화하고 proprioception으로 target bearing·distance를 정렬하는 역할 분담 |
+| B56 | Reactive Diffusion Policy | Slow trajectory policy와 fast tactile/force feedback branch를 분리한 reactive IL 상한 |
+| B57 | FoAR | Future-contact predictor로 vision과 high-frequency wrist F/T의 중요도를 조절하는 IL baseline |
+| B73 | FORGE | Force threshold·dynamics randomization으로 pose uncertainty 아래 contact policy를 안전하게 전이하는 RL baseline |
+| B77 | DP-RRL | Demonstration diffusion policy의 motion·force trajectory를 residual RL이 online 보정하는 hybrid baseline |
+| B78 | MSDP | Vision·force·proprioception의 masked dynamic pretraining과 asymmetric actor–critic sensor fusion |
+| B80 | TRANSIC | Simulation base policy의 real-world failure를 human correction 기반 residual policy로 보완하는 Sim-to-Real baseline |
 
 ### 3.4 Goal-Conditioned Nonprehensile Manipulation과 Contact 선택
 
@@ -127,6 +177,9 @@
 | B01 | GD2P | 주어진 object state와 pushing direction에 대한 geometry-conditioned hand pose |
 | B23 | Task-Oriented Contact Optimization | 주어진 planar trajectory에 적합한 contact 배치 결정 |
 | B28 | Where to Touch, How to Contact | Surface contact와 object subgoal을 함께 표현하는 contact intention |
+| B74 | Privileged Action | Virtual force와 constraint relaxation을 이용해 sparse-reward long-horizon nonprehensile behavior를 발견하는 방식 |
+| B75 | Emergent Dexterity / OmniReset | Reward·curriculum 변경보다 reset-state coverage를 확장해 contact-rich exploration을 개선하는 방식 |
+| B79 | ConRFT | 소수 demonstration에서 BC+Q learning으로 초기화한 뒤 online RL로 실제 policy를 개선하는 VLA–RL 결합 |
 
 ### 3.5 Track B 2단계 — 조작 의사결정, 공간 확보와 Retrieval
 
@@ -170,9 +223,99 @@
 | B39 | General In-Hand Object Re-Orientation | 임의 goal orientation에는 quaternion difference를, symmetric-object vision 평가에는 shape-equivalent criterion을 둔 사례 |
 | B40 | RotateIt | 연속 회전 task에서 hand-centric 3D rotation-axis vector를 observation에 추가한 이유 |
 
+### 3.8 최신 VLA·IL 기반 Research Motivation
+
+이 그룹은 VLA·IL을 약한 비교 대상으로 만드는 것이 아니라, **각 계열이 이미 해결한 문제와 Track B가 추가로 검증할 문제의 경계**를 확인하기 위한 것이다. 종합된 논리와 논문 서술 초안은 [`motivation.md`](./motivation.md)에서 관리한다.
+
+#### 3.8.1 최신 핵심 연구 선별 기준
+
+`최신 연구`는 π0가 공개된 **2024-10-31 이후 정식 게재된 논문**으로 정의한다. 최초 preprint가 더 이르더라도 정식 학회·저널 게재가 이후라면 포함하며, 2025–2026년 arXiv 문서라도 정식 게재가 확인되지 않으면 핵심 baseline이 아니라 watch list로 구분한다.
+
+1. **정식 게재 수준:** ICLR·NeurIPS·ICCV·RSS·CoRL·ICRA 또는 IEEE RA-L을 우선한다.
+2. **Track B 직접성:** Contact-rich, nonprehensile, dexterous hand, tactile/F/T와 long-horizon transition의 중첩 정도를 본다.
+3. **영향력:** 인용 수와 후속 baseline 채택을 보조 지표로 사용하되, 최신 논문의 시간상 불이익을 감안한다.
+4. **비교 가능성:** Observation·action·sensor·data budget과 공개 code·checkpoint·dataset을 확인한다.
+5. **주장 대응성:** 각 baseline이 검증할 Track B의 주장 또는 구성요소를 명시한다.
+
+아래 인용 수는 **2026-09-16 Semantic Scholar snapshot**이며 데이터베이스와 시점에 따라 바뀐다. 연구의 질이나 직접성을 대신하는 지표로 사용하지 않는다.
+
+#### 3.8.2 영향력과 Track B 비교 역할
+
+| 계열 | 연구·정식 게재 | 영향력 snapshot | 이 연구가 이미 보여준 것 | Track B에서 남는 비교 질문 | 현재 역할 |
+| --- | --- | ---: | --- | --- | --- |
+| Generalist VLA | B43 π0.5, CoRL 2025 | 1,764 citations | 이종 robot·web data와 semantic subtask prediction으로 새로운 가정의 장기 household task까지 일반화 | Semantic generalization이 제한된 shelf의 contact feasibility와 force safety도 보장하는가 | Literature upper reference |
+| Efficient VLA | B44 OpenVLA-OFT, RSS 2025 | 850 citations | Parallel decoding·action chunking·continuous action으로 VLA adaptation의 속도와 성공률을 개선 | 낮은 latency가 contact observability와 Rotation→Push terminal-contact quality도 해결하는가 | VLA adaptation reference |
+| Contact-aware VLA | B46 ForceVLA, NeurIPS 2025 | 121 citations | 6축 force를 first-class modality로 통합해 contact-rich task 성능을 개선 | 대규모 backbone·task-specific multimodal data 없이 coarse tactile+F/T로 물리적 보정이 가능한가 | 핵심 VLA reference |
+| Reactive IL | B56 Reactive Diffusion Policy, RSS 2025 | 204 citations | Slow diffusion와 fast tactile/force branch로 action chunk 중 폐루프 반응을 구현 | 고주파 반응이 downstream Push를 고려한 Rotation terminal state도 최적화하는가 | 강한 matched IL 후보 |
+| Force-aware IL | B57 FoAR, IEEE RA-L 2025 | 68 citations | Vision과 high-frequency wrist F/T를 future-contact prediction으로 융합 | 유사한 F/T 조건에서 IL과 simulation RL의 failure coverage·비용은 어떻게 다른가 | 현실적인 matched IL 후보 |
+| Visuotactile RL | B27 VTDexManip, ICLR 2025 | 재확인 필요 | Sparse binary tactile가 policy 성능과 noise robustness에 기여 | Track B에서도 binary tactile가 충분하며 17-channel과 coarse pooling 중 무엇이 필요한가 | Sensor·representation baseline |
+| Sim-to-Real RL | B73 FORGE, IEEE RA-L 2025 | 45 citations | Force threshold와 dynamics randomization으로 pose uncertainty 아래 real transfer | Threshold-conditioned safety와 privileged-force reward 중 무엇이 강건한가 | Force-safety·Sim-to-Real baseline |
+| Long-horizon RL | B74 Privileged Action, CoRL 2025 Spotlight | 3 citations | Virtual force·constraint relaxation curriculum으로 multi-stage contact behavior를 학습 | Reward gate와 privileged critic만으로 같은 exploration hurdle을 넘을 수 있는가 | 직접 formulation comparator |
+| Scalable RL | B75 OmniReset, ICLR 2026 | 11 citations | Diverse resets로 multi-phase behavior와 retry를 학습 | Phase gate의 이득이 reset coverage를 통제한 뒤에도 남는가 | 강한 reset/curriculum comparator |
+| Nonprehensile world model | B26 DyWA, ICCV 2025 | 27 citations | History로 dynamics variation을 추정해 unseen condition에 일반화 | Dense geometry/world model 없이 OBB+tactile/F/T history로 충분한가 | Task·generalization baseline |
+| Dexterous tactile IL | B22 DexMove, ICLR 2026 | 신규·집계 미성숙 | Simulation trajectory와 human tactile demonstration을 결합한 wrist–finger nonprehensile control | Dense visuotactile·hybrid demonstration 없이 coarse tactile RL이 어느 수준까지 가능한가 | 가장 가까운 task-level reference |
+| Geometry-conditioned execution | B01 GD2P, ICRA 2026 | 5 citations | Pushing/pulling direction에 맞는 dexterous pre-contact pose를 대규모로 생성·실험 | 정적 pre-contact selection과 contact 중 feedback adaptation 중 무엇이 필요한가 | Contact-configuration baseline |
+
+높은 인용 수와 task 직접성은 다르다. π0.5·OpenVLA-OFT는 영향력이 큰 상한 reference이고, DexMove·DyWA·RDP·FoAR와 long-horizon contact-rich RL이 Track B의 실험 질문에는 더 가깝다.
+
+#### 3.8.3 Baseline 계층과 비교 원칙
+
+| 계층 | 포함할 연구·방법 | 비교 목적 | 구현 원칙 |
+| --- | --- | --- | --- |
+| A. Matched experimental baseline | Same-task PPO/asymmetric critic, FoAR-style vision+F/T IL, 가능한 경우 RDP-style reactive IL | Reward·privileged learning·closed-loop transition의 실제 이득 검증 | Task distribution, actor observation, action, controller와 real trial budget을 맞추고 pretraining·demonstration 비용도 기록 |
+| B. Component baseline | B27 tactile encoding, B73 force threshold·randomization, B74 privileged curriculum, B75 diverse resets | Sensor, force safety, exploration과 phase-free learning의 효과 분리 | 전체 architecture 대신 논문이 검증한 핵심 구성요소를 ablation으로 재현 |
+| C. Closest-task system baseline | B26 DyWA, B22 DexMove, B01 GD2P | Nonprehensile generalization, wrist–finger contact와 hand-pose selection의 현재 상한 확인 | Sensor·geometry·data가 다르면 성공률을 단순 대조하지 않고 공통 조건에서만 정량 비교 |
+| D. High-impact reference | B43 π0.5, B44 OpenVLA-OFT, B46 ForceVLA | Generalist semantics, fast adaptation과 force-aware VLA가 해결한 범위를 인정 | Compute·data 조건이 다르면 literature comparison과 제한된 fine-tuning을 구분하고 전체 우열은 주장하지 않음 |
+
+#### 3.8.4 계열별 해결 범위와 남는 질문
+
+| 계열 | 핵심 논문 | 확인된 장점 | Track B에서 남는 질문 |
+| --- | --- | --- | --- |
+| Generalist VLA | B41 OpenVLA, B42 π0, B43 π0.5, B45 RDT-1B | 대규모 이종 robot data와 semantic prior를 이용한 다과업·다환경 transfer | Shelf 내부 unseen blocker의 국소 contact configuration과 Rotation→Push 전환을 제한된 실물 센서로 얼마나 정밀하게 다루는가 |
+| Fast·efficient VLA | B44 OpenVLA-OFT, B59 Fast-in-Slow, B61 VLA-Cache, B64 RTC | 병렬 decoding, fast action module, caching과 asynchronous chunk execution으로 latency·control frequency를 개선 | 빠른 실행만으로 접촉 관측 가능성, force safety와 downstream contact feasibility까지 해결되는가 |
+| Force·tactile VLA | B46 ForceVLA, B47 TLA, B48 Tactile-VLA, B49 VTLA, B50 DreamTacVLA, B51 TaF-VLA, B52 HapticVLA | Force/tactile을 VLA의 명시적 modality 또는 학습 supervision으로 도입해 contact-rich 성능을 개선 | Specialized sensor와 task-specific multimodal demonstration 비용 없이 coarse binary tactile+F/T로 preparatory rotation과 pushing을 연결할 수 있는가 |
+| Demonstration IL | B54 ACT, B55 Diffusion Policy, B45 RDT-1B | 자연스러운 multimodal trajectory, action chunk와 expressive action distribution을 reward engineering 없이 학습 | Demonstration 밖의 접촉 이탈·물성 변화·실패 상태를 어떻게 탐색하고 회복할 것인가 |
+| Reactive multimodal IL | B56 RDP, B57 FoAR, B58 3D-ViTac | 고주파 tactile/F/T feedback과 vision을 결합해 action chunk 중 반응성과 정밀 접촉을 개선 | 별도 tactile teleoperation·task demonstrations가 필요한 조건과, 후속 Push 성공을 고려한 rotation terminal contact를 직접 학습하는지는 별개인가 |
+| Contact-rich simulation RL | B73 FORGE, B74 Privileged Action, B75 OmniReset, B76 Refinery, B78 MSDP | Force limit·randomization, privileged curriculum, reset coverage, active fine-tuning과 multisensory pretraining으로 탐색·Sim-to-Real·sensor fusion을 개선 | Phase-gated reward의 이득이 reset/curriculum·randomization·representation을 통제한 뒤에도 남는가 |
+| IL–RL·Sim–Real hybrid | B77 DP-RRL, B80 TRANSIC | Demonstration 또는 simulation base policy에 residual RL·human correction을 더해 real-world contact error를 보정 | 순수 simulation RL의 data·engineering 비용과 소량의 real correction을 쓰는 hybrid method 중 무엇이 더 효율적인가 |
+| RL-refined VLA | B53 TORL-VLA, B60 SafeVLA, B79 ConRFT | Offline VLA에 online RL 적응, Q learning 또는 명시적 safety constraint를 결합 | VLA+RL이라는 조합 자체는 gap이 아니며, shelf blocker의 어떤 state transition과 sensor·reward contract를 새로 검증하는가 |
+| Closest task-specific systems | B01 GD2P, B22 DexMove, B26 DyWA | Dexterous pushing/pulling contact pose, tactile wrist–finger nonprehensile control과 dynamics-adaptive manipulation을 각각 해결 | Preparatory Rotation의 종료 접촉을 downstream Push 초기 접촉으로 직접 최적화하는가, 그리고 coarse deployable sensing으로 가능한가 |
+| Physical prerequisite 평가 | B62 VLA-OS, B63 BridgeVLA, B65 PAC Bench | Hierarchical planning, 3D alignment와 물리적 실행 전제의 평가 필요성을 체계화 | Semantic plan과 coarse geometry가 실제 contact feasibility·stability·force constraint를 충분히 표현하는가 |
+
+현재 가장 방어 가능한 gap은 `VLA는 힘을 모른다` 또는 `IL은 반응하지 못한다`가 아니다. 최신 반례가 이미 존재한다. 현재 문헌에서 직접 평가가 부족한 조합은 다음과 같이 더 좁게 정의한다.
+
+> **Unknown shelf blocker를 목표 방향으로 밀기 전에 필요한 preparatory rotation을 수행하면서, 회전 종료 접촉 상태가 후속 pushing에 적합하도록 유지·전환하고, 이를 coarse OBB·binary tactile·wrist F/T라는 배포 가능한 저차원 입력과 simulation privileged supervision으로 학습할 수 있는가?**
+
+우리 방법의 우위 주장은 matched baseline, sensor·history ablation, unseen geometry·friction·mass 평가와 데이터·계산·센서 비용 비교가 완료된 뒤에만 사용한다. 그 전에는 `극복한다`가 아니라 `이 공백을 겨냥한다` 또는 `검증한다`로 서술한다.
+
+### 3.9 연구 배경 — Conventional Method와 Learning Method의 Trade-off
+
+| ID | 연구 | Motivation에서의 역할 |
+| --- | --- | --- |
+| B67 | Tight Convex Relaxations | Contact mode와 quasi-static dynamics를 명시하면 global contact planning이 강력할 수 있으므로 conventional planning을 무능한 baseline으로 서술하지 않을 근거 |
+| B68 | Distributionally Robust Control | Model-based method의 효율·신뢰성과 contact uncertainty 표현 한계 사이의 trade-off를 최신 사례로 설명 |
+| B69 | Certifiable Gradient-Based Contact-Rich Manipulation | Hybrid contact dynamics의 불연속 gradient와 smoothing-induced model mismatch가 현재도 핵심 문제임을 보여주는 사례 |
+| B66 | IndustReal | Contact-rich RL의 simulation 학습과 real transfer 가능성, 동시에 simulation-aware update·reward·curriculum·deployment 보정이 필요한 사례 |
+| B70 | MimicTouch | Tactile IL의 장점과 human–robot embodiment·demonstration sensing mismatch를 residual RL로 보완한 사례 |
+| B71 | Semantic Contact Fields | VLA의 semantic knowledge와 고충실도 physical grounding 사이의 간극, real tactile scale과 sim-to-real 문제를 직접 지적한 최신 사례 |
+| B72 | Planner-generated Contact-Rich Policy Learning | Human teleoperation이 어려운 multi-contact task에서 planning data를 활용할 수 있지만 demonstration consistency가 별도 병목임을 보여주는 사례 |
+
 ---
 
-## 4. 현재 우선 독해 순서 — Observation formulation
+## 4. 우선 독해 순서와 검토 관점
+
+### 4.1 Research motivation 구체화
+
+단순히 유사한 논문을 많이 모으는 것이 아니라 다음 네 축의 비교표를 만드는 것이 목적이다.
+
+1. **Shelf retrieval의 실제 필요:** B17 RetrDex, IROS21-081 Occlusion-Aware Search, IROS22-016 parallel MCTS retrieval과 ICRA24-169 Unknown Object Retrieval을 통해 blocker 조작이 target visibility·reachability·retrieval에 주는 효용과 상위 planner의 범위를 확인한다.
+2. **Direct push와 preparatory rotation의 경계:** B21 Hermans et al., ICRA23-103 Learning Generalizable Pivoting, IROS22-013 Goal-Oriented Non-Prehensile Pushing과 ICRA25-189 Dynamic Object Goal Pushing을 비교해 어떤 초기 pose·geometry·contact 조건에서 rotation이 필요한지 정리한다.
+3. **Contact configuration과 phase 연결:** B01 GD2P, B02 TaskDexGrasp, B03 critic-based grasp scoring, B08 Sequential Dexterity와 ICRA25-147 impedance-primitive HRL을 비교해 rotation terminal state가 후속 pushing 실행 가능성을 어떻게 보존해야 하는지 검토한다.
+4. **Multimodal feedback의 필요:** B09 DexTouch, IROS21-003 COCOI, B32 Rotating without Seeing와 ICRA25-166 tactile sensing 비교를 통해 coarse geometry·vision만으로 남는 불확실성과 tactile/F/T가 실제로 보완하는 정보를 구분한다.
+
+각 논문은 `문제 설정 / object·scene 조건 / observation / action·controller / contact representation / rotation–translation 관계 / downstream objective / generalization / real validation / 우리 gap에 주는 근거` 열로 정리한다. 이 비교가 끝나기 전에는 `rotate-then-push`, `multimodal`, `multi-finger` 또는 `phase-free RL`의 결합만으로 novelty를 주장하지 않는다.
+
+### 4.2 Observation formulation
 
 현재 Track B 1단계의 **coarse OBB + arm/hand q + binary tactile + wrist F/T + MLP history** observation을 구체화하기 위한 순서다. 최종 실험 baseline 선정은 아니다. Point cloud·raw RGB·optical tactile는 현재 actor 최소안이 아니라 비교 배경 또는 후속 확장으로 읽는다.
 
