@@ -1,4 +1,4 @@
-# Track B Research Motivation
+﻿# Track B Research Motivation
 
 > **연구 주제:** Shelf retrieval을 위한 goal-conditioned blocker-object contact manipulation
 >
@@ -33,7 +33,7 @@ Rotation terminal contact가 Push initial contact를 결정
 Downstream-aware contact transition을 학습·평가
 ```
 
-현재 명세는 [`research_topic.md`](./research_topic.md), 논문과 baseline 근거는 [`papers.md`](./papers.md), 결정 과정은 [`context.md`](./context.md)를 따른다.
+현재 명세는 [`research_topic.md`](./research_topic.md), 논문과 baseline 근거는 [`papers/README.md`](./papers/README.md), 결정 과정은 [`context.md`](./context.md)를 따른다.
 
 ---
 
@@ -71,16 +71,16 @@ Track B는 두 번째 상태를 학습 목표와 평가 대상으로 삼는다.
 
 ## 2. 기존 연구가 해결한 것과 남은 Gap
 
-구체 논문의 서지정보·게재 상태·영향력과 baseline 역할은 [`papers.md`](./papers.md)의 3.8절에서 관리한다. 여기서는 motivation에 필요한 결론만 사용한다.
+구체 논문의 서지정보·게재 상태·영향력과 baseline 역할은 [`papers/topic_groups.md`](./papers/topic_groups.md)의 8절에서 관리한다. 여기서는 motivation에 필요한 결론만 사용한다.
 
 ### 2.1 최신 연구가 이미 제거한 단순한 비판
 
 | 연구 흐름과 대표 사례 | 이미 확인된 발전 | Track B에서 별도로 남는 질문 |
 | --- | --- | --- |
-| Generalist·efficient VLA — π0.5, OpenVLA-OFT | 장기 household task 일반화와 빠른 VLA adaptation | Semantic generalization과 낮은 latency가 shelf 내부의 contact feasibility·force safety까지 보장하는가 |
-| Force·tactile-aware policy — ForceVLA, Reactive Diffusion Policy, FoAR | Force/tactile을 이용한 contact grounding과 고주파 반응 | 반응성이 Rotation 종료 접촉을 downstream Push 성공에 맞게 최적화하는가 |
-| Contact-rich·long-horizon RL — FORGE, Privileged Action, OmniReset | Sim-to-Real randomization, exploration curriculum과 reset coverage 개선 | 동일 exploration 조건에서도 downstream-aware objective와 phase-free transition의 이점이 남는가 |
-| 인접 nonprehensile·dexterous 연구 — DyWA, DexMove, GD2P | Dynamics adaptation, tactile wrist–finger control과 geometry-conditioned contact pose | Coarse deployable sensing으로 Rotation–Push contact transition 전체를 폐루프로 실행할 수 있는가 |
+| Generalist·efficient VLA — [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017) | 장기 household task 일반화와 빠른 VLA adaptation | Semantic generalization과 낮은 latency가 shelf 내부의 contact feasibility·force safety까지 보장하는가 |
+| Force·tactile-aware policy — [ForceVLA](https://doi.org/10.52202/085713-3124), [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), [FoAR](https://doi.org/10.1109/LRA.2025.3560871) | Force/tactile을 이용한 contact grounding과 고주파 반응 | 반응성이 Rotation 종료 접촉을 downstream Push 성공에 맞게 최적화하는가 |
+| Contact-rich·long-horizon RL — [FORGE](https://doi.org/10.1109/LRA.2025.3551637), [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442), [OmniReset](https://doi.org/10.48550/arXiv.2603.15789) | Sim-to-Real randomization, exploration curriculum과 reset coverage 개선 | 동일 exploration 조건에서도 downstream-aware objective와 phase-free transition의 이점이 남는가 |
+| 인접 nonprehensile·dexterous 연구 — [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Dynamics adaptation, tactile wrist–finger control과 geometry-conditioned contact pose | Coarse deployable sensing으로 Rotation–Push contact transition 전체를 폐루프로 실행할 수 있는가 |
 
 따라서 다음은 research gap으로 사용하지 않는다.
 

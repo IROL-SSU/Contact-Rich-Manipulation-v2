@@ -1,4 +1,4 @@
-# JH.Jeong Research Topic
+﻿# JH.Jeong Research Topic
 
 > **연구 주제:** Shelf retrieval을 위한 goal-conditioned blocker-object contact manipulation
 >
@@ -34,7 +34,7 @@ Research motivation의 문헌 비교, gap, 가설과 논문용 서술 초안은 
 
 Preparatory rotation은 독립적인 자세 맞춤이 아니라 후속 pushing에 유효한 object–hand 관계와 접촉 배치를 만드는 수단으로 본다. 따라서 Rotation의 terminal contact와 Push의 initial contact를 연결해 평가하며, coarse OBB로 알 수 없는 접촉·물성 차이는 binary tactile와 wrist F/T feedback으로 보정하는지를 검증한다.
 
-이 문제 정의의 배경, research gap, MH1–MH4와 claim–evidence 구조는 [`motivation.md`](./motivation.md), 이를 뒷받침하는 논문과 baseline 후보는 [`papers.md`](./papers.md), 이 결론에 도달한 과정은 [`context.md`](./context.md)를 따른다.
+이 문제 정의의 배경, research gap, MH1–MH4와 claim–evidence 구조는 [`motivation.md`](./motivation.md), 이를 뒷받침하는 논문과 baseline 후보는 [`papers/README.md`](./papers/README.md), 이 결론에 도달한 과정은 [`context.md`](./context.md)를 따른다.
 
 ---
 
@@ -97,7 +97,7 @@ Approach는 준비의 시작이며, Rotation과 Push에서도 접촉 구성의 �
 
 Track B는 manipulation 전 과정에서 Vision, wrist F/T와 tactile sensing을 함께 사용한다.
 
-각 신호는 **선행연구의 raw input·전처리·representation, Isaac Lab의 원천 데이터와 가공 가능성, 실물 대응, 좌표계·주기·noise·latency와 history**를 함께 검토한다. Simulation의 exact state·contact를 실제 sensor observation과 구분하지 않고 actor에 넣지 않는다.
+각 신호는 **선행연구의 raw input·전처리·representation, [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)의 원천 데이터와 가공 가능성, 실물 대응, 좌표계·주기·noise·latency와 history**를 함께 검토한다. Simulation의 exact state·contact를 실제 sensor observation과 구분하지 않고 actor에 넣지 않는다.
 
 현재 policy는 MLP이며 actor에 phase ID를 주지 않는다. `Approach / Contact Formation → Rotation → Push`의 진행은 phase별 gate가 reward term을 활성화하는 방식으로 학습한다. Gate가 action 자유도를 phase별로 mask한다는 뜻은 아니다.
 
@@ -164,11 +164,11 @@ Continuous Vision을 사용하더라도 실제 국소 접촉 표면, 마찰, 질
 
 ### 5.4 Observation 결정 근거의 위치
 
-Observation의 **현재 채택 결과**는 5.1–5.3절을 따른다. 각 항목을 유지·제외하거나 ablation으로 남긴 이유, 관련 논문과 Isaac Lab 구현 검토는 [`context.md`](./context.md)의 5.6.1.7절과 [`papers.md`](./papers.md)의 3.7·4.2절에서 관리한다.
+Observation의 **현재 채택 결과**는 5.1–5.3절을 따른다. 각 항목을 유지·제외하거나 ablation으로 남긴 이유는 [`context.md`](./context.md)의 5.6.1.7절, 관련 논문과 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 검토는 [`papers/topic_groups.md`](./papers/topic_groups.md)의 7절과 [`papers/reading_guide.md`](./papers/reading_guide.md)의 2절에서 관리한다.
 
 ### 5.5 Rotation Observation 현재 명세
 
-현재 baseline은 full SO(3) 문맥을 보존하는 6D continuous representation을 사용한다. Planar `sin/cos yaw`와 5D representation은 ablation으로만 남긴다. 표현 선택의 문헌 근거와 5D의 유도는 [`papers.md`](./papers.md)의 3.7절과 [`context.md`](./context.md)의 Stage 17–18에 기록한다.
+현재 baseline은 full SO(3) 문맥을 보존하는 6D continuous representation을 사용한다. Planar `sin/cos yaw`와 5D representation은 ablation으로만 남긴다. 표현 선택의 문헌 근거는 [`papers/topic_groups.md`](./papers/topic_groups.md)의 7절, 5D의 유도와 결정 과정은 [`context.md`](./context.md)의 Stage 17–18에 기록한다.
 
 우리의 current와 goal frame은 다음처럼 EEF 기준으로 맞추는 것이 자연스럽다.
 
@@ -265,7 +265,7 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 다음 항목은 추가 논의와 실험을 통해 구체화한 뒤 이 문서에 반영한다.
 
 - 현재 최소 MLP observation의 실제 구현과 각 항목의 정규화·noise
-- 사용 중인 Isaac Lab·Isaac Sim 버전과 이에 맞는 ContactSensor·joint-wrench API
+- 사용 중인 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)·Isaac Sim 버전과 이에 맞는 ContactSensor·joint-wrench API
 - 실제 RH56E2 17 sensor의 위치·단위·noise floor·packet/update rate
 - 실제 17 sensor와 URDF link/pad의 coarse grouping, 최종 `M`과 17-channel 비교 구현
 - Binary contact threshold·hysteresis·filter와 접촉 상대에 무관한 any-contact aggregation
@@ -293,5 +293,5 @@ Low-level object goal의 달성과 최종 shelf-retrieval 효과도 구분한다
 | 필요한 정보 | 기준 문서 |
 | --- | --- |
 | 정리된 research motivation·gap·가설·contribution 후보 | [`motivation.md`](./motivation.md) |
-| 참고 논문·서지정보·선별 평가·baseline 후보 | [`papers.md`](./papers.md) |
+| 참고 논문·서지정보·선별 평가·baseline 후보 | [`papers/README.md`](./papers/README.md) |
 | 결정 근거·변경 이력·미결 backlog·작업 우선순위 | [`context.md`](./context.md) |

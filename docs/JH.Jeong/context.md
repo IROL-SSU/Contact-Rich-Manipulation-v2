@@ -1,4 +1,4 @@
-# JH.Jeong Research Context
+﻿# JH.Jeong Research Context
 
 > **주제:** Shelf retrieval을 위한 blocker-object contact manipulation
 >
@@ -16,7 +16,7 @@
 | --- | --- |
 | 현재 확정·working 연구 명세 | [`research_topic.md`](./research_topic.md) |
 | 정리된 research motivation·gap·가설 | [`motivation.md`](./motivation.md) |
-| 논문 목록·서지정보·문헌 평가·baseline 후보 | [`papers.md`](./papers.md) |
+| 논문 목록·서지정보·문헌 평가·baseline 후보 | [`papers/README.md`](./papers/README.md) |
 | 결정 이유·변경 이력·미결 backlog | 이 문서 |
 
 이 문서 앞부분의 연구 요약과 세부 설계 기록은 결정 당시의 맥락을 복원하기 위한 snapshot이다. 최신 명세와 다르면 `research_topic.md`와 가장 최근 Stage·결정 레지스터를 우선한다.
@@ -35,7 +35,7 @@
 
 1. [`research_topic.md`](./research_topic.md) — 현재 연구 범위와 observation·action 등 최신 working specification
 2. [`motivation.md`](./motivation.md) — 정리된 문제 배경, gap, 연구 질문과 contribution 후보
-3. [`papers.md`](./papers.md) — 논문 inventory, 목적별 그룹, 선별 평가와 baseline 후보
+3. [`papers/README.md`](./papers/README.md) — 논문 inventory, 목적별 그룹, 선별 평가와 baseline 후보
 4. 이 문서의 `11. 의사결정 과정`과 `13. 현재 결정 레지스터와 미결 Backlog`
 5. 결정의 상세 맥락이 필요할 때만 `1–10절`과 `15. 관련 자료와 Provenance`
 
@@ -110,7 +110,7 @@ Research motivation의 최신 통합 초안은 [`motivation.md`](./motivation.md
 
 Motivation 작업의 목표 산출물은 `실제 문제·failure → 문헌상 해결 범위 → gap → research question/hypothesis → 실험`을 잇는 problem statement, motivation paragraph, gap table과 hypothesis–experiment matrix다. 구체 gap은 원문 검토 전 확정하지 않는다.
 
-**[2026-09-16 최신 문헌 검토 반영]** Motivation에서 `VLA는 contact/force를 다루지 못한다`, `IL은 실시간 feedback에 반응하지 못한다`와 같은 일반화는 사용하지 않는다. ForceVLA·TLA·TaF-VLA는 force/tactile-aware VLA의 반례이고, Reactive Diffusion Policy·FoAR·3D-ViTac은 reactive multimodal IL의 반례다. Generalist·fast·safe·online-refined VLA도 빠르게 발전하고 있다. 따라서 현재의 방어 가능한 공백은 **대규모 이종 data 또는 task-specific multimodal demonstration에 주로 의존하는 최신 방법들과 달리, unknown shelf blocker의 preparatory rotation이 후속 Push에 적합한 contact state로 끝나도록 coarse OBB·binary tactile·wrist F/T와 simulation privileged supervision으로 폐루프 학습하는 문제**다. 이는 문헌에서 확인한 범위에 대한 현재 추론이며, 보편적 우위가 아니라 matched baseline과 ablation으로 검증할 연구 질문이다.
+**[2026-09-16 최신 문헌 검토 반영]** Motivation에서 `VLA는 contact/force를 다루지 못한다`, `IL은 실시간 feedback에 반응하지 못한다`와 같은 일반화는 사용하지 않는다. [ForceVLA](https://doi.org/10.52202/085713-3124)·[TLA](https://doi.org/10.48550/arXiv.2503.08548)·[TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321)는 force/tactile-aware VLA의 반례이고, [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)·[3D-ViTac](https://doi.org/10.48550/arXiv.2410.24091)은 reactive multimodal IL의 반례다. Generalist·fast·safe·online-refined VLA도 빠르게 발전하고 있다. 따라서 현재의 방어 가능한 공백은 **대규모 이종 data 또는 task-specific multimodal demonstration에 주로 의존하는 최신 방법들과 달리, unknown shelf blocker의 preparatory rotation이 후속 Push에 적합한 contact state로 끝나도록 coarse OBB·binary tactile·wrist F/T와 simulation privileged supervision으로 폐루프 학습하는 문제**다. 이는 문헌에서 확인한 범위에 대한 현재 추론이며, 보편적 우위가 아니라 matched baseline과 ablation으로 검증할 연구 질문이다.
 
 **[2026-09-15 최신 합의]** 사용자는 Track B를 본인의 연구주제로 삼는 방향이며, 현재는 **1단계 low-level policy 학습**을 우선 구체화한다. `Approach / Contact Formation → Rotation → Push` 전체 phase를 고려한 reward formulation을 진행하되, reward 항을 정하기 전에 다음 정보·제어 계약을 먼저 정리한다.
 
@@ -120,13 +120,13 @@ Motivation 작업의 목표 산출물은 `실제 문제·failure → 문헌상 �
 
 각 reward term에는 task objective, 물리 원리, 안전 제약, 관찰된 failure mode 또는 선행연구 중 어떤 근거를 갖는지 명시한다. Baseline의 전체 접근 방식 검토는 폐기하지 않고 reward term과 비교 실험의 근거를 마련하는 병행 작업으로 둔다. Observation·privileged information의 정확한 항목, action encoding·scale·control interface와 reward 수식은 아직 미결이다.
 
-**[2026-09-16 공동 진행 중]** 정보 계약에서는 첫 번째 항목인 observation을 계속 구체화한다. 동시에 motivation에서는 direct-push failure 조건, preparatory rotation의 downstream value와 contact feedback의 필요성을 문헌·가설·실험으로 연결한다. 모든 후보 신호에 대해 `선행연구의 실제 입력·가공 → Isaac Lab 원천 데이터와 API → policy에 넣을 표현 → 실물에서의 대응 신호 → noise·latency·한계`를 기록하며, 시뮬레이터가 제공한다는 이유만으로 실물에서 얻을 수 없는 exact state·contact를 actor observation에 포함하지 않는다.
+**[2026-09-16 공동 진행 중]** 정보 계약에서는 첫 번째 항목인 observation을 계속 구체화한다. 동시에 motivation에서는 direct-push failure 조건, preparatory rotation의 downstream value와 contact feedback의 필요성을 문헌·가설·실험으로 연결한다. 모든 후보 신호에 대해 `선행연구의 실제 입력·가공 → [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 원천 데이터와 API → policy에 넣을 표현 → 실물에서의 대응 신호 → noise·latency·한계`를 기록하며, 시뮬레이터가 제공한다는 이유만으로 실물에서 얻을 수 없는 exact state·contact를 actor observation에 포함하지 않는다.
 
 **[2026-09-15 사용자 검토 후 현재안]** MLP actor에는 phase ID를 주지 않고 reward gate로 sequence를 학습한다. 현재 최소 입력은 EEF-frame push-conditioned goal, current EEF–object pose, episode-consistent OBB extent, current arm q와 hand q, binary tactile·wrist F/T·previous-action history다. Shelf·workspace state는 actor에 주지 않고 collision penalty·termination으로 제약한다. Tactile은 상대 body identity와 무관한 any-contact binary이며 contact pair는 privileged information에서만 구분한다. History 길이는 실험으로 정하고 F/T preprocessing은 환경 구현 단계에서 확정한다. DiffIK/OSC의 delta action은 매 step measured state를 기준으로 새 command를 만들고 이전 target에 누적하지 않으므로 controller-target state는 추가하지 않는다. Simulation pose는 core manipulation 학습에서 GT를 사용할 수 있으나 Sim-to-Real에서는 실제 tracker log에 맞춘 noise·bias·latency·dropout을 observation에 적용한다. Vision tracking 개선은 연구 범위가 아니며 valid/age는 기본 입력이 아니라 deployment 옵션이다. 움직이는 EEF frame의 yaw 해석 문제를 고려해 current/target orientation은 EEF-relative 6D로 보존하고 reward는 shelf/task-frame yaw만 평가하는 조합을 Agent 권고안으로 두었다. 5D는 stereographic projection을 이용한 full-SO(3) 표현이지만 baseline이 아니라 ablation 후보다. 세부는 5.6.1.6–5.6.1.7과 Stage 13–17을 따른다.
 
 **[현재 합의: 연구 관점]** 단순히 회전과 밀기라는 서로 다른 동작을 나열하는 것이 아니라, 다양한 초기 물체 자세에서 **목표 방향의 pushing을 위해 물체를 주어진 자세로 돌려두고, 이에 필요한 hand configuration과 접촉 상태를 형성·조절하는 문제**로 이해한다. Contribution의 범위를 최초 Approach에만 한정하지 않는다.
 
-GD2P의 energy와 Approach reward 분석은 폐기하지 않고 **5.10절의 이전 검토 이력·설계 후보**로 보존한다. 최신 baseline 비교 관점은 **5.11절**에 결정 당시의 근거로 남기며, 논문 목록·해석·우선 독해 후보의 최신본은 [`papers.md`](./papers.md)를 따른다. GD2P·Hermans et al.·TaskDexGrasp 우선 독해는 Agent의 추천이며, 최종 실험 baseline의 선정은 미결이다.
+[GD2P](https://doi.org/10.48550/arXiv.2509.18455)의 energy와 Approach reward 분석은 폐기하지 않고 **5.10절의 이전 검토 이력·설계 후보**로 보존한다. 최신 baseline 비교 관점은 **5.11절**에 결정 당시의 근거로 남기며, 논문 목록·해석·우선 독해 후보의 최신본은 [`papers/README.md`](./papers/README.md)를 따른다. [GD2P](https://doi.org/10.48550/arXiv.2509.18455)·[Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011)·[TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) 우선 독해는 Agent의 추천이며, 최종 실험 baseline의 선정은 미결이다.
 
 ### 1.6 1단계에서 확인된 역할 경계와 contribution 후보
 
@@ -439,7 +439,7 @@ Privileged information은 학습 목표와 안전 조건을 정확히 평가하�
 
 #### 5.6.1 Policy observation 정보 계약 초안
 
-5.6.1.1–5.6.1.5는 문헌·Isaac Lab 구현 조사 직후의 **초기 Agent 제안과 검토 이력**이다. 이후 사용자와 항목별로 논의하며 phase·goal·geometry·tactile·history 구성이 바뀌었다. 현재 최소안은 **5.6.1.6**, 유사 연구의 채택 이유에 따른 재검토와 조건부 수정안은 **5.6.1.7**을 우선한다. 앞 절의 point cloud 우선 확장, phase 입력, 다수 kinematic feature와 모든 modality의 동일 history 등의 제안을 확정 명세로 사용하지 않는다.
+5.6.1.1–5.6.1.5는 문헌·[Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 조사 직후의 **초기 Agent 제안과 검토 이력**이다. 이후 사용자와 항목별로 논의하며 phase·goal·geometry·tactile·history 구성이 바뀌었다. 현재 최소안은 **5.6.1.6**, 유사 연구의 채택 이유에 따른 재검토와 조건부 수정안은 **5.6.1.7**을 우선한다. 앞 절의 point cloud 우선 확장, phase 입력, 다수 kinematic feature와 모든 modality의 동일 history 등의 제안을 확정 명세로 사용하지 않는다.
 
 ##### 5.6.1.1 선택 원칙
 
@@ -453,16 +453,16 @@ Privileged information은 학습 목표와 안전 조건을 정확히 평가하�
 
 | 연구 | 실제 policy 입력·가공 | 이 연구에 주는 근거와 한계 |
 | --- | --- | --- |
-| [DexTouch, RA-L 2024](https://arxiv.org/html/2401.12496v2) (B09) | Arm·hand `q/dq`, palm pose·velocity, palm-relative fingertip position, task prior와 16개 FSR의 binary contact. Simulation에서는 sensor별 net contact-force norm을 `0.01 N`에서 threshold하고 실물 전압은 low-pass 후 threshold. 10 Hz policy와 asymmetric critic 사용 | Binary tactile를 ContactSensor로 근사하는 직접 근거다. `0.01 N`은 해당 simulator·sensor의 설정이며 우리 hardware threshold로 복사하지 않는다. Wrist F/T보다 tactile가 좋았다는 해당 과업의 ablation을 모든 조작에 일반화하지 않는다. |
-| [Rotating without Seeing, RSS 2023](https://roboticsproceedings.org/rss19/p036.html) (B32) | Hand joint position 16D, binary tactile 16D, 이전 joint target 16D와 rotation axis 3D. 현재와 과거 3개 state를 stack하고, contact-force norm을 `0.01 N`에서 이진화. Tactile dropout·delay randomization과 10 Hz policy 사용 | `proprioception + binary contact + previous command + short history`로 구성한 최소 tactile policy의 근거다. In-hand rotation 전용이고 vision·arm motion·wrist F/T가 없다는 한계가 있다. |
-| [VTDexManip, ICLR 2025](https://proceedings.iclr.cc/paper_files/paper/2025/file/e19b6f65791e350347bcff8a3955cb5b-Paper-Conference.pdf) (B27) | Egocentric RGB `224×224`를 ResNet18 계열로, 20개 force sensor를 `0.01 N`에서 이진화해 MLP로, hand joint angle·velocity를 proprioception branch로 처리한 뒤 feature 결합 | ResNet은 image branch에, binary tactile는 MLP에 사용하는 구분의 근거다. 우리 기본 perception 출력이 pose·근사 geometry라면 raw RGB branch를 반드시 재현할 이유는 없다. |
-| [Robot Synesthesia, ICRA 2024](https://arxiv.org/abs/2312.01853) (B33) | Depth point cloud, proprioception으로 복원한 robot-mesh points, 활성 binary tactile sensor surface의 points를 palm frame으로 변환하고 modality tag를 붙여 PointNet으로 결합 | Binary 접촉의 공간적 위치를 보존하는 확장안의 근거다. Simulator exact contact point가 아니라 **활성 sensor 영역의 위치**를 사용하므로 실물 대응이 가능하다. |
-| [Visuotactile Estimation and Control, CoRL 2024](https://proceedings.mlr.press/v270/ferrandis25a.html) (B12) | Occlusion·noise가 있는 object pose와 EEF pose·wrench history를 recurrent estimator가 처리하고, 추정 pose와 uncertainty를 control policy에 전달 | Continuous vision에도 validity·age·uncertainty와 history가 필요하다는 근거다. 해당 pusher·camera·wrench 모델을 그대로 사용한다는 뜻은 아니다. |
-| [DexMove, ICLR 2026](https://peilin-666.github.io/projects/DexMove/) (B22) | 여러 frame의 hand joint, wrist pose, object pose, finger별 contact position·force와 marker-level normal/shear tactile field를 transformer가 처리 | 고해상도 tactile와 긴 history의 성능 상한 후보지만, vanilla ContactSensor와 현재 실제 hand로 직접 재현할 수 없는 정보를 기본 observation으로 넣으면 안 된다. |
+| [DexTouch, RA-L 2024](https://doi.org/10.1109/LRA.2024.3478571) ([B09](https://doi.org/10.1109/LRA.2024.3478571)) | Arm·hand `q/dq`, palm pose·velocity, palm-relative fingertip position, task prior와 16개 FSR의 binary contact. Simulation에서는 sensor별 net contact-force norm을 `0.01 N`에서 threshold하고 실물 전압은 low-pass 후 threshold. 10 Hz policy와 asymmetric critic 사용 | Binary tactile를 ContactSensor로 근사하는 직접 근거다. `0.01 N`은 해당 simulator·sensor의 설정이며 우리 hardware threshold로 복사하지 않는다. Wrist F/T보다 tactile가 좋았다는 해당 과업의 ablation을 모든 조작에 일반화하지 않는다. |
+| [Rotating without Seeing, RSS 2023](https://doi.org/10.15607/RSS.2023.XIX.036) ([B32](https://doi.org/10.15607/RSS.2023.XIX.036)) | Hand joint position 16D, binary tactile 16D, 이전 joint target 16D와 rotation axis 3D. 현재와 과거 3개 state를 stack하고, contact-force norm을 `0.01 N`에서 이진화. Tactile dropout·delay randomization과 10 Hz policy 사용 | `proprioception + binary contact + previous command + short history`로 구성한 최소 tactile policy의 근거다. In-hand rotation 전용이고 vision·arm motion·wrist F/T가 없다는 한계가 있다. |
+| [VTDexManip, ICLR 2025](https://openreview.net/forum?id=jf7C7EGw21) ([B27](https://openreview.net/forum?id=jf7C7EGw21)) | Egocentric RGB `224×224`를 ResNet18 계열로, 20개 force sensor를 `0.01 N`에서 이진화해 MLP로, hand joint angle·velocity를 proprioception branch로 처리한 뒤 feature 결합 | ResNet은 image branch에, binary tactile는 MLP에 사용하는 구분의 근거다. 우리 기본 perception 출력이 pose·근사 geometry라면 raw RGB branch를 반드시 재현할 이유는 없다. |
+| [Robot Synesthesia, ICRA 2024](https://doi.org/10.1109/ICRA57147.2024.10610532) ([B33](https://doi.org/10.1109/ICRA57147.2024.10610532)) | Depth point cloud, proprioception으로 복원한 robot-mesh points, 활성 binary tactile sensor surface의 points를 palm frame으로 변환하고 modality tag를 붙여 PointNet으로 결합 | Binary 접촉의 공간적 위치를 보존하는 확장안의 근거다. Simulator exact contact point가 아니라 **활성 sensor 영역의 위치**를 사용하므로 실물 대응이 가능하다. |
+| [Visuotactile Estimation and Control, CoRL 2024](https://doi.org/10.48550/arXiv.2412.13157) ([B12](https://doi.org/10.48550/arXiv.2412.13157)) | Occlusion·noise가 있는 object pose와 EEF pose·wrench history를 recurrent estimator가 처리하고, 추정 pose와 uncertainty를 control policy에 전달 | Continuous vision에도 validity·age·uncertainty와 history가 필요하다는 근거다. 해당 pusher·camera·wrench 모델을 그대로 사용한다는 뜻은 아니다. |
+| [DexMove, ICLR 2026](https://openreview.net/forum?id=dT3ZciXvNX) ([B22](https://openreview.net/forum?id=dT3ZciXvNX)) | 여러 frame의 hand joint, wrist pose, object pose, finger별 contact position·force와 marker-level normal/shear tactile field를 transformer가 처리 | 고해상도 tactile와 긴 history의 성능 상한 후보지만, vanilla ContactSensor와 현재 실제 hand로 직접 재현할 수 없는 정보를 기본 observation으로 넣으면 안 된다. |
 
-##### 5.6.1.3 신호별 Isaac Lab–실물 대응과 가공안
+##### 5.6.1.3 신호별 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)–실물 대응과 가공안
 
-| 그룹 | 원천 정보 | Isaac Lab 구현 경로 | Policy 입력 가공안 | 실물 대응·주의 | 우선 판단 |
+| 그룹 | 원천 정보 | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 경로 | Policy 입력 가공안 | 실물 대응·주의 | 우선 판단 |
 | --- | --- | --- | --- | --- | --- |
 | Task command | 상위 모듈의 목표 blocker pose 또는 회전·병진 명령 | Command term 또는 environment state에 episode별 goal 저장 | Shelf/task-frame 목표와 현재 추정 pose로 position/orientation error 계산. 회전은 quaternion 원소보다 log-map 3D 또는 planar yaw의 `sin/cos` 후보 | 실제 상위 모듈이 보내는 command와 동일해야 함. 최종 goal과 phase subgoal을 혼동하지 않음 | 필수 |
 | Phase context | Approach/Rotation/Push 상태 또는 현재 subgoal | Manager/command term에서 one-hot·remaining subgoal 제공 가능 | 실물 FSM이 동일한 관측 조건으로 전환할 때만 phase one-hot 또는 subgoal을 포함 | Privileged exact phase predicate로만 만든 ID를 actor에 주면 sim-to-real 불일치 | 조건부 |
@@ -472,12 +472,12 @@ Privileged information은 학습 목표와 안전 조건을 정확히 평가하�
 | Arm proprioception | Arm encoder `q_A`, `dq_A` | Articulation data의 joint position/velocity | Joint limit 중심으로 `[-1,1]` 정규화하고 velocity scale·clip. 6D EEF action이어도 singularity·joint-limit 상태 때문에 arm state 유지 | UR5e encoder와 동일한 joint ordering·sign·zero를 맞춤 | 필수 |
 | Hand proprioception | Hand encoder `q_H`, `dq_H` | Articulation joint state | 실제 actuator 기준의 position/velocity를 limit·속도 기준으로 정규화. Simulator의 종속 관절을 별도 독립 관측처럼 추가하지 않음 | RH56E2는 공식 사양상 6 actuated DoF다. 실제 API가 제공하는 좌표와 coupling을 확인해야 함 | 필수 |
 | EEF·finger kinematics | EEF pose/twist, fingertip/pad center와 surface normal | [FrameTransformer](https://isaac-sim.github.io/IsaacLab/develop/source/overview/core-concepts/sensors/frame_transformer.html)와 FK | Shelf/object/EEF-relative pose, EEF-frame twist, 각 tactile region 중심·법선을 고정 순서로 표현 | Encoder와 calibrated kinematics로 실물에서도 계산 가능. 계산값이 실제 contact point라는 뜻은 아님 | EEF 필수; pad feature는 확장 |
-| Wrist F/T | 6D force·torque | Isaac Lab 3.x의 JointWrenchSensor; 2.x 계열은 articulation의 incoming joint wrench 등 version별 경로 확인 | Sensor/EEF frame으로 변환하고 zero-bias·tool gravity/inertia 보정, low-pass, clip·scale. 현재값과 짧은 history 우선; noisy derivative는 후순위 | Joint reaction wrench는 외부 접촉만이 아니라 hand dynamics·gravity도 포함할 수 있음. Hardware sensor frame·sign·range·bias와 맞춤 | 필수 |
+| Wrist F/T | 6D force·torque | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 3.x의 JointWrenchSensor; 2.x 계열은 articulation의 incoming joint wrench 등 version별 경로 확인 | Sensor/EEF frame으로 변환하고 zero-bias·tool gravity/inertia 보정, low-pass, clip·scale. 현재값과 짧은 history 우선; noisy derivative는 후순위 | Joint reaction wrench는 외부 접촉만이 아니라 hand dynamics·gravity도 포함할 수 있음. Hardware sensor frame·sign·range·bias와 맞춤 | 필수 |
 | Tactile/contact | Finger/palm의 센서 영역별 접촉 신호 | 각 pad/link에 [ContactSensor](https://isaac-sim.github.io/IsaacLab/develop/source/overview/core-concepts/sensors/contact_sensor.html)를 두고 blocker와의 force norm을 명시적으로 threshold | **최소안:** binary vector `b∈{0,1}^m`, direct 또는 작은 MLP. Hysteresis·debounce 적용. **공간 확장:** 활성 sensor center/normal을 EEF/palm frame point set 또는 fixed masked vector로 결합 | RH56E2 공식 제품군은 T1 17개, T2 5개 tactile sensor 구성이므로 실제 variant를 확인. Simulator exact contact point·normal·shear·slip을 actor에 추가하지 않음 | Binary 최소안 우선 추천 |
 | Previous command | 직전 policy action과 controller target | Action manager buffer와 desired EEF/hand target | `a_{t-1}` 및 필요 시 current desired pose/joint target의 actual-state residual | Delta action·actuator lag·action smoothing 때문에 현재 state만으로 내부 command 상태를 알 수 없는 문제를 줄임 | 필수 후보 |
 | Timing/validity | Sensor timestamp, valid mask, dropout state | Observation term에서 age·mask 상태 관리 | Vision age/confidence, tactile sensor-valid mask, 선택적으로 modality별 time-since-update | Dropout을 0값과 구분. 실물 timestamp 기준으로 생성 | 필수 후보 |
 
-[Isaac Lab ObservationManager](https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.managers.html)는 observation term별 `noise`, `clip`, `scale`과 history 설정을 지원하므로 위 계약을 term 단위로 구현할 수 있다. 다만 API와 wrench 경로는 Isaac Lab/Isaac Sim 버전에 따라 달라지므로 구현 전에 버전을 고정해야 한다.
+[Isaac Lab ObservationManager](https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.managers.html)는 observation term별 `noise`, `clip`, `scale`과 history 설정을 지원하므로 위 계약을 term 단위로 구현할 수 있다. 다만 API와 wrench 경로는 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)/Isaac Sim 버전에 따라 달라지므로 구현 전에 버전을 고정해야 한다.
 
 ##### 5.6.1.4 Modality별 구체 처리
 
@@ -496,13 +496,13 @@ Vision 입력은 처음부터 raw RGB로 고정하지 않는다.
 
 - **Vector baseline:** Upstream perception이 제공할 estimated pose + confidence/validity/age + OBB extent. 가장 저렴하고 현재 연구 가정과 일치한다.
 - **Geometry-aware extension:** Segmented depth를 metric-scale partial point cloud로 만들어 EEF/palm frame에서 PointNet 또는 BPS encoder를 사용한다. [Isaac Lab Camera](https://isaac-sim.github.io/IsaacLab/main/source/overview/core-concepts/sensors/camera.html)와 depth unprojection으로 구현 가능하지만, segmentation·crop·sampling과 실물 카메라 noise를 함께 맞춰야 한다.
-- **Raw RGB ablation:** VTDexManip처럼 ResNet encoder를 둘 수 있으나, 많은 parallel environment에서의 rendering·encoder 비용과 sim-to-real appearance gap이 커진다. 현재 상위 perception이 pose·geometry를 제공한다는 연구 경계에서는 기본안이 아니다.
+- **Raw RGB ablation:** [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)처럼 ResNet encoder를 둘 수 있으나, 많은 parallel environment에서의 rendering·encoder 비용과 sim-to-real appearance gap이 커진다. 현재 상위 perception이 pose·geometry를 제공한다는 연구 경계에서는 기본안이 아니다.
 
 실제 pose estimator를 붙이기 전 simulator GT로 학습하더라도 `perception proxy`를 둔다. Proxy는 GT를 정해진 vision rate에서만 sample하고, episode bias·measurement noise·latency·dropout을 적용한 뒤 update 사이에는 zero-order hold한다. `valid/confidence/age`를 함께 제공하여 occlusion을 정확한 0 pose와 구분한다.
 
 **B. Tactile**
 
-표준 Isaac Lab ContactSensor는 optical/visuotactile image가 아니라 rigid-body contact report에 기반한 force 정보를 제공한다. 따라서 첫 구현은 각 실제 tactile region 또는 대응 pad link의 contact-force magnitude `f_i`로 binary contact를 만든다.
+표준 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) ContactSensor는 optical/visuotactile image가 아니라 rigid-body contact report에 기반한 force 정보를 제공한다. 따라서 첫 구현은 각 실제 tactile region 또는 대응 pad link의 contact-force magnitude `f_i`로 binary contact를 만든다.
 
 $$
 b_{i,t}=\begin{cases}
@@ -514,7 +514,7 @@ $$
 
 - `force_threshold` 설정에만 암묵적으로 의존하지 않고 observation용 binary를 명시적으로 계산한다.
 - 짧은 low-pass/median filter, 최소 on/off 지속시간 또는 debounce를 사용해 physics substep의 순간 접촉과 chatter를 줄인다.
-- DexTouch·Rotating without Seeing의 `0.01 N`은 문헌 재현값일 뿐이다. [RH56E2 공식 사양](https://en.inspire-robots.com/product/rh56e2/)의 sensor variant·분해능과 실제 no-contact/contact 분포를 측정해 `τ_on/off`를 정한다.
+- [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)·[Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)의 `0.01 N`은 문헌 재현값일 뿐이다. [RH56E2 공식 사양](https://en.inspire-robots.com/product/rh56e2/)의 sensor variant·분해능과 실제 no-contact/contact 분포를 측정해 `τ_on/off`를 정한다.
 - Domain randomization에는 threshold, bias, delay, false positive/negative, sensor dropout·dead mask를 포함한다. 모든 sensor가 동시에 정상이라는 가정을 피한다.
 - 기본 binary vector에는 작은 MLP면 충분하다. ResNet은 tactile image가 있을 때만 고려한다.
 - ContactSensor의 contact filtering은 PhysX의 one-to-many 제약을 받으므로 여러 pad와 여러 상대 물체를 동시에 구분할 때에는 pad/body별 sensor configuration이 필요할 수 있다. Pinned version에서 collision/contact reporting과 tensor shape를 확인한다. `net force`를 taxel-level force field, 정확한 contact point, shear 또는 slip으로 해석하지 않는다.
@@ -525,9 +525,9 @@ $$
 o^{\mathrm{tac}}_i=[b_i,\; b_i p_i^E,\; b_i n_i^E]
 $$
 
-여기서 `p_i^E,n_i^E`는 exact contact point/normal이 아니라 kinematics로 계산한 **sensor 영역 중심과 명목 표면 법선**이다. 또는 활성 sensor surface에서 소수 points를 뽑아 Robot Synesthesia와 같은 tactile point cloud로 만들 수 있다. 연속 force magnitude `log(1+||f_i||/f_0)`는 binary 대비 ablation 후보지만, real sensor와 force scale을 보정하기 전에는 기본안으로 삼지 않는다.
+여기서 `p_i^E,n_i^E`는 exact contact point/normal이 아니라 kinematics로 계산한 **sensor 영역 중심과 명목 표면 법선**이다. 또는 활성 sensor surface에서 소수 points를 뽑아 [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532)와 같은 tactile point cloud로 만들 수 있다. 연속 force magnitude `log(1+||f_i||/f_0)`는 binary 대비 ablation 후보지만, real sensor와 force scale을 보정하기 전에는 기본안으로 삼지 않는다.
 
-[TacSL](https://isaac-sim.github.io/IsaacLab/develop/source/experimental-features/bleeding-edge.html)은 Isaac Lab contrib의 실험적 visuotactile 경로이며 RGB와 per-taxel force field를 제공할 수 있다. 그러나 별도 sensor model·object SDF/asset 준비와 버전 의존성이 있으므로 재현 가능한 최소 baseline과 분리한다. Optical tactile image가 핵심 연구 질문으로 바뀔 때 별도 extension으로 검토한다.
+[TacSL](https://doi.org/10.1109/TRO.2025.3547267)은 [Isaac Lab contrib의 실험적 구현 경로](https://isaac-sim.github.io/IsaacLab/develop/source/experimental-features/bleeding-edge.html)를 제공하며 RGB와 per-taxel force field를 생성할 수 있다. 그러나 별도 sensor model·object SDF/asset 준비와 버전 의존성이 있으므로 재현 가능한 최소 baseline과 분리한다. Optical tactile image가 핵심 연구 질문으로 바뀔 때 별도 extension으로 검토한다.
 
 **C. Wrist F/T**
 
@@ -538,18 +538,18 @@ f_E=R_{ES}f_S, \qquad
 \tau_E=R_{ES}\tau_S+r_{E\rightarrow S}^{E}\times f_E
 $$
 
-Episode/reset 시의 zero bias, tool·hand의 gravity와 가능한 inertial component를 보정한 뒤 low-pass, symmetric clip과 정규화를 적용한다. Force·torque는 서로 단위와 범위가 다르므로 별도 scale을 둔다. Isaac Lab joint reaction wrench를 사용할 경우 접촉 외의 관성·중력·controller 반력이 섞일 수 있으므로 real F/T와 동일한 값이라고 가정하지 않고 bias·scale·latency randomization 및 무접촉/정적/동적 검증을 수행한다.
+Episode/reset 시의 zero bias, tool·hand의 gravity와 가능한 inertial component를 보정한 뒤 low-pass, symmetric clip과 정규화를 적용한다. Force·torque는 서로 단위와 범위가 다르므로 별도 scale을 둔다. [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) joint reaction wrench를 사용할 경우 접촉 외의 관성·중력·controller 반력이 섞일 수 있으므로 real F/T와 동일한 값이라고 가정하지 않고 bias·scale·latency randomization 및 무접촉/정적/동적 검증을 수행한다.
 
 **D. Proprioception·kinematics·previous action**
 
 - Arm과 hand `q/dq`는 실제 encoder가 제공하는 순서·zero·sign으로 정렬하고 joint/velocity limit로 정규화한다.
 - RH56E2의 hand observation과 action은 우선 실제 6 actuator coordinates를 기준으로 한다. Simulator의 12개 물리 joint가 6개 actuator에서 종속되는 경우, 실물 API로 동일하게 복원되지 않는 독립 joint 값을 actor에 추가하지 않는다.
 - EEF pose/twist와 fingertip/pad center는 `q`에서 계산 가능하지만, task geometry와 action frame의 관계를 쉽게 학습하도록 명시적으로 제공할 가치가 있다. 중복 효과는 ablation한다.
-- Delta-pose·delta-joint action을 쓰면 누적 desired target을 알아야 actuator lag·smoothing 아래의 상태 모호성을 줄일 수 있다. `Rotating without Seeing`의 previous joint target 사용이 직접 근거다. DexTouch는 robot `q/dq`와 kinematics를 actor에 제공하지만 previous target을 사용한 근거로 인용하지 않는다.
+- Delta-pose·delta-joint action을 쓰면 누적 desired target을 알아야 actuator lag·smoothing 아래의 상태 모호성을 줄일 수 있다. `[Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)`의 previous joint target 사용이 직접 근거다. [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)는 robot `q/dq`와 kinematics를 actor에 제공하지만 previous target을 사용한 근거로 인용하지 않는다.
 
 **E. History·sensor synchronization**
 
-- DexTouch와 Rotating without Seeing는 10 Hz policy를 사용했고, [RH56E2 공식 FAQ](https://en.inspire-robots.com/faq/)는 sensor refresh와 ROS interface rate에 제약이 있음을 명시한다. 따라서 10 Hz는 첫 통합 후보일 뿐이며, 실제 vision·hand·F/T 측정 rate와 low-level controller rate를 측정한 뒤 확정한다.
+- [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)와 [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)는 10 Hz policy를 사용했고, [RH56E2 공식 FAQ](https://en.inspire-robots.com/faq/)는 sensor refresh와 ROS interface rate에 제약이 있음을 명시한다. 따라서 10 Hz는 첫 통합 후보일 뿐이며, 실제 vision·hand·F/T 측정 rate와 low-level controller rate를 측정한 뒤 확정한다.
 - Policy interval 동안 tactile는 `last/max contact`, wrench는 filtered last 또는 mean/max를 비교하고, vision은 새 측정이 없으면 hold하되 age를 증가시킨다.
 - 첫 vector baseline은 현재+과거 3개, 즉 4-step stack을 유력 후보로 둔다. Raw image/point cloud 전체를 반복 stack하기보다 frame encoder 후 latent history 또는 recurrent module을 사용한다.
 - Noise는 raw sensor level 또는 물리적으로 의미 있는 normalized level에 적용한다. 모든 modality에 동일한 독립 Gaussian noise만 넣는 방식은 피하고 bias, latency, correlated noise와 dropout을 구분한다.
@@ -592,7 +592,7 @@ $$
 3. Binary와 calibrated continuous contact magnitude 비교
 4. Vector pose 입력과 raw RGB–ResNet 입력 비교
 5. Fixed history와 GRU/Transformer latent history 비교
-6. 마지막으로 TacSL/TacEx 계열 optical tactile 경로를 별도 실험
+6. 마지막으로 [TacSL](https://doi.org/10.1109/TRO.2025.3547267)/[TacEx](https://doi.org/10.48550/arXiv.2411.04776) 계열 optical tactile 경로를 별도 실험
 
 기본안과 확장안 모두 actor observation, asymmetric critic input과 reward ground truth의 tensor를 명시적으로 분리한다. Phase-conditioned reward를 사용하더라도 actor가 phase를 받지 않는다면 관측만으로 phase를 추론할 수 있는지 검증하고, privileged phase를 이용한 숨은 action 규칙을 만들지 않는다.
 
@@ -711,18 +711,18 @@ Shelf collision은 actor scene observation으로 예측시키기보다 simulatio
 
 | 연구 | Actor가 받은 핵심 observation | 그렇게 설정한 이유 | 우리에게 주는 판단 |
 | --- | --- | --- | --- |
-| [B09 DexTouch](https://arxiv.org/html/2401.12496v2) | UR5e+Allegro `q/dq`, 16D binary tactile, palm pose·twist, palm-relative fingertip positions, task prior | Vision이 없는 넓은 탐색 범위에서 robot configuration과 접촉 위치로 물체를 찾고 조작해야 했다. Exact object pose·velocity·물성·phase indicator는 actor가 아니라 asymmetric critic에 추가했다. Full-hand tactile가 F/T-only, fingertip-only, palm-only보다 높았던 ablation은 **접촉의 공간적 identity와 coverage**가 중요함을 보여준다. | Binary tactile와 robot proprioception을 지지한다. 우리는 current arm q와 hand q만 채택하고, joint-space arm action·blind search에 사용된 arm/hand dq, palm twist와 fingertip 위치는 자동 채택하지 않는다. |
-| [B32 Rotating without Seeing](https://roboticsproceedings.org/rss19/p036.html) | Hand q 16D, binary tactile 16D, previous joint-position target 16D, rotation axis 3D를 현재+과거 3 state로 stack | Object pose를 전혀 보지 않으므로 distributed contact pattern으로 in-hand 위치와 critical contact를 간접 추론했다. 저자들은 단일 step이 제어에 충분하지 않다고 명시했고, relative action을 누적해 PD target으로 쓰므로 previous target을 observation에 포함했다. Exact contact force·object pose·물성은 critic만 받았다. | MLP tactile history와 privileged contact force 분리는 직접 근거가 있다. 더 중요한 점은 이 논문이 raw previous action이 아니라 **현재 controller target state**를 넣었다는 것이다. 누적 delta controller를 쓸 경우 우리도 내부 target을 숨기면 안 된다. |
-| [B10 Tactile Pushing](https://arxiv.org/html/2307.14272) | Tactile image 또는 tactile에서 추정한 pusher–contact-surface relative pose와 pusher/object-relative goal | Vision 없이 object center를 알 수 없으므로 전역 object pose 대신 제어 가능한 local contact pose로 문제를 재정의했다. Raw image보다 contact-surface pose가 pushing 관련 feature를 더 직접 표현해 model-free 학습도 더 sample-efficient했다. | EEF-relative goal과 current EEF–object/contact state를 분리한 현재 표현을 지지한다. Raw tactile image가 항상 더 낫지 않으며, task-relevant 저차원 feature가 유리할 수 있다. 단, 이 연구의 연속 contact pose는 우리 binary tactile가 직접 제공하지 못한다. |
-| [B37 Goal-Driven Robotic Pushing](https://arxiv.org/abs/2012.01859) | Optical tactile CNN이 추정한 sensor–object relative pose + robot proprioception으로 계산한 sensor–target bearing·distance | Local tactile loop는 접촉 거리·각도를 안정화하고, global proprioceptive loop는 pusher와 목표를 정렬했다. 복잡하고 불확실한 pushing model을 직접 식별하기보다 안정 접촉을 feedback으로 탐색하려는 설계다. | 우리의 `current EEF–object pose + EEF-frame goal` 역할 분담과 가깝다. 그러나 binary tactile만으로 연속 contact angle/depth를 복원할 수 없으므로 continuous vision과 wrist F/T가 그 부족분을 보완해야 한다. |
-| [B12 Visuotactile Estimation and Control](https://arxiv.org/html/2412.13157) | Noise·occlusion이 있는 object pose, EEF pose·force, occlusion indicator의 sequence → recurrent pose estimator; policy에는 추정 pose와 covariance | Nonprehensile interaction 중 object motion이 robot과 독립적으로 변하고 onboard vision은 장시간 occlude될 수 있어, 마지막 pose를 그대로 쓰면 현재값처럼 보이는 ambiguity가 생긴다. Force history로 motion을 추정하고 uncertainty를 policy에 알려 보수적으로 제어했다. | Uncertainty-aware control의 근거지만 tracker 개선은 우리 범위가 아니다. Core actor에는 `valid/age`를 넣지 않고 tracker-shaped observation corruption으로 robustness를 평가하며, metadata는 실제 interface가 제공할 때의 deployment 옵션으로 둔다. |
-| [B27 VTDexManip](https://proceedings.iclr.cc/paper_files/paper/2025/file/e19b6f65791e350347bcff8a3955cb5b-Paper-Conference.pdf) | Ego-centric RGB 또는 20-channel binary tactile의 learned representation + hand joint angle·velocity | RGB는 전역 scene/object 정보를, sparse binary tactile는 접촉 순간과 finger gait를 제공한다. Pressure를 binary로 만든 직접 목적은 human–simulation–robot 사이의 gap을 줄이는 것이며, tactile을 vision에 더하면 unseen-object 성능도 개선됐다. | Binary tactile+vision 조합과 hand proprioception을 지지한다. 우리는 upstream에서 pose·OBB를 이미 받으므로 raw RGB encoder까지 중복할 필요는 없지만, `q_H`만 쓸지 `dq_H` 또는 짧은 q history가 필요한지는 ablation 가치가 있다. |
-| [B14 Force Push](https://arxiv.org/abs/2401.17517) | Robot/contact point의 global 위치, 원하는 path와 contact force; object pose·geometry·friction·inertia는 사용하지 않음 | Quasi-static single-point pushing에서는 force direction으로 slider의 상대 orientation과 contact stability를 간접 조절할 수 있어 unknown object parameter와 pose를 명시적으로 추정하지 않았다. | Wrist F/T가 unknown dynamics 아래의 closed-loop correction에 유용하다는 근거다. 하지만 single known contact의 힘과 여러 손가락 힘이 합쳐진 wrist wrench는 정보량이 다르므로 F/T가 spatial tactile를 대체한다는 근거는 아니다. |
-| [B15 RoboPack](https://arxiv.org/html/2407.01418) | Initial visual particles, tactile history와 과거 action을 recurrent estimator에 입력 | 질량 분포·마찰·compliance는 한 frame에서 관측되지 않으므로, 어떤 action 뒤에 어떤 tactile response가 왔는지를 누적해 latent physics를 추론했다. | Action history는 contact response와 함께 볼 때 hidden dynamics 추론에 의미가 있다. 다만 recurrent world model의 긴 history가 MLP actor의 동일한 `K`를 정당화하지는 않는다. |
-| [B25 CORN](https://arxiv.org/abs/2403.10760)·[B30 HACMan](https://proceedings.mlr.press/v229/zhou23a.html) | Object/background point cloud와 geometry-conditioned goal/contact representation | Unseen shape에서 surface contact location 또는 point-wise motion을 직접 선택하는 것이 action의 일부이므로 local surface geometry가 필요했다. HACMan은 goal flow를 각 object point에 붙여 contact와 목표 이동을 공간적으로 정렬했다. | OBB는 의도적인 저정보량 baseline으로 유지할 수 있지만, 같은 extent를 가진 box·cylinder·concave object를 구분하지 못한다. OBB만 쓰면서 fine surface-level geometry-aware contact selection까지 주장해서는 안 된다. |
-| [B39 General In-Hand Object Re-Orientation](https://proceedings.mlr.press/v164/chen22a.html) | Reduced student policy에 hand q, object position과 current–target orientation quaternion difference | 임의의 SO(3) goal 자세 도달이 목적이므로 목표까지 남은 회전을 직접 표현했다. Symmetric object는 여러 orientation이 같은 관측을 만들 수 있어 point-cloud Chamfer criterion도 병행했다. | Arbitrary reorientation에는 quaternion error가 흔한 선택이지만, 우리의 goal/current 분리와 OBB symmetry에는 그대로 복사하지 않는다. Symmetry-equivalent orientation을 같은 목표로 취급해야 한다는 근거로 사용한다. |
-| [B40 RotateIt](https://proceedings.mlr.press/v229/qi23a.html) | Hand-centric rotation axis `k`를 goal로 추가하고 visuotactile·proprioceptive history를 사용 | 특정 final pose가 아니라 지정 축으로 연속 회전하는 과업이므로 full goal orientation 대신 rotation-axis vector가 task command였다. | Rotation observation은 차원보다 task semantics가 먼저다. 우리의 preparatory pose goal은 continuous spin과 다르므로 axis vector를 그대로 쓰지 않되 EEF-centric goal 설계의 근거로 삼는다. |
-| [B38 Rotation Representation](https://openaccess.thecvf.com/content_CVPR_2019/html/Zhou_On_the_Continuity_of_Rotation_Representations_in_Neural_Networks_CVPR_2019_paper.html) | Full SO(3)를 neural network에 넣기 위한 5D/6D continuous representation | Quaternion·Euler 등 4D 이하의 전역 표현에는 불연속성이 있으며, 6D representation이 rotation regression에서 더 안정적임을 보였다. | Full 3D current/goal orientation을 MLP에 직접 넣는다면 각각 6D를 우선 후보로 둔다. Local action increment는 작은 범위의 3D rotation vector를 별도로 사용할 수 있다. |
+| [B09 DexTouch](https://doi.org/10.1109/LRA.2024.3478571) | UR5e+Allegro `q/dq`, 16D binary tactile, palm pose·twist, palm-relative fingertip positions, task prior | Vision이 없는 넓은 탐색 범위에서 robot configuration과 접촉 위치로 물체를 찾고 조작해야 했다. Exact object pose·velocity·물성·phase indicator는 actor가 아니라 asymmetric critic에 추가했다. Full-hand tactile가 F/T-only, fingertip-only, palm-only보다 높았던 ablation은 **접촉의 공간적 identity와 coverage**가 중요함을 보여준다. | Binary tactile와 robot proprioception을 지지한다. 우리는 current arm q와 hand q만 채택하고, joint-space arm action·blind search에 사용된 arm/hand dq, palm twist와 fingertip 위치는 자동 채택하지 않는다. |
+| [B32 Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036) | Hand q 16D, binary tactile 16D, previous joint-position target 16D, rotation axis 3D를 현재+과거 3 state로 stack | Object pose를 전혀 보지 않으므로 distributed contact pattern으로 in-hand 위치와 critical contact를 간접 추론했다. 저자들은 단일 step이 제어에 충분하지 않다고 명시했고, relative action을 누적해 PD target으로 쓰므로 previous target을 observation에 포함했다. Exact contact force·object pose·물성은 critic만 받았다. | MLP tactile history와 privileged contact force 분리는 직접 근거가 있다. 더 중요한 점은 이 논문이 raw previous action이 아니라 **현재 controller target state**를 넣었다는 것이다. 누적 delta controller를 쓸 경우 우리도 내부 target을 숨기면 안 된다. |
+| [B10 Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236) | Tactile image 또는 tactile에서 추정한 pusher–contact-surface relative pose와 pusher/object-relative goal | Vision 없이 object center를 알 수 없으므로 전역 object pose 대신 제어 가능한 local contact pose로 문제를 재정의했다. Raw image보다 contact-surface pose가 pushing 관련 feature를 더 직접 표현해 model-free 학습도 더 sample-efficient했다. | EEF-relative goal과 current EEF–object/contact state를 분리한 현재 표현을 지지한다. Raw tactile image가 항상 더 낫지 않으며, task-relevant 저차원 feature가 유리할 수 있다. 단, 이 연구의 연속 contact pose는 우리 binary tactile가 직접 제공하지 못한다. |
+| [B37 Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) | Optical tactile CNN이 추정한 sensor–object relative pose + robot proprioception으로 계산한 sensor–target bearing·distance | Local tactile loop는 접촉 거리·각도를 안정화하고, global proprioceptive loop는 pusher와 목표를 정렬했다. 복잡하고 불확실한 pushing model을 직접 식별하기보다 안정 접촉을 feedback으로 탐색하려는 설계다. | 우리의 `current EEF–object pose + EEF-frame goal` 역할 분담과 가깝다. 그러나 binary tactile만으로 연속 contact angle/depth를 복원할 수 없으므로 continuous vision과 wrist F/T가 그 부족분을 보완해야 한다. |
+| [B12 Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157) | Noise·occlusion이 있는 object pose, EEF pose·force, occlusion indicator의 sequence → recurrent pose estimator; policy에는 추정 pose와 covariance | Nonprehensile interaction 중 object motion이 robot과 독립적으로 변하고 onboard vision은 장시간 occlude될 수 있어, 마지막 pose를 그대로 쓰면 현재값처럼 보이는 ambiguity가 생긴다. Force history로 motion을 추정하고 uncertainty를 policy에 알려 보수적으로 제어했다. | Uncertainty-aware control의 근거지만 tracker 개선은 우리 범위가 아니다. Core actor에는 `valid/age`를 넣지 않고 tracker-shaped observation corruption으로 robustness를 평가하며, metadata는 실제 interface가 제공할 때의 deployment 옵션으로 둔다. |
+| [B27 VTDexManip](https://openreview.net/forum?id=jf7C7EGw21) | Ego-centric RGB 또는 20-channel binary tactile의 learned representation + hand joint angle·velocity | RGB는 전역 scene/object 정보를, sparse binary tactile는 접촉 순간과 finger gait를 제공한다. Pressure를 binary로 만든 직접 목적은 human–simulation–robot 사이의 gap을 줄이는 것이며, tactile을 vision에 더하면 unseen-object 성능도 개선됐다. | Binary tactile+vision 조합과 hand proprioception을 지지한다. 우리는 upstream에서 pose·OBB를 이미 받으므로 raw RGB encoder까지 중복할 필요는 없지만, `q_H`만 쓸지 `dq_H` 또는 짧은 q history가 필요한지는 ablation 가치가 있다. |
+| [B14 Force Push](https://doi.org/10.1109/LRA.2024.3414180) | Robot/contact point의 global 위치, 원하는 path와 contact force; object pose·geometry·friction·inertia는 사용하지 않음 | Quasi-static single-point pushing에서는 force direction으로 slider의 상대 orientation과 contact stability를 간접 조절할 수 있어 unknown object parameter와 pose를 명시적으로 추정하지 않았다. | Wrist F/T가 unknown dynamics 아래의 closed-loop correction에 유용하다는 근거다. 하지만 single known contact의 힘과 여러 손가락 힘이 합쳐진 wrist wrench는 정보량이 다르므로 F/T가 spatial tactile를 대체한다는 근거는 아니다. |
+| [B15 RoboPack](https://doi.org/10.15607/RSS.2024.XX.130) | Initial visual particles, tactile history와 과거 action을 recurrent estimator에 입력 | 질량 분포·마찰·compliance는 한 frame에서 관측되지 않으므로, 어떤 action 뒤에 어떤 tactile response가 왔는지를 누적해 latent physics를 추론했다. | Action history는 contact response와 함께 볼 때 hidden dynamics 추론에 의미가 있다. 다만 recurrent world model의 긴 history가 MLP actor의 동일한 `K`를 정당화하지는 않는다. |
+| [B25 CORN](https://doi.org/10.48550/arXiv.2403.10760)·[B30 HACMan](https://doi.org/10.48550/arXiv.2305.03942) | Object/background point cloud와 geometry-conditioned goal/contact representation | Unseen shape에서 surface contact location 또는 point-wise motion을 직접 선택하는 것이 action의 일부이므로 local surface geometry가 필요했다. [HACMan](https://doi.org/10.48550/arXiv.2305.03942)은 goal flow를 각 object point에 붙여 contact와 목표 이동을 공간적으로 정렬했다. | OBB는 의도적인 저정보량 baseline으로 유지할 수 있지만, 같은 extent를 가진 box·cylinder·concave object를 구분하지 못한다. OBB만 쓰면서 fine surface-level geometry-aware contact selection까지 주장해서는 안 된다. |
+| [B39 General In-Hand Object Re-Orientation](https://doi.org/10.48550/arXiv.2111.03043) | Reduced student policy에 hand q, object position과 current–target orientation quaternion difference | 임의의 SO(3) goal 자세 도달이 목적이므로 목표까지 남은 회전을 직접 표현했다. Symmetric object는 여러 orientation이 같은 관측을 만들 수 있어 point-cloud Chamfer criterion도 병행했다. | Arbitrary reorientation에는 quaternion error가 흔한 선택이지만, 우리의 goal/current 분리와 OBB symmetry에는 그대로 복사하지 않는다. Symmetry-equivalent orientation을 같은 목표로 취급해야 한다는 근거로 사용한다. |
+| [B40 RotateIt](https://doi.org/10.48550/arXiv.2309.09979) | Hand-centric rotation axis `k`를 goal로 추가하고 visuotactile·proprioceptive history를 사용 | 특정 final pose가 아니라 지정 축으로 연속 회전하는 과업이므로 full goal orientation 대신 rotation-axis vector가 task command였다. | Rotation observation은 차원보다 task semantics가 먼저다. 우리의 preparatory pose goal은 continuous spin과 다르므로 axis vector를 그대로 쓰지 않되 EEF-centric goal 설계의 근거로 삼는다. |
+| [B38 Rotation Representation](https://doi.org/10.1109/CVPR.2019.00589) | Full SO(3)를 neural network에 넣기 위한 5D/6D continuous representation | Quaternion·Euler 등 4D 이하의 전역 표현에는 불연속성이 있으며, 6D representation이 rotation regression에서 더 안정적임을 보였다. | Full 3D current/goal orientation을 MLP에 직접 넣는다면 각각 6D를 우선 후보로 둔다. Local action increment는 작은 범위의 3D rotation vector를 별도로 사용할 수 있다. |
 
 **현재 observation별 판정**
 
@@ -737,9 +737,9 @@ Shelf collision은 actor scene observation으로 예측시키기보다 simulatio
 | Previous action history | **유지 후보 / ablation** | 최근 command와 tactile·wrench response의 관계 및 actuator lag를 해석하는 데 사용할 수 있다. 현재 action semantics에서는 controller target을 복원하기 위한 항목이 아니므로 history 유무와 `K_a`를 비교한다. |
 | Vision valid/age | **Core에서 제외, Sim-to-Real 확장** | Tracking 개선은 현재 contribution이 아니다. 실제 tracker가 dropout metadata를 제공하고 recovery가 필요할 때만 deployment observation으로 검토한다. |
 | Controller target state | **제외** | DiffIK/OSC command는 매 policy step의 measured state를 기준으로 이번 delta를 해석하고 새 command가 이전 command를 대체한다. 이전 desired target에 action을 누적하지 않으므로 별도 persistent target state가 없다. |
-| Hand dq 또는 q history | **Ablation** | DexTouch·VTDexManip은 dq를, Rotating without Seeing는 q history를 사용했다. Actual hand motion과 commanded motion의 차이가 failure 원인이 될 때 둘 중 하나를 추가한다. |
+| Hand dq 또는 q history | **Ablation** | [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)·[VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)은 dq를, [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)는 q history를 사용했다. Actual hand motion과 commanded motion의 차이가 failure 원인이 될 때 둘 중 하나를 추가한다. |
 | Object-pose history 또는 filtered twist | **조건부 ablation** | 현재안은 저속 quasi-static 조작을 전제로 할 때 방어 가능하다. Dynamic push, overshoot 또는 vision latency가 크면 current pose 하나로 운동 방향을 구별할 수 없으므로 GT velocity 대신 실제 tracker pose history부터 비교한다. |
-| Phase ID | **계속 제외** | DexTouch처럼 reward를 단계화하면서 actor에 phase를 주지 않는 사례가 있다. 단, gate가 actor observation으로 복원할 수 없는 latched memory를 가지면 안 된다. |
+| Phase ID | **계속 제외** | [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)처럼 reward를 단계화하면서 actor에 phase를 주지 않는 사례가 있다. 단, gate가 actor observation으로 복원할 수 없는 latched memory를 가지면 안 된다. |
 | Arm dq·absolute EEF pose·fingertip 위치·raw RGB/point cloud | **현재는 제외 유지** | Arm q는 포함하되 velocity와 추가 kinematics를 한꺼번에 넣지 않는다. 나머지는 failure가 관찰되기 전 자동 추가할 근거가 약하다. |
 
 **EEF-frame Rotation Observation 후보**
@@ -874,6 +874,8 @@ Position increment는 phase 사이에서 연속적으로 손 구성을 바꾸기
 
 > `term → 해결할 task/failure → 계산 신호 → privileged 여부 → 활성 조건/phase → 근거 → 예상 부작용 → ablation`
 
+**[2026-09-16 문헌 검토 갱신]** Pushing과 rotation/pivoting RL의 실제 reward 항과 설계 이유는 [`papers/reward_formulation.md`](./papers/reward_formulation.md)에 분리해 정리했다. 현재 확인된 핵심 경계는 (1) target-orientation pivoting과 continuous-axis rotation의 reward를 구분하고, (2) object task progress와 contact shaping·safety constraint를 분리하며, (3) privileged contact force는 magnitude 최대화보다 방향·과부하·충격·slip 평가에 우선 사용하는 것이다. 이는 최종 reward 채택이 아니라 term별 가설과 ablation을 좁히기 위한 문헌 근거다.
+
 다음은 전체 phase를 포괄하는 **[작업 가설 / 설계안]**이며, 확정된 수식이나 구현이 아니다.
 
 | 범위 | 보상 목표 후보 | 주의점 |
@@ -904,7 +906,7 @@ Contribution을 Approach에만 한정하지 않는다. 접근 때 손을 준비�
 - 1단계: 근사 형상으로 준비한 접촉을 F/T·Tactile로 보정하면, 형상·마찰 등 불확실성 아래에서 접촉 형성·전환 실패를 줄이고 주어진 조작 목표의 정확도·안정성을 개선하는가? 센서 추가의 효과뿐 아니라 어떤 접촉 행동과 실패가 달라졌는지 검증한다.
 - 2단계: 학습된 실행 능력을 기반으로 중간 목표와 동작 전환을 결정하면, 공간 확보 성공과 조작 효율을 개선할 수 있는가?
 
-단순히 센서를 함께 쓰거나 세 동작을 순서대로 학습한다는 사실만으로 novelty를 확정하지 않는다. 준비 회전은 B21, 작업별 손 구성은 B01·B02, 촉각 기반 손목–손가락 제어는 B22, 후속 성공을 고려한 연결은 B08에 선행 사례가 있다. 이들 전체에 대한 우위나 `최초`를 현재 문헌 검토만으로 주장하지 않는다. 비교 방법과 최종 Contribution, 각 단계의 논문화 범위는 미결이다.
+단순히 센서를 함께 쓰거나 세 동작을 순서대로 학습한다는 사실만으로 novelty를 확정하지 않는다. 준비 회전은 [B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011), 작업별 손 구성은 [B01](https://doi.org/10.48550/arXiv.2509.18455)·[B02](https://doi.org/10.1109/IROS58592.2024.10802652), 촉각 기반 손목–손가락 제어는 [B22](https://openreview.net/forum?id=dT3ZciXvNX), 후속 성공을 고려한 연결은 [B08](https://doi.org/10.48550/arXiv.2309.00987)에 선행 사례가 있다. 이들 전체에 대한 우위나 `최초`를 현재 문헌 검토만으로 주장하지 않는다. 비교 방법과 최종 Contribution, 각 단계의 논문화 범위는 미결이다.
 
 ### 5.8 현재 설명용 조작 예시
 
@@ -928,9 +930,9 @@ Top view, 양옆이 개방된 선반, 주변 물체 배치는 **설명용 그림
 
 Rotation에 적합한 접촉과 Push에 적합한 접촉이 다를 수 있다. 초기 configuration을 전체 동작 내내 고정하거나, Approach부터 최종 Push용 palm alignment를 무조건 강제하지 않는다. 손목·손가락·접촉 위치를 재구성할 여지를 둔다.
 
-#### 5.10.2 GD2P에서 확인한 사실과 정정
+#### 5.10.2 [GD2P](https://doi.org/10.48550/arXiv.2509.18455)에서 확인한 사실과 정정
 
-기준 원문은 *Learning Geometry-Aware Nonprehensile Pushing and Pulling with Dexterous Hands*, arXiv:2509.18455v4, ICRA 2026이다. 참고문헌 B01.
+기준 원문은 *Learning Geometry-Aware Nonprehensile Pushing and Pulling with Dexterous Hands*, arXiv:2509.18455v4, ICRA 2026이다. 참고문헌 [B01](https://doi.org/10.48550/arXiv.2509.18455).
 
 - **RL 논문이 아니다.** 물체 geometry 표현으로 조건화한 diffusion model이 pre-contact hand pose를 생성한다.
 - Diffusion의 생성·denoising 대상은 **hand pose**다. Point cloud를 diffusion으로 augmentation하는 연구로 설명하지 않는다.
@@ -938,11 +940,11 @@ Rotation에 적합한 접촉과 Push에 적합한 접촉이 다를 수 있다. �
 - Grasp synthesis의 최적화 도구에서 출발하지만, 이 연구의 데이터는 **nonprehensile push/pull 성공 pose**를 생성·검증해 구축한다. 일반적인 파지 dataset만으로 push를 수행했다고 단순화하지 않는다.
 - 핵심 절차는 접촉 후보 기반 pose 최적화 → physics rollout으로 실제 동작 성공 판별 → 성공 pose 기반 생성 모델 학습 → 후보 생성·선택·실행이다.
 - Tactile·F/T closed-loop 적응 또는 정밀 Rotation→Push 정책 학습을 검증한 연구는 아니다. 주된 실제 실행은 open-loop이며, 다단계 예시의 재계획과 고주기 contact feedback을 구분한다.
-- 우리에게 유용한 점은 **기하학적 configuration 평가와 실제 동작 성공 검증을 연결하는 구조**다. GD2P energy를 그대로 RL reward로 전환한 효과는 별도로 검증해야 한다.
+- 우리에게 유용한 점은 **기하학적 configuration 평가와 실제 동작 성공 검증을 연결하는 구조**다. [GD2P](https://doi.org/10.48550/arXiv.2509.18455) energy를 그대로 RL reward로 전환한 효과는 별도로 검증해야 한다.
 
-[GD2P 원문 v4](https://arxiv.org/html/2509.18455v4)
+[GD2P](https://doi.org/10.48550/arXiv.2509.18455) [원문 v4](https://arxiv.org/html/2509.18455v4)
 
-#### 5.10.3 GD2P energy 항별 의미와 reward로의 연결
+#### 5.10.3 [GD2P](https://doi.org/10.48550/arXiv.2509.18455) energy 항별 의미와 reward로의 연결
 
 논문의 목적함수:
 
@@ -989,12 +991,12 @@ Tactile은 observation만으로도 기여할 수 있다. Reward에 반드시 센
 
 | 후보 | 참고 문헌 | 평가하는 내용 | 남은 문제 |
 | --- | --- | --- | --- |
-| Task-specific wrench capability | B02 TaskDexGrasp | 요구 힘·토크 방향과 현재 접촉이 생성할 수 있는 wrench의 관계 | Friction·surface normal·지지면 접촉의 불확실성, force/torque scale 정규화, task prior 설정 |
-| Downstream execution value / success | B03 Critic 기반 선택, B08 Sequential Dexterity, B06 HANDFUL | 실제 후속 정책 관점에서 Approach 종료 상태의 유용성 | 학습 분포 밖 critic 신뢰도, reward로 이용할 때의 과대평가, rollout 검증 |
+| Task-specific wrench capability | [B02](https://doi.org/10.1109/IROS58592.2024.10802652) [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) | 요구 힘·토크 방향과 현재 접촉이 생성할 수 있는 wrench의 관계 | Friction·surface normal·지지면 접촉의 불확실성, force/torque scale 정규화, task prior 설정 |
+| Downstream execution value / success | [B03](https://doi.org/10.1109/ICRA55743.2025.11127792) Critic 기반 선택, [B08](https://doi.org/10.48550/arXiv.2309.00987) [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987), [B06](https://doi.org/10.48550/arXiv.2604.25126) [HANDFUL](https://doi.org/10.48550/arXiv.2604.25126) | 실제 후속 정책 관점에서 Approach 종료 상태의 유용성 | 학습 분포 밖 critic 신뢰도, reward로 이용할 때의 과대평가, rollout 검증 |
 
-TaskDexGrasp의 Task Wrench Space는 사전 지정하는 방향 집합이다. 목표 이동 거리·회전각만으로 필요한 wrench가 유일하게 결정되는 것은 아니다. 접촉·마찰·질량·지지면 조건이 함께 영향을 준다.
+[TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652)의 Task Wrench Space는 사전 지정하는 방향 집합이다. 목표 이동 거리·회전각만으로 필요한 wrench가 유일하게 결정되는 것은 아니다. 접촉·마찰·질량·지지면 조건이 함께 영향을 준다.
 
-B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. 이를 Approach reward로 직접 사용하는 것은 우리의 확장안이다. 할인된 value를 보정된 성공확률로 설명하지 않는다. 물체를 손 안에서 파지한 상태와 선반에 지지된 nonprehensile 상태의 차이도 검증해야 한다.
+[B03](https://doi.org/10.1109/ICRA55743.2025.11127792)은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. 이를 Approach reward로 직접 사용하는 것은 우리의 확장안이다. 할인된 value를 보정된 성공확률로 설명하지 않는다. 물체를 손 안에서 파지한 상태와 선반에 지지된 nonprehensile 상태의 차이도 검증해야 한다.
 
 #### 5.10.6 당시의 우선 확인 사항 — Reward 검토 재개 시 참고
 
@@ -1003,7 +1005,7 @@ B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. �
 3. 여러 유효 configuration을 허용하고 phase 사이의 접촉 재구성을 검토한다.
 4. 같은 근사 bounding volume이지만 **실제 외부 접촉 형상**이 다른 물체군으로 geometry mismatch를 평가하는 안을 유지한다. 동일 외형·다른 질량 분포는 별도의 물성 variation이다.
 5. Geometry 정확도, F/T·tactile 입력, 고정/적응 hand configuration, 후속 적합성 항의 비교 실험을 검토한다. 최종 ablation 구성은 미결이다.
-6. 우선 읽기 순서: **B02 TaskDexGrasp → B03 RL critic → B04 GraspXL → B05 UniDexFPM → B06 HANDFUL**. GD2P는 이미 정독·energy 분석을 시작한 기준 논문이다.
+6. 우선 읽기 순서: **[B02](https://doi.org/10.1109/IROS58592.2024.10802652) [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) → [B03](https://doi.org/10.1109/ICRA55743.2025.11127792) RL critic → [B04](https://doi.org/10.1007/978-3-031-73347-5_22) [GraspXL](https://doi.org/10.1007/978-3-031-73347-5_22) → [B05](https://doi.org/10.48550/arXiv.2403.12421) [UniDexFPM](https://doi.org/10.48550/arXiv.2403.12421) → [B06](https://doi.org/10.48550/arXiv.2604.25126) [HANDFUL](https://doi.org/10.48550/arXiv.2604.25126)**. [GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 이미 정독·energy 분석을 시작한 기준 논문이다.
 
 문헌의 모든 항을 한꺼번에 합치지 않는다. 각 항이 해결하는 실패 원인을 정의하고, 실제 후속 성공 개선 여부를 확인해 채택한다.
 
@@ -1015,16 +1017,16 @@ B03은 후속 RL critic으로 초기 grasp **후보를 선택**한 연구다. �
 
 | 후보 | 먼저 확인할 내용 | 우리 범위와 구분할 점 |
 | --- | --- | --- |
-| B01 GD2P | 주어진 물체 상태·밀기 방향에서 손목·손가락 pose를 생성하고 실제 push 성공으로 검증하는 전체 pipeline | 준비 회전 목표의 선택·실행이나 tactile closed-loop 정책을 그대로 제공하는 방법은 아님 |
-| B21 Hermans et al. | 형상에서 안정 밀기·회전 접촉점을 예측하고, 안정 접촉이 목표 방향과 정렬되도록 물체를 돌린 뒤 미는 관점 | 다지 손 configuration 학습이 아님; 정량 실험의 중심은 두 동작 각각의 접촉점 예측 |
-| B02 TaskDexGrasp | 작업에 필요한 힘·모멘트를 가할 수 있는 손 자세의 생성·평가 | 정적 pose 합성이며 지지면을 포함한 실제 Rotation→Push 성공과 동일하지 않음 |
-| B22 DexMove | 촉각 기반 손목–손가락 공동 제어와 접촉 데이터 학습 | 시연 기반 flow policy; RL이나 우리 shelf 목표와 동일한 방법은 아님 |
-| B23 Task-oriented contact optimization | 주어진 물체 운동을 적은 접촉력으로 실행할 접촉 배치 최적화 | 다중 이동로봇 설정; 독립 접촉점을 다지 손 관절로 그대로 치환하지 않음 |
-| B24 Tactile-based negotiation | 회전 후 밀어 경로 확보, 방향별 접촉 위치 선택과 감각 기반 손 정렬 | 큰 장애물·mobile manipulation·계획/순응 제어; 다지 손 학습이 아님 |
+| [B01](https://doi.org/10.48550/arXiv.2509.18455) [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | 주어진 물체 상태·밀기 방향에서 손목·손가락 pose를 생성하고 실제 push 성공으로 검증하는 전체 pipeline | 준비 회전 목표의 선택·실행이나 tactile closed-loop 정책을 그대로 제공하는 방법은 아님 |
+| [B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011) [Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011) | 형상에서 안정 밀기·회전 접촉점을 예측하고, 안정 접촉이 목표 방향과 정렬되도록 물체를 돌린 뒤 미는 관점 | 다지 손 configuration 학습이 아님; 정량 실험의 중심은 두 동작 각각의 접촉점 예측 |
+| [B02](https://doi.org/10.1109/IROS58592.2024.10802652) [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) | 작업에 필요한 힘·모멘트를 가할 수 있는 손 자세의 생성·평가 | 정적 pose 합성이며 지지면을 포함한 실제 Rotation→Push 성공과 동일하지 않음 |
+| [B22](https://openreview.net/forum?id=dT3ZciXvNX) [DexMove](https://openreview.net/forum?id=dT3ZciXvNX) | 촉각 기반 손목–손가락 공동 제어와 접촉 데이터 학습 | 시연 기반 flow policy; RL이나 우리 shelf 목표와 동일한 방법은 아님 |
+| [B23](https://doi.org/10.1109/IROS47612.2022.9982177) [Task-oriented contact optimization](https://doi.org/10.1109/IROS47612.2022.9982177) | 주어진 물체 운동을 적은 접촉력으로 실행할 접촉 배치 최적화 | 다중 이동로봇 설정; 독립 접촉점을 다지 손 관절로 그대로 치환하지 않음 |
+| [B24](https://doi.org/10.1002/aisy.202300621) [Tactile-based negotiation](https://doi.org/10.1002/aisy.202300621) | 회전 후 밀어 경로 확보, 방향별 접촉 위치 선택과 감각 기반 손 정렬 | 큰 장애물·mobile manipulation·계획/순응 제어; 다지 손 학습이 아님 |
 
-ExDex(B07)·UniDexFPM(B05)은 arm–hand 제어와 구현 구조, Sequential Dexterity(B08)는 phase 연결의 비교 후보로 유지한다. GraspXL(B04)·critic 기반 선택(B03) 등은 후속 구성 요소 검토에 활용한다. CORN(B25)·DyWA(B26)·VTDexManip(B27)은 각각 일반 비파지 목표 제어·물성 적응·센서 표현의 보조 후보이며, RetrDex(B17)는 주로 2단계 공간 확보 목적의 참고다.
+[ExDex](https://doi.org/10.48550/arXiv.2503.23120)([B07](https://doi.org/10.48550/arXiv.2503.23120))·[UniDexFPM](https://doi.org/10.48550/arXiv.2403.12421)([B05](https://doi.org/10.48550/arXiv.2403.12421))은 arm–hand 제어와 구현 구조, [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)([B08](https://doi.org/10.48550/arXiv.2309.00987))는 phase 연결의 비교 후보로 유지한다. [GraspXL](https://doi.org/10.1007/978-3-031-73347-5_22)([B04](https://doi.org/10.1007/978-3-031-73347-5_22))·critic 기반 선택([B03](https://doi.org/10.1109/ICRA55743.2025.11127792)) 등은 후속 구성 요소 검토에 활용한다. [CORN](https://doi.org/10.48550/arXiv.2403.10760)([B25](https://doi.org/10.48550/arXiv.2403.10760))·[DyWA](https://doi.org/10.48550/arXiv.2503.16806)([B26](https://doi.org/10.48550/arXiv.2503.16806))·[VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)([B27](https://openreview.net/forum?id=jf7C7EGw21))은 각각 일반 비파지 목표 제어·물성 적응·센서 표현의 보조 후보이며, [RetrDex](https://doi.org/10.48550/arXiv.2502.18423)([B17](https://doi.org/10.48550/arXiv.2502.18423))는 주로 2단계 공간 확보 목적의 참고다.
 
-**[작업 가설: 공정한 비교]** GD2P 단독과만 비교하면 우리에게 추가된 회전 동작의 효과와 새로운 접촉 방법의 효과가 섞일 수 있다. `별도 회전 정책 + GD2P` 같은 단순 결합 방법, 접촉 구성 고정/적응 방식, 접촉 feedback 유무 등을 비교하는 안이 제안되었다. 이는 실험 설계 후보이지 구현·채택한 baseline이 아니다. 동일 목표·초기 물체 상태·사용 가능 관측 및 안전 조건을 맞추고, 원래 방법에 추가한 모듈을 명시해야 한다.
+**[작업 가설: 공정한 비교]** [GD2P](https://doi.org/10.48550/arXiv.2509.18455) 단독과만 비교하면 우리에게 추가된 회전 동작의 효과와 새로운 접촉 방법의 효과가 섞일 수 있다. `별도 회전 정책 + [GD2P](https://doi.org/10.48550/arXiv.2509.18455)` 같은 단순 결합 방법, 접촉 구성 고정/적응 방식, 접촉 feedback 유무 등을 비교하는 안이 제안되었다. 이는 실험 설계 후보이지 구현·채택한 baseline이 아니다. 동일 목표·초기 물체 상태·사용 가능 관측 및 안전 조건을 맞추고, 원래 방법에 추가한 모듈을 명시해야 한다.
 
 다음 독해는 **문제·성공 조건 → 목표/관측/행동 → 접촉 구성 생성·선택 → 학습/제어·전환 방식 → 실패와 비교 실험 → reward** 순으로 진행하는 것을 권한다. 문헌의 코드 공개 여부는 재현 완료와 다르며, 현재 대화에서 학습·실험을 재현한 것은 아니다.
 
@@ -1307,8 +1309,8 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 ### Stage 7 — Track B 1단계 우선 구체화와 후속 동작을 고려한 Approach
 
 - **날짜:** 2026-09-14, Stage 6 이후 문헌 논의.
-- **논의 배경:** 사용자는 Track B를 본인의 연구주제로 삼는 방향을 제시하고 1단계 관련 문헌 조사를 요청했다. GD2P를 먼저 읽으며 energy 항별 의미와 Approach reward로의 연결을 논의했다.
-- **정정한 해석:** GD2P는 point-cloud diffusion augmentation이나 RL policy 학습이 아니라, geometry-conditioned hand pose 생성과 nonprehensile execution 검증을 결합한 연구다.
+- **논의 배경:** 사용자는 Track B를 본인의 연구주제로 삼는 방향을 제시하고 1단계 관련 문헌 조사를 요청했다. [GD2P](https://doi.org/10.48550/arXiv.2509.18455)를 먼저 읽으며 energy 항별 의미와 Approach reward로의 연결을 논의했다.
+- **정정한 해석:** [GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 point-cloud diffusion augmentation이나 RL policy 학습이 아니라, geometry-conditioned hand pose 생성과 nonprehensile execution 검증을 결합한 연구다.
 - **현재 초점:** 좋은 Approach configuration을 후속 Rotation과 Push의 수행 가능성에 연결한다. 기하 거리·접촉 안정성만으로 충분한지 검토한다.
 - **검토 후보:** Wrench-space 적합성, 후속 RL critic 기반 평가, 목표 조건부 접촉 보상, 다목표 reward 결합, 후속 손가락 사용 여유.
 - **미결:** 실제 reward 수식, policy 구성, tactile 표현, phase 전환 및 contribution. 2단계 확장은 backlog로 유지한다.
@@ -1317,17 +1319,17 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 - **기록 날짜:** 2026-09-15. Stage 7 이후 대화의 순서를 보존한다.
 - **사용자 요청:** Reward formulation을 고민하던 중, baseline 논문의 접근 방식과 해결 방식을 먼저 살펴보는 것이 우선이라고 설명하고 논문 탐색을 요청했다.
-- **Agent의 초기 추천:** ExDex·DexMove·UniDexFPM·Sequential Dexterity·GD2P를 주요 후보로, CORN·DyWA·VTDexManip을 보조 후보로 제시했다. 과업·로봇·학습·센서·phase 연결의 유사성을 기준으로 삼았다.
-- **새 결론 [현재 합의]:** 특정 reward 항을 채택하기 전에 baseline의 전체 문제 정의와 해결 pipeline을 이해한다. 기존 GD2P energy 분석은 보존하지만 즉시 reward로 구현하기로 한 것은 아니다.
+- **Agent의 초기 추천:** [ExDex](https://doi.org/10.48550/arXiv.2503.23120)·[DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[UniDexFPM](https://doi.org/10.48550/arXiv.2403.12421)·[Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)를 주요 후보로, [CORN](https://doi.org/10.48550/arXiv.2403.10760)·[DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)을 보조 후보로 제시했다. 과업·로봇·학습·센서·phase 연결의 유사성을 기준으로 삼았다.
+- **새 결론 [현재 합의]:** 특정 reward 항을 채택하기 전에 baseline의 전체 문제 정의와 해결 pipeline을 이해한다. 기존 [GD2P](https://doi.org/10.48550/arXiv.2509.18455) energy 분석은 보존하지만 즉시 reward로 구현하기로 한 것은 아니다.
 - **남은 질문:** 최종 baseline 선정, 공개 코드 재현 가능성, 우리의 손·센서·목표 조건으로 이식할 범위.
 
 ### Stage 9 — Pushing을 위한 물체 자세와 hand configuration으로 비교 관점 이동
 
 - **기록 날짜:** 2026-09-15. Stage 8 이후 사용자 설명과 문헌 탐색을 기록한다.
-- **사용자 설명:** 물체가 다양한 초기 자세에 있더라도 밀기에 적합한 자세로 돌려두고 미는 관점이 중요하다. 완전히 일치하는 연구를 찾기보다 특정 방향으로 밀기 위한 물체 자세와 hand configuration에 집중해야 한다. 사용자는 GD2P가 어느 정도 부합한다고 평가했다.
-- **Agent의 후속 추천:** GD2P에 더해 Hermans et al.(B21)의 준비 회전·안정 접촉점 선택, TaskDexGrasp(B02)의 작업별 wrench 기반 손 자세 합성을 우선 후보로 제안했다. Task-oriented contact optimization(B23)과 tactile-based negotiation(B24)을 추가했다. 이는 사용자가 최종 baseline을 확정한 기록이 아니다.
+- **사용자 설명:** 물체가 다양한 초기 자세에 있더라도 밀기에 적합한 자세로 돌려두고 미는 관점이 중요하다. 완전히 일치하는 연구를 찾기보다 특정 방향으로 밀기 위한 물체 자세와 hand configuration에 집중해야 한다. 사용자는 [GD2P](https://doi.org/10.48550/arXiv.2509.18455)가 어느 정도 부합한다고 평가했다.
+- **Agent의 후속 추천:** [GD2P](https://doi.org/10.48550/arXiv.2509.18455)에 더해 [Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011)([B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011))의 준비 회전·안정 접촉점 선택, [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652)([B02](https://doi.org/10.1109/IROS58592.2024.10802652))의 작업별 wrench 기반 손 자세 합성을 우선 후보로 제안했다. [Task-oriented contact optimization](https://doi.org/10.1109/IROS47612.2022.9982177)([B23](https://doi.org/10.1109/IROS47612.2022.9982177))과 [tactile-based negotiation](https://doi.org/10.1002/aisy.202300621)([B24](https://doi.org/10.1002/aisy.202300621))을 추가했다. 이는 사용자가 최종 baseline을 확정한 기록이 아니다.
 - **Contribution 논의:** 준비 회전, 다지 손의 pushing pose, tactile wrist–finger 제어, downstream skill 연결 각각에 선행 연구가 있음을 확인했다. 따라서 이 요소들을 사용한다는 사실만으로 novelty를 주장할 수 없고, 접촉 구성의 형성·전환·보정에 구체적인 방법과 검증이 필요하다고 설명했다.
-- **작업 가설:** 후속 pushing에 유효한 접촉 상태를 준비하고 실제 geometry/contact mismatch를 보정하는 방향. `별도 회전 정책 + GD2P`와 같은 단순 결합 비교도 Agent가 제안했지만 확정하지 않았다.
+- **작업 가설:** 후속 pushing에 유효한 접촉 상태를 준비하고 실제 geometry/contact mismatch를 보정하는 방향. `별도 회전 정책 + [GD2P](https://doi.org/10.48550/arXiv.2509.18455)`와 같은 단순 결합 비교도 Agent가 제안했지만 확정하지 않았다.
 - **영향:** 문헌 탐색의 기준을 generic dexterous RL/skill chaining에서 pushing을 위한 준비 조작으로 좁혔다. 물체 목표를 선택하는 주체는 다음 Stage 10에서 명확히 재확인했다.
 
 ### Stage 10 — Approach만의 contribution이라는 해석과 목표 자세 선택 권한을 정정
@@ -1354,16 +1356,16 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **영향:** 최신 요약, Track B reward 설계, baseline 우선순위, 결정 레지스터, backlog, 후속 Agent 지침과 `research_topic.md`.
 - **남은 질문:** Observation과 privileged information의 정확한 항목·표현·좌표계·history, action semantics, phase 전환·termination, term별 수식·정규화·weight·ablation.
 
-### Stage 12 — 문헌과 Isaac Lab 구현 범위를 연결한 Observation 구체화
+### Stage 12 — 문헌과 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 범위를 연결한 Observation 구체화
 
 - **날짜:** 2026-09-15.
-- **사용자 지시:** Observation부터 정리하며, 각 정보에 대해 선행연구의 구성뿐 아니라 Isaac Lab에서 얻고 가공할 수 있는 범위까지 검토한다. Tactile은 raw/learned image feature를 쓰는 연구와 달리 현재 simulator 제약에 따라 ContactSensor 기반 on/off가 필요할 수 있음을 명시했다.
-- **조사 결과:** DexTouch와 Rotating without Seeing는 simulator contact-force norm을 threshold한 binary tactile를 사용하고, VTDexManip은 RGB를 ResNet 계열로 처리하는 반면 binary tactile는 MLP로 처리한다. Robot Synesthesia는 활성 binary sensor의 공간 위치를 point cloud에 넣는다. Visuotactile Estimation and Control은 pose uncertainty와 wrench history의 필요성을 보여준다.
-- **Isaac Lab 해석:** Core ContactSensor는 optical tactile image가 아니라 rigid-body contact report를 제공하므로 binary contact baseline을 구현할 수 있다. Camera/depth unprojection, FrameTransformer, articulation/joint-wrench 정보와 ObservationManager를 이용해 vision proxy, kinematics, F/T와 history를 구성할 수 있다. TacSL은 contrib의 experimental path이므로 최소 baseline과 분리한다. 정확한 API는 version pinning이 필요하다.
+- **사용자 지시:** Observation부터 정리하며, 각 정보에 대해 선행연구의 구성뿐 아니라 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)에서 얻고 가공할 수 있는 범위까지 검토한다. Tactile은 raw/learned image feature를 쓰는 연구와 달리 현재 simulator 제약에 따라 ContactSensor 기반 on/off가 필요할 수 있음을 명시했다.
+- **조사 결과:** [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)와 [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)는 simulator contact-force norm을 threshold한 binary tactile를 사용하고, [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)은 RGB를 ResNet 계열로 처리하는 반면 binary tactile는 MLP로 처리한다. [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532)는 활성 binary sensor의 공간 위치를 point cloud에 넣는다. [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157)은 pose uncertainty와 wrench history의 필요성을 보여준다.
+- **[Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 해석:** Core ContactSensor는 optical tactile image가 아니라 rigid-body contact report를 제공하므로 binary contact baseline을 구현할 수 있다. Camera/depth unprojection, FrameTransformer, articulation/joint-wrench 정보와 ObservationManager를 이용해 vision proxy, kinematics, F/T와 history를 구성할 수 있다. [TacSL](https://doi.org/10.1109/TRO.2025.3547267)은 contrib의 experimental path이므로 최소 baseline과 분리한다. 정확한 API는 version pinning이 필요하다.
 - **Agent 우선안 / 미확정:** Structured goal·noisy pose·OBB geometry, arm/hand proprioception, EEF/finger kinematics, filtered wrist wrench, sensor-region binary tactile, previous action과 validity/age를 vector baseline으로 둔다. Geometry point cloud·spatial tactile·continuous force·raw RGB·optical tactile는 순차 extension/ablation으로 둔다.
 - **중요한 제한:** 논문의 `0.01 N` tactile threshold를 그대로 복사하지 않는다. 실제 RH56E2 variant·센서 배치·noise floor를 확인해 hysteresis threshold를 calibration한다. Exact contact point·normal·shear·slip은 actor 관측으로 올리지 않는다.
-- **영향:** 5.6.1 observation contract, 결정 레지스터, backlog, 후속 Agent 지침, `research_topic.md`의 현재 작업 원칙과 `papers.md`의 B32–B36·observation 그룹.
-- **남은 질문:** 사용 중인 Isaac Lab/Isaac Sim 버전, RH56E2 T1/T2 및 실제 sensor packet, vision/hand/F/T update rate, upstream geometry 형식, phase ID 제공 여부, 최종 vector 항목·차원.
+- **영향:** 5.6.1 observation contract, 결정 레지스터, backlog, 후속 Agent 지침, `research_topic.md`의 현재 작업 원칙과 `papers/README.md`의 [B32](https://doi.org/10.15607/RSS.2023.XIX.036)–[B36](https://doi.org/10.48550/arXiv.2411.04776)·observation 그룹.
+- **남은 질문:** 사용 중인 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)/Isaac Sim 버전, RH56E2 T1/T2 및 실제 sensor packet, vision/hand/F/T update rate, upstream geometry 형식, phase ID 제공 여부, 최종 vector 항목·차원.
 
 ### Stage 13 — Observation 항목별 사용자 검토와 최소 MLP 입력 구체화
 
@@ -1377,20 +1379,20 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **최소 MLP 입력:** Push-conditioned goal 6D, current EEF–object pose 6D, OBB extent 3D, hand joint position 6D, tactile history `K_bM`, wrench history `6K_w`, action history `12K_a`. 차원은 `21+K_bM+6K_w+12K_a`다.
 - **History 정정:** History는 observation 외부의 별도 개념이 아니라 MLP에 flatten해 넣는 actor observation이다. 모든 modality에 같은 window를 적용할 필연성은 없으며, 공통 `K`는 첫 비교의 단순한 기준선이다.
 - **초기 제외:** Phase ID, object velocity, joint velocity, EEF twist, fingertip 위치, vision confidence/age, arm q, raw RGB, point cloud와 mesh. 실제 failure가 근거를 제공하면 다시 추가한다.
-- **남은 질문:** 실제 17 sensor의 URDF/packet mapping과 coarse group `M`, `K_b/K_w/K_a`, rotation representation, OBB tracker와 symmetry 처리, F/T preprocessing, exact Isaac Lab version.
+- **남은 질문:** 실제 17 sensor의 URDF/packet mapping과 coarse group `M`, `K_b/K_w/K_a`, rotation representation, OBB tracker와 symmetry 처리, F/T preprocessing, exact [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) version.
 
 ### Stage 14 — 유사 과업·센서 연구의 Observation 채택 이유를 기준으로 재검토
 
 - **날짜:** 2026-09-15.
 - **사용자 지시:** 현재까지 결정한 observation을 비슷한 과업·센서를 사용한 연구와 비교하되, 논문이 무엇을 입력했는지보다 **왜 그 입력이 필요했는지**를 중점적으로 검토한다.
-- **비교 범위:** DexTouch, Rotating without Seeing, Tactile Pushing, Goal-Driven Robotic Pushing, Visuotactile Estimation and Control, VTDexManip, Force Push, RoboPack과 point-cloud 기반 nonprehensile manipulation을 비교했다.
+- **비교 범위:** [DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036), [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236), [Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471), [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157), [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21), [Force Push](https://doi.org/10.1109/LRA.2024.3414180), [RoboPack](https://doi.org/10.15607/RSS.2024.XX.130)과 point-cloud 기반 nonprehensile manipulation을 비교했다.
 - **지지된 구성:** EEF-relative goal과 current object state의 분리, hand q, spatial identity를 보존한 binary tactile, wrist F/T history는 현재 과업의 부분관측성과 접촉 feedback 요구에 직접 대응한다.
 - **표현 한계:** OBB는 occlusion에 비교적 안정적인 coarse size·axis prior지만 surface contact point를 선택할 정도의 fine geometry를 제공하지 않는다. Geometry-aware라는 표현을 쓰더라도 이 범위를 넘겨 주장하지 않는다.
 - **첫 번째 hidden-state 위험:** 누적 delta action으로 desired target을 갱신하는 controller에서는 raw previous action history가 현재 target을 유일하게 나타내지 못할 수 있다. Persistent target을 쓰면 desired–actual EEF/hand target error를 조건부 필수 observation으로 검토한다.
 - **두 번째 hidden-state 위험:** Vision tracker가 invalid frame에서 last pose를 hold하면 pose 값만으로 freshness를 알 수 없다. 이 동작을 사용하면 valid/fresh indicator와 measurement age를 조건부 필수로 검토한다.
 - **Phase 제약:** Phase ID를 주지 않는 방향은 유지한다. 다만 reward gate가 observation으로 복원할 수 없는 latched phase memory를 가지면 같은 observation에 서로 다른 행동이 요구될 수 있으므로, gate는 current observation과 제공된 history에서 진행 상태를 판별할 수 있게 설계한다.
 - **Ablation 후보:** Previous-action-only / controller-target-only / both, hand dq / hand-q history, object pose history / filtered twist를 failure-driven ablation으로 둔다. 모든 modality의 history 길이를 같게 만들 근거는 없다.
-- **영향:** 5.6.1.7에 논문별 비교와 observation별 판정을 기록하고, `research_topic.md` 5.4절에 현재 설계에 대한 요약을 추가했으며, `papers.md`에 B37과 observation 독해 순서를 반영했다.
+- **영향:** 5.6.1.7에 논문별 비교와 observation별 판정을 기록하고, `research_topic.md` 5.4절에 현재 설계에 대한 요약을 추가했으며, `papers/README.md`에 [B37](https://doi.org/10.1109/TRO.2021.3104471)과 observation 독해 순서를 반영했다.
 - **남은 확인:** 실제 controller가 delta를 누적하는지 매 step measured state 기준으로 target을 재설정하는지, tracker의 dropout 처리, phase gate의 모든 상태 변수가 actor 관측으로 복원 가능한지.
 
 ### Stage 15 — DiffIK/OSC Action 의미와 Vision Sim-to-Real 범위 확인
@@ -1415,7 +1417,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **Rotation 문헌 검토:** Arbitrary final orientation 연구는 current–goal quaternion difference를, continuous rotation 연구는 hand-centric rotation-axis vector를, planar pushing은 local planar angle을 사용한다. Full SO(3)의 neural input에는 6D continuous representation이 유력하다.
 - **Agent 추천 / 사용자 확인 전:** 대부분의 관측을 EEF frame으로 둔다. Shelf-plane yaw만 목표이면 current/target을 각각 `sin/cos` 2D로, full SO(3)이면 current/target을 각각 6D로 표현한다. 3D rotation-vector는 작은 EEF-local action increment에 계속 사용할 수 있다.
 - **Symmetry 원칙:** Episode-local OBB axes는 이전 frame과 가장 가까운 symmetry-equivalent orientation을 선택하고, reward·success는 symmetry-equivalent goal 중 최소 rotation error를 사용한다. 6D 표현만으로 symmetry가 해결되지는 않는다.
-- **영향:** 5.6.1.6–5.6.1.7, `research_topic.md` 5절, 결정 레지스터, backlog, 후속 Agent 지침과 `papers.md` B38–B40을 갱신했다.
+- **영향:** 5.6.1.6–5.6.1.7, `research_topic.md` 5절, 결정 레지스터, backlog, 후속 Agent 지침과 `papers/README.md` [B38](https://doi.org/10.1109/CVPR.2019.00589)–[B40](https://doi.org/10.48550/arXiv.2309.09979)을 갱신했다.
 - **당시 남은 질문 / Stage 17에서 구체화:** Preparatory objective는 shelf-plane yaw지만 moving EEF의 observation은 full orientation 6D를 보존하는 조합으로 구체화했다. Symmetry group의 object별 정의는 여전히 미결이다.
 
 ### Stage 17 — 5D Rotation 표현과 Moving EEF에서의 Yaw 해석
@@ -1453,13 +1455,13 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 - **날짜:** 2026-09-16.
 - **사용자 요구:** VLA·IL 계열의 한계를 추상적으로 주장하지 않고 최신 연구 사례의 장점과 단점을 표로 비교해, 우리 방법이 겨냥하는 개선점을 설명한다.
-- **확인한 반례:** OpenVLA·π0.5는 semantic·open-world generalization, OpenVLA-OFT·Fast-in-Slow는 실행 속도, ForceVLA·TLA·TaF-VLA는 force/tactile grounding, Reactive Diffusion Policy·FoAR·3D-ViTac은 reactive multimodal IL, SafeVLA·TORL-VLA는 RL 기반 safety·online refinement를 이미 다룬다.
+- **확인한 반례:** [OpenVLA](https://doi.org/10.48550/arXiv.2406.09246)·[π0.5](https://doi.org/10.48550/arXiv.2504.16054)는 semantic·open-world generalization, [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[Fast-in-Slow](https://doi.org/10.52202/085713-3276)는 실행 속도, [ForceVLA](https://doi.org/10.52202/085713-3124)·[TLA](https://doi.org/10.48550/arXiv.2503.08548)·[TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321)는 force/tactile grounding, [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)·[3D-ViTac](https://doi.org/10.48550/arXiv.2410.24091)은 reactive multimodal IL, [SafeVLA](https://doi.org/10.52202/085713-5128)·[TORL-VLA](https://doi.org/10.48550/arXiv.2606.09337)는 RL 기반 safety·online refinement를 이미 다룬다.
 - **정정된 주장:** `VLA는 force를 모른다`, `IL은 reactive하지 않다`, `VLA와 RL을 결합하면 새롭다`는 주장은 사용하지 않는다.
 - **현재 gap:** 검토한 최신 사례는 대규모 이종 data 또는 task-specific multimodal demonstrations·특수 tactile data를 사용하며, 제한된 shelf 공간에서 unknown blocker의 preparatory rotation 종료 접촉을 후속 pushing feasibility와 직접 연결하는 설정은 확인되지 않았다.
 - **우리 방법의 대응:** Goal-conditioned simulation RL에서 exact contact force·collision·object state를 reward/critic용 privileged information으로만 사용하고, actor는 coarse OBB·binary tactile·wrist F/T로 contact configuration의 형성·유지·전환을 학습한다.
 - **주장 한계:** 언어·semantic generalization, 범용 task transfer와 demonstration-free superiority를 자동으로 얻는 방법이 아니다. Reward misspecification, simulation contact bias와 domain randomization 부담을 별도 한계로 인정한다.
 - **입증 조건:** Task success, initial-pose basin, sensor/history ablation, unseen geometry·friction·mass·vision corruption robustness와 data·compute·sensor cost를 matched baseline과 비교하기 전에는 `극복한다` 대신 `겨냥한다` 또는 `검증한다`로 쓴다.
-- **당시 문서 반영:** `research_topic.md`에 비교표와 motivation 초안을, `papers.md` B41–B65와 3.8에 최신 사례와 목적별 그룹을 추가했다. 이후 Stage 24에서 비교표·초안은 `motivation.md`, 문헌 평가는 `papers.md`로 일원화했다.
+- **당시 문서 반영:** `research_topic.md`에 비교표와 motivation 초안을, `papers/README.md` [B41](https://doi.org/10.48550/arXiv.2406.09246)–[B65](https://doi.org/10.52202/085713-3671)와 3.8에 최신 사례와 목적별 그룹을 추가했다. 이후 Stage 24에서 비교표·초안은 `motivation.md`, 문헌 평가는 `papers/README.md`로 일원화했다.
 
 ### Stage 21 — Research Motivation 전용 문서 분리
 
@@ -1467,7 +1469,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **사용자 결정:** Motivation을 기존 `context.md`·`research_topic.md`의 일부로만 두지 않고 별도의 Markdown 문서에서 정리한다.
 - **새 문서:** [`motivation.md`](./motivation.md).
 - **문서 역할:** 실제 shelf failure, 최신 VLA·IL과 task-specific 연구의 장단점, 좁혀진 gap, method 대응, MH1–MH4, claim–evidence matrix, 논문용 paragraph와 예상 반론을 하나의 흐름으로 관리한다.
-- **기존 문서와의 관계:** `context.md`는 의사결정 흐름, `research_topic.md`는 현재 연구 명세, `papers.md`는 논문 inventory를 계속 담당한다. 중복된 motivation 내용은 당장 삭제하지 않고 전용 문서가 안정화된 뒤 요약·링크 중심으로 정리한다.
+- **기존 문서와의 관계:** `context.md`는 의사결정 흐름, `research_topic.md`는 현재 연구 명세, `papers/README.md`는 논문 inventory를 계속 담당한다. 중복된 motivation 내용은 당장 삭제하지 않고 전용 문서가 안정화된 뒤 요약·링크 중심으로 정리한다.
 
 ### Stage 22 — 연구 시작 배경에서 Track B까지의 Storytelling 구체화
 
@@ -1476,25 +1478,25 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **구체화 원칙:** Conventional method나 RL·IL·VLA 전체를 실패한 접근으로 서술하지 않는다. 각 계열의 강점과 최신 보완 연구를 인정한 뒤 unknown-object·부분관측·contact-transition 조건에서 남는 부담으로 좁힌다.
 - **Story funnel:** 적용 환경 확대 → 의도적 contact task 증가 → hybrid dynamics·부분관측·model uncertainty → learning method의 등장 → data·Sim-to-Real·deployable sensing·terminal-contact compatibility 문제 → shelf blocker Rotation→Push.
 - **중심 gap:** 개별 skill 성공보다 Rotation terminal contact가 downstream Push initial contact로 실행 가능한지가 핵심이다. `RL 사용`, `tactile 추가` 또는 `VLA가 아님` 자체는 gap이 아니다.
-- **문헌 보강:** Conventional planning·robust control, simulation RL, tactile demonstration과 semantic contact grounding을 설명하는 B66–B72를 `papers.md`에 추가했다.
+- **문헌 보강:** Conventional planning·robust control, simulation RL, tactile demonstration과 semantic contact grounding을 설명하는 [B66](https://doi.org/10.15607/RSS.2023.XIX.039)–[B72](https://doi.org/10.48550/arXiv.2412.09743)를 `papers/README.md`에 추가했다.
 - **문서 반영:** `motivation.md` 2절에 배경 storyline을, 10.1절에 논문 Introduction용 네 문단 초안을 추가했다.
 
 ### Stage 23 — 정식 게재 이후의 구체 연구로 Baseline 재구성
 
 - **날짜:** 2026-09-16.
-- **사용자 요구:** RL·IL·VLA라는 큰 분류만 설명하지 말고, π0 공개일 이후의 영향력 있는 구체 연구를 연구 사례이자 baseline 후보로 사용한다. Venue 수준과 인용 수를 함께 고려한다.
+- **사용자 요구:** RL·IL·VLA라는 큰 분류만 설명하지 말고, [π0](https://doi.org/10.48550/arXiv.2410.24164) 공개일 이후의 영향력 있는 구체 연구를 연구 사례이자 baseline 후보로 사용한다. Venue 수준과 인용 수를 함께 고려한다.
 - **최신성 기준 보정:** 사용자는 최초 preprint 공개일이 아니라 정식 게재일을 기준으로 삼아도 된다고 확인했다. 따라서 2024-10-31 이후 정식 게재된 논문을 핵심 선정군으로 두며, preprint-only 연구는 watch list로 분리한다.
 - **영향력 원칙:** Venue와 citation을 함께 보되, 인용 수는 2026년 논문에 불리하므로 동일 시점 snapshot의 보조 지표로만 사용한다. Task directness와 fair comparison 가능성을 우선한다.
-- **구체 사례:** π0.5·OpenVLA-OFT·ForceVLA, RDP·FoAR, VTDexManip·FORGE·Privileged Action·OmniReset, DyWA·DexMove·GD2P를 중심으로 각 연구가 이미 해결한 범위와 남는 Track B 질문을 연결했다.
+- **구체 사례:** [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[ForceVLA](https://doi.org/10.52202/085713-3124), [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871), [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)·[FORGE](https://doi.org/10.1109/LRA.2025.3551637)·[Privileged Action](https://doi.org/10.48550/arXiv.2502.15442)·[OmniReset](https://doi.org/10.48550/arXiv.2603.15789), [DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)를 중심으로 각 연구가 이미 해결한 범위와 남는 Track B 질문을 연결했다.
 - **Baseline 계층:** Same-task matched experimental baseline, component ablation, closest-task system baseline, high-impact literature reference를 분리한다. 유명한 generalist model과 직접 비교 가능한 task-specific baseline을 같은 의미로 사용하지 않는다.
-- **문서 반영:** `motivation.md` 5절에 선정 기준·영향력 표·baseline 계층·구체 storyline을 추가하고, `papers.md` B73–B80 및 목적별 그룹을 갱신했다. OpenVLA-OFT의 정식 발표를 RSS 2025로 정정했다.
+- **문서 반영:** `motivation.md` 5절에 선정 기준·영향력 표·baseline 계층·구체 storyline을 추가하고, `papers/README.md` [B73](https://doi.org/10.1109/LRA.2025.3551637)–[B80](https://doi.org/10.48550/arXiv.2405.10315) 및 목적별 그룹을 갱신했다. [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)의 정식 발표를 RSS 2025로 정정했다.
 
 ### Stage 24 — 문서 역할과 기준 정보 재분리
 
 - **날짜:** 2026-09-16.
-- **사용자 결정:** `motivation.md`에는 정리된 motivation만, `papers.md`에는 참고 논문, `context.md`에는 변경 log와 내용을 확정·변경한 근거를 기록한다.
+- **사용자 결정:** `motivation.md`에는 정리된 motivation만, `papers/README.md`에는 참고 논문, `context.md`에는 변경 log와 내용을 확정·변경한 근거를 기록한다.
 - **역할 명확화:** `research_topic.md`는 현재 연구 범위와 확정·working 명세의 기준 문서로 유지한다.
-- **중복 정리:** Citation snapshot·문헌 선별 기준·baseline 계층·상세 논문 목록은 `papers.md`로, 작업 우선순위·결정 이력은 `context.md`로 모았다. `motivation.md`와 `research_topic.md`에는 필요한 결론과 링크만 남겼다.
+- **중복 정리:** Citation snapshot·문헌 선별 기준·baseline 계층·상세 논문 목록은 `papers/README.md`로, 작업 우선순위·결정 이력은 `context.md`로 모았다. `motivation.md`와 `research_topic.md`에는 필요한 결론과 링크만 남겼다.
 - **운영 원칙:** Change Log는 `context.md`에만 기록한다. 다른 문서의 내용을 변경할 때도 변경 이유와 영향을 이 Stage·결정 레지스터·Change Log 중 적절한 위치에 남긴다.
 
 ### Stage 25 — Motivation을 핵심 중심 구조로 재편
@@ -1502,8 +1504,35 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - **날짜:** 2026-09-16.
 - **사용자 피드백:** `motivation.md`가 길고 내용을 나열하는 인상이 강해 핵심을 한 번에 파악하기 어렵다.
 - **변경 원칙:** 문서 첫 화면에 실제 상황·핵심 failure·research gap·Track B의 대응·필수 검증을 요약하고, 이후 내용을 `문제 → 기존 연구의 해결 범위 → 남은 gap → method 대응 → hypothesis/evidence → claim boundary` 순서로 제한한다.
-- **중복 제거:** Background, problem statement, RQ와 claim–evidence에서 반복되던 설명을 통합하고, 논문별 세부 비교는 `papers.md`로 유지했다.
+- **중복 제거:** Background, problem statement, RQ와 claim–evidence에서 반복되던 설명을 통합하고, 논문별 세부 비교는 `papers/README.md`로 유지했다.
 - **결과:** `motivation.md`를 12개 주요 절의 376줄 구조에서 6개 주요 절의 약 200줄 구조로 축약했다. 핵심 thesis, Orientation-success와 Transition-success의 구분, MH1–MH4와 주장 경계를 앞쪽에서 바로 확인할 수 있게 했다.
+
+### Stage 26 — Paper 문서를 탐색용 디렉터리로 분할
+
+- **날짜:** 2026-09-16.
+- **사용자 요청:** 단일 `papers.md`를 디렉터리의 여러 페이지로 나누고, 생성된 `README.md`의 링크를 통해 필요한 문헌을 쉽게 찾도록 한다.
+- **새 진입점:** [`papers/README.md`](./papers/README.md).
+- **분할 구조:** 핵심 B-ID 목록, 목적별 그룹, 우선 독해 가이드와 conference screening을 분리했다. Screening은 ICRA·IROS 연도별 목록과 네 개의 주제 묶음으로 추가 분할했다.
+- **호환성:** 기존 `papers.md`는 새 index를 안내하는 redirect 문서로 유지하여 과거 링크가 깨지지 않게 했다.
+- **링크 갱신:** `motivation.md`와 `research_topic.md`는 index뿐 아니라 실제 근거가 있는 세부 페이지를 직접 가리키도록 수정했다.
+
+### Stage 27 — Pushing·Rotation/Pivoting RL의 Reward 근거를 별도 비교
+
+- **날짜:** 2026-09-16.
+- **사용자 요청:** Pushing과 rotating/pivoting 각각의 강화학습 논문을 reward formulation 참고용으로 추가 탐색한다.
+- **문헌 확장:** 최신 pushing·pivoting 공통 연구인 [B81](https://doi.org/10.1109/LRA.2026.3655262)과 pushing [B82](https://doi.org/10.1109/ICRA55743.2025.11128166)–[B84](https://doi.org/10.1109/IROS47612.2022.9981873), pivoting [B85](https://doi.org/10.1109/ICRA48891.2023.10161271)–[B86](https://doi.org/10.48550/arXiv.1703.00472)을 핵심 corpus로 승격했다. 기존 [B10](https://doi.org/10.1109/LRA.2023.3295236)·[B32](https://doi.org/10.15607/RSS.2023.XIX.036)·[B40](https://doi.org/10.48550/arXiv.2309.09979)과 함께 원문 reward 구성과 각 항을 둔 이유를 검토했다.
+- **비교 기준:** `task progress / contact formation·maintenance / force direction·contact geometry / safety constraint / action regularization / success·termination / gate`로 항을 분해하고, 논문 원문과 Track B 해석을 분리했다.
+- **핵심 해석:** Target-orientation pivoting과 continuous rotation은 다른 reward 문제다. Track B는 전자에 가깝고 후자의 drift·work·torque regularizer만 선택적으로 참고할 수 있다. Pushing에서는 distance-only reward의 local optimum, contact loss, undesired rotation, aggressive pushing과 collision·toppling을 서로 다른 항이 해결한다.
+- **남은 gap:** 확인한 pivoting 연구는 orientation success 또는 continuous rotation 안정성을 평가하지만, rotation terminal contact가 downstream pushing에 적합한지는 직접 reward하지 않는다.
+- **문서 반영:** `papers/reward_formulation.md`를 만들고 paper index, core B-ID, 목적별 그룹과 독해 가이드를 연결했다. 아직 Track B의 최종 reward 수식·weight·gate를 채택한 것은 아니다.
+
+### Stage 28 — 모든 논문 언급을 DOI 중심 링크로 통일
+
+- **날짜:** 2026-09-16.
+- **사용자 요청:** ICRA·IROS screening 문서와 같이 JH.Jeong 문서 전반의 논문 언급을 논문 DOI로 직접 연결한다.
+- **표기 규칙:** 논문 제목·약칭·B-ID는 정식 출판 DOI를 우선 사용하고, 정식 DOI가 없으면 arXiv DOI를 사용한다. 두 DOI가 모두 없는 경우에만 공식 학회 원문으로 연결하면서 `DOI 없음`을 명시한다.
+- **문서 반영:** 핵심 86편의 제목 열, 목적별 그룹, 독해 가이드, reward 비교, motivation·research topic·context와 conference screening의 B-ID 교차참조를 같은 링크 규칙으로 정규화했다.
+- **확인된 예외:** [DexMove](https://openreview.net/forum?id=dT3ZciXvNX)([B22](https://openreview.net/forum?id=dT3ZciXvNX))와 [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)([B27](https://openreview.net/forum?id=jf7C7EGw21))은 현재 정식 DOI와 arXiv 원문이 확인되지 않아 공식 OpenReview 링크를 사용한다.
 
 ---
 
@@ -1527,9 +1556,9 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | 피해야 할 오해: End-to-end에 가까운 확장 = raw sensor→action 단일 network | 목적에서 행동까지 역할 통합; perception·network·학습 구조는 미결 | **[해석 제한]** |
 | 회전·병진 정확도로 연구 전체의 성공 평가 | 1단계는 실행 성능, 2단계는 공간 확보 효과와 실행 안정성을 평가 | **[확장]** |
 | 피해야 할 오해: Track A/B = 1단계/2단계 | 연구축과 진행 단계는 별개; 이번 구체화는 Track B 중심 | **[해석 제한]** |
-| GD2P가 point cloud를 diffusion으로 augmentation | Geometry를 조건으로 hand pose를 생성 | **[대체됨]** |
-| GD2P가 RL 또는 일반 grasp dataset만을 활용한 push 연구 | Nonprehensile push/pull pose의 최적화·physics 검증·생성 모델 학습 | **[대체됨]** |
-| GD2P energy가 검증된 RL reward | 우리의 reward에 적용하는 것은 설계 후보이며 별도 검증 필요 | **[해석 제한]** |
+| [GD2P](https://doi.org/10.48550/arXiv.2509.18455)가 point cloud를 diffusion으로 augmentation | Geometry를 조건으로 hand pose를 생성 | **[대체됨]** |
+| [GD2P](https://doi.org/10.48550/arXiv.2509.18455)가 RL 또는 일반 grasp dataset만을 활용한 push 연구 | Nonprehensile push/pull pose의 최적화·physics 검증·생성 모델 학습 | **[대체됨]** |
+| [GD2P](https://doi.org/10.48550/arXiv.2509.18455) energy가 검증된 RL reward | 우리의 reward에 적용하는 것은 설계 후보이며 별도 검증 필요 | **[해석 제한]** |
 | Approach에서 접촉을 많이 만들면 후속 동작에도 유리 | Task-specific 접촉 능력과 실제 후속 성공을 함께 평가 | **[작업 가설]** |
 | Critic value를 그대로 성공확률로 사용 | 학습된 return 또는 ranking proxy이며 보정·검증 필요 | **[해석 제한]** |
 | Approach reward의 수식 구체화를 최우선 작업으로 둠 | Baseline의 문제 정의와 전체 해결 방식을 먼저 검토 | **[우선순위 변경 · 2026-09-15]** 기존 분석은 5.10절에 보존 |
@@ -1539,7 +1568,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | Current/goal rotation을 3D placeholder로 두고 전체 observation을 `27+K_bM+6K_w+12K_a`로 계산 | Moving EEF의 문맥을 위해 current/goal rotation을 각각 6D로 두는 working baseline | **[D-054로 대체]** 현재 차원은 `33+K_bM+6K_w+12K_a`; reward는 yaw-only |
 | 새 contribution 후보 문장에 동의 = 신규성과 성능이 입증됨 | 연구 framing·역할 경계에 동의; 구체 method와 실험 검증은 남음 | **[해석 제한]** |
 | Baseline의 전체 해결 방식 검토를 reward 이전의 단독 최우선으로 둠 | Observation·privileged information·action을 먼저 정리한 뒤 전체 phase reward를 근거와 함께 설계; baseline은 근거 수집으로 병행 | **[우선순위 변경 · 2026-09-15]** Stage 8–10의 분석은 보존 |
-| Tactile 입력의 raw/feature 형태를 먼저 정하지 않음 | Core Isaac Lab에서는 ContactSensor-derived binary tactile를 최소안으로 검토하고, spatial binary와 optical tactile를 확장으로 분리 | **[작업 가설 · 2026-09-15]** 실제 hand variant·calibration과 ablation 후 확정 |
+| Tactile 입력의 raw/feature 형태를 먼저 정하지 않음 | Core [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)에서는 ContactSensor-derived binary tactile를 최소안으로 검토하고, spatial binary와 optical tactile를 확장으로 분리 | **[작업 가설 · 2026-09-15]** 실제 hand variant·calibration과 ablation 후 확정 |
 | Simulation object/contact state를 편의상 actor가 직접 사용 | 실제 perception/sensor와 동일한 rate·noise·latency·dropout을 거친 proxy만 actor에 제공하고 exact state는 privileged로 분리 | **[구체화된 원칙 · 2026-09-15]** |
 | Shared policy이면 phase one-hot을 주는 것이 우선 | Actor에는 phase를 주지 않고 observable progress·history 아래에서 reward gate로 phase별 term을 활성화 | **[대체됨 · 2026-09-15]** 이전 연구 경험을 반영 |
 | OBB는 개발용이고 point cloud가 최종 geometry 후보 | Unseen object·occlusion에서의 안정성을 위해 episode-consistent OBB를 현재 actor geometry로 사용 | **[대체됨 · 2026-09-15]** point cloud·mesh는 현재 최소안에서 제외 |
@@ -1574,21 +1603,21 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-016 | 현재 합의 · 2026-09-14 | Track A/B와 1단계/2단계는 별개다. 이번 변경이 Track A의 관측 조건 변경이나 두 Track의 Vision-Free 통합을 뜻하지 않는다. |
 | D-017 | 현재 합의 · 2026-09-14 후속 논의 | Track B를 사용자의 연구주제로 삼는 방향이며, 현재는 1단계 low-level policy와 관련 문헌 검토를 우선한다. |
 | D-018 | 이전 우선순위 · 2026-09-15 변경 | Approach에서 이후 Rotation과 Push를 고려한 hand configuration reward를 먼저 검토했다. 분석은 보존하며 최신 우선순위는 D-022를 따른다. |
-| D-019 | 문헌 확인 | GD2P는 geometry-conditioned pre-contact hand pose 생성이며 RL 또는 point-cloud diffusion augmentation이 아니다. |
+| D-019 | 문헌 확인 | [GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 geometry-conditioned pre-contact hand pose 생성이며 RL 또는 point-cloud diffusion augmentation이 아니다. |
 | D-020 | 작업 가설 | Task-specific wrench capability와 후속 정책의 execution value를 Approach 적합성의 평가 후보로 검토한다. |
 | D-021 | 문헌 해석 원칙 | 원 논문, 공개 구현, 우리의 reward 확장안을 구분하고 DOI 유형·출판 상태를 명시한다. |
 | D-022 | 이전 우선순위 · 2026-09-15 변경 | Reward formulation보다 baseline의 문제 정의와 전체 접근·해결 방식을 먼저 살펴보려 했다. 분석은 보존하며 최신 우선순위는 D-027을 따른다. |
 | D-023 | 현재 합의 · 2026-09-15 | 연구 관점은 목표 방향의 pushing을 위해 물체를 주어진 자세로 돌려두고 손 구성·접촉을 준비하는 것이다. 최초 Approach에만 contribution을 한정하지 않는다. |
 | D-024 | 현재 합의 · 2026-09-15 | 1단계의 적합한 목표 물체 orientation 선택은 상위 모듈의 역할이다. Policy는 주어진 물체 회전·병진 목표를 접촉 조작으로 달성한다. |
 | D-025 | 합의된 framing / 검증 전 후보 · 2026-09-15 | Contribution 후보는 주어진 물체 목표를 위한 다지 손 접촉 구성의 형성·전환·피드백 보정 방법이다. 구체 method와 신규성·성능은 미결이다. |
-| D-026 | Agent 추천 / 미선정 | GD2P·Hermans et al.·TaskDexGrasp를 관점별 우선 독해 후보로 두고, 단순 회전 정책+GD2P 등의 비교를 검토한다. 사용자가 실험 baseline을 확정한 것은 아니다. |
+| D-026 | Agent 추천 / 미선정 | [GD2P](https://doi.org/10.48550/arXiv.2509.18455)·[Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011)·[TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652)를 관점별 우선 독해 후보로 두고, 단순 회전 정책+[GD2P](https://doi.org/10.48550/arXiv.2509.18455) 등의 비교를 검토한다. 사용자가 실험 baseline을 확정한 것은 아니다. |
 | D-027 | 현재 합의 · 2026-09-15 | 전체 phase reward formulation 전에 policy observation과 reward·termination·evaluation용 privileged information을 구분해 정리한다. |
 | D-028 | 현재 action 방향 · D-045로 구체화 | Action은 EEF frame의 delta pose와 hand joint action으로 구성한다. EEF delta의 measured-state-referenced one-step semantics는 확정했고, 세부 rotation 표현·scale·DiffIK/OSC 선택과 hand action mode는 미결이다. |
 | D-029 | 현재 합의 · 2026-09-15 | Approach·Rotation·Push 전체를 고려해 reward를 설계하고, 각 term의 목적·물리·안전·failure 또는 문헌 근거를 명시한다. |
-| D-030 | 현재 합의 · 2026-09-15 | 각 observation 신호는 선행연구의 입력·가공, Isaac Lab 원천 데이터·구현, policy 표현, 실물 대응, noise·latency·한계를 함께 검토한다. |
+| D-030 | 현재 합의 · 2026-09-15 | 각 observation 신호는 선행연구의 입력·가공, [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 원천 데이터·구현, policy 표현, 실물 대응, noise·latency·한계를 함께 검토한다. |
 | D-031 | 이전 Agent 추천 · D-037–D-039로 구체화 | ContactSensor-derived binary tactile 최소안을 제안했다. 이후 binary tactile+wrist F/T, URDF coarse pooling과 privileged continuous force로 구체화했다. |
 | D-032 | 이전 Agent 추천 · D-036으로 대체 | Noisy pose·OBB에서 시작해 point cloud를 확장하려 했으나, 현재는 occlusion 안정성을 이유로 OBB를 actor geometry로 유지하고 point cloud를 최소안에서 제외한다. |
-| D-033 | 구현 전 확인 필요 | Isaac Lab/Isaac Sim version, 실제 17 tactile sensor의 위치·packet·update rate를 확인하기 전에는 ContactSensor/wrench API와 `M`, history 차원을 확정하지 않는다. |
+| D-033 | 구현 전 확인 필요 | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)/Isaac Sim version, 실제 17 tactile sensor의 위치·packet·update rate를 확인하기 전에는 ContactSensor/wrench API와 `M`, history 차원을 확정하지 않는다. |
 | D-034 | 현재 방향 · 2026-09-15 | 1단계 MLP actor에 phase ID를 주지 않고 phase별 gate로 reward term을 활성화한다. Gate는 phase별 action masking을 의미하지 않는다. |
 | D-035 | 현재 방향 · 2026-09-15 | Goal은 임의의 object pose가 아니라 지정 방향 pushing과 이를 위한 preparatory orientation이다. EEF-frame target object position·preparatory orientation과 current EEF–object pose를 별도로 관측한다. |
 | D-036 | 현재 방향 · 2026-09-15 | Unseen object·occlusion을 고려해 point cloud/mesh 대신 episode-consistent object-local OBB extent를 actor의 coarse geometry로 사용한다. Initial template의 axes·extent를 고정하고 pose만 tracking한다. |
@@ -1613,13 +1642,16 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 | D-055 | 현재 합의 · 2026-09-16 | Research motivation의 구체화·정리를 observation·privileged information·action contract와 공동 1순위로 진행한다. 실제 문제–문헌상 해결 범위–gap–검증 가능한 hypothesis–baseline·metric을 연결하며, 요소의 단순 결합을 novelty로 간주하지 않는다. |
 | D-056 | 현재 문헌 기반 원칙 · 2026-09-16 | VLA·IL의 약점을 일반화하지 않는다. Force/tactile VLA, reactive multimodal IL, fast·safe·RL-refined VLA를 강한 반례로 포함하고 각 방법의 장점·한계·data/sensor 비용을 같은 표에서 비교한다. |
 | D-057 | 현재 working motivation · 실험 검증 전 · 2026-09-16 | Track B는 unknown shelf blocker에서 preparatory rotation의 terminal contact state를 downstream pushing feasibility와 연결하고, coarse OBB·binary tactile·wrist F/T actor와 simulation privileged supervision으로 이를 학습하는 공백을 겨냥한다. 비교 실험 전에는 기존 방법을 `극복한다`고 단정하지 않는다. |
-| D-058 | 문서 운영 결정 · 2026-09-16 | Research motivation의 최신 통합 초안은 별도 `motivation.md`에서 관리한다. `context.md`는 논의 흐름, `research_topic.md`는 확인된 연구 명세, `papers.md`는 논문 목록이라는 기존 역할을 유지한다. |
+| D-058 | 문서 운영 결정 · 2026-09-16 | Research motivation의 최신 통합 초안은 별도 `motivation.md`에서 관리한다. `context.md`는 논의 흐름, `research_topic.md`는 확인된 연구 명세, `papers/README.md`는 논문 목록이라는 기존 역할을 유지한다. |
 | D-059 | 현재 storytelling 원칙 · 2026-09-16 | Motivation은 적용 환경 확대–contact-rich 난점–conventional method의 모델링 부담–RL·IL·VLA의 장점과 잔여 한계–downstream-aware Rotation→Push transition 순으로 좁힌다. 기존 계열의 무능이 아니라 unknown object, deployable sensing과 terminal-contact compatibility의 미해결 범위를 gap으로 둔다. |
-| D-060 | 현재 문헌 선정 기준 · 2026-09-16 | 최신 핵심 baseline 후보는 π0 공개일인 2024-10-31 이후 **정식 게재**된 논문을 기준으로 한다. Venue·citation·Track B 직접성·재현 가능성을 함께 평가하고 preprint-only 연구는 watch list로 분리한다. |
-| D-061 | 현재 baseline 설계 원칙 · 2026-09-16 | High-impact reference와 fair experimental baseline을 분리한다. π0.5·OpenVLA-OFT·ForceVLA는 범용·VLA 상한의 reference, RDP·FoAR는 강한 IL 비교군, VTDexManip·FORGE·Privileged Action·OmniReset은 component·RL formulation 비교군, DyWA·DexMove·GD2P는 closest-task system 비교군으로 우선 검토한다. 최종 구현 baseline은 data·code·hardware feasibility 확인 후 확정한다. |
-| D-062 | 문서 운영 결정 · 2026-09-16 | `motivation.md`는 정리된 motivation, `papers.md`는 논문 inventory·평가·baseline 후보, `research_topic.md`는 현재 연구 명세, `context.md`는 결정 근거·변경 이력·backlog의 기준 문서다. |
-| D-063 | 문서 운영 결정 · 2026-09-16 | 논문 상세 목록과 Change Log를 여러 문서에 중복하지 않는다. 문헌 정보는 `papers.md`, Change Log는 `context.md`에만 기록하고 다른 문서에는 필요한 결론과 링크만 둔다. |
+| D-060 | 현재 문헌 선정 기준 · 2026-09-16 | 최신 핵심 baseline 후보는 [π0](https://doi.org/10.48550/arXiv.2410.24164) 공개일인 2024-10-31 이후 **정식 게재**된 논문을 기준으로 한다. Venue·citation·Track B 직접성·재현 가능성을 함께 평가하고 preprint-only 연구는 watch list로 분리한다. |
+| D-061 | 현재 baseline 설계 원칙 · 2026-09-16 | High-impact reference와 fair experimental baseline을 분리한다. [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[ForceVLA](https://doi.org/10.52202/085713-3124)는 범용·VLA 상한의 reference, [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)는 강한 IL 비교군, [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)·[FORGE](https://doi.org/10.1109/LRA.2025.3551637)·[Privileged Action](https://doi.org/10.48550/arXiv.2502.15442)·[OmniReset](https://doi.org/10.48550/arXiv.2603.15789)은 component·RL formulation 비교군, [DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 closest-task system 비교군으로 우선 검토한다. 최종 구현 baseline은 data·code·hardware feasibility 확인 후 확정한다. |
+| D-062 | 문서 운영 결정 · 2026-09-16 | `motivation.md`는 정리된 motivation, `papers/README.md`는 논문 inventory·평가·baseline 후보, `research_topic.md`는 현재 연구 명세, `context.md`는 결정 근거·변경 이력·backlog의 기준 문서다. |
+| D-063 | 문서 운영 결정 · 2026-09-16 | 논문 상세 목록과 Change Log를 여러 문서에 중복하지 않는다. 문헌 정보는 `papers/README.md`, Change Log는 `context.md`에만 기록하고 다른 문서에는 필요한 결론과 링크만 둔다. |
 | D-064 | Motivation 구성 결정 · 2026-09-16 | `motivation.md`는 첫 화면에서 문제·gap·접근·검증을 파악할 수 있게 하고, 본문은 하나의 인과사슬과 MH1–MH4 증거 구조를 중심으로 작성한다. 반복 배경·논문별 상세·중복 RQ/claim 표는 두지 않는다. |
+| D-065 | 문서 운영 결정 · 2026-09-16 | 문헌의 공식 진입점은 `papers/README.md`다. B-ID inventory, 목적별 그룹, 독해 가이드와 conference screening은 별도 페이지로 유지하며, 기존 `papers.md`는 호환용 안내 문서로만 둔다. |
+| D-066 | 현재 reward 문헌 해석 · 채택 전 · 2026-09-16 | Pushing·pivoting reward는 object task progress, contact shaping, safety constraint와 control regularization으로 분해해 검토한다. Target-orientation pivoting과 continuous-axis rotation을 구분하고, privileged force는 magnitude 최대화보다 방향·과부하·충격·slip 평가에 우선 사용한다. Rotation terminal contact의 downstream Push feasibility는 기존 항을 그대로 복사하지 않고 별도 reward·metric 후보로 검증한다. |
+| D-067 | 문서 운영 결정 · 2026-09-16 | 모든 논문 제목·약칭·B-ID는 정식 출판 DOI에 직접 연결하고, 정식 DOI가 없으면 arXiv DOI를 사용한다. DOI 자체가 없는 논문만 공식 학회 원문으로 연결하고 그 예외를 명시한다. |
 
 ### 13.2 미결 Backlog
 
@@ -1629,10 +1661,10 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 - Research motivation을 `실제 문제·failure → 기존 연구의 해결 범위 → gap → hypothesis → baseline·metric` 구조로 완성
 - 논문용 one-sentence problem statement와 motivation paragraph, literature gap matrix와 hypothesis–experiment matrix 작성
-- B41–B80의 원문 method·observation·action·sensor·data 규모와 evaluation task를 동일 schema로 full-text 검증
-- Same-task PPO, FoAR-style vision+F/T IL과 가능한 RDP-style reactive IL 중 현재 hardware·data budget에서 구현 가능한 matched experimental baseline 확정
-- VTDexManip tactile encoding, FORGE force threshold·randomization, Privileged Action curriculum과 OmniReset reset distribution을 component ablation으로 재현할 범위 확정
-- DyWA·DexMove·GD2P의 공통 object/task subset과 sensor·data 차이를 정리하고, π0.5·OpenVLA-OFT·ForceVLA는 literature reference 또는 제한된 fine-tuning 중 어디까지 비교할지 확정
+- [B41](https://doi.org/10.48550/arXiv.2406.09246)–[B86](https://doi.org/10.48550/arXiv.1703.00472)의 원문 method·observation·action·sensor·data 규모와 evaluation task를 동일 schema로 full-text 검증
+- Same-task PPO, [FoAR](https://doi.org/10.1109/LRA.2025.3560871)-style vision+F/T IL과 가능한 [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)-style reactive IL 중 현재 hardware·data budget에서 구현 가능한 matched experimental baseline 확정
+- [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21) tactile encoding, [FORGE](https://doi.org/10.1109/LRA.2025.3551637) force threshold·randomization, [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442) curriculum과 [OmniReset](https://doi.org/10.48550/arXiv.2603.15789) reset distribution을 component ablation으로 재현할 범위 확정
+- [DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)의 공통 object/task subset과 sensor·data 차이를 정리하고, [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[ForceVLA](https://doi.org/10.52202/085713-3124)는 literature reference 또는 제한된 fine-tuning 중 어디까지 비교할지 확정
 - 각 Track이 별도 논문/졸업연구인지, 하나의 연구 안의 병렬 Track인지
 - 상위 Planner가 제공할 정확한 manipulation goal과 interface
 - 초기 단일 blocker에서 clutter/multi-object 환경으로 확장하는 시점
@@ -1664,7 +1696,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - Noise-free GT feasibility / calibrated corruption training / real tracker deployment를 분리해 보고하고, tracker 개선을 method contribution으로 포함하지 않기
 - Phase reward gate가 actor observation으로 복원 불가능한 latch·counter·privileged transition state를 사용하는지 점검
 - OBB를 coarse size·axis prior로 제한하고, 동일 extent이지만 표면 형상이 다른 unseen object에서 생기는 failure를 별도 평가
-- 사용 중인 Isaac Lab·Isaac Sim 정확한 version과 ContactSensor·JointWrench API 경로
+- 사용 중인 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)·Isaac Sim 정확한 version과 ContactSensor·JointWrench API 경로
 - 실제 RH56E2 17 tactile sensor의 위치·단위·noise floor·packet rate와 dead/invalid 표시
 - 실제 17 sensor→URDF link/pad의 grouping `G_j/L_j`와 coarse region 수 `M`
 - F/T only / coarse `M<17` binary+F/T / 17-channel binary+F/T의 granularity ablation
@@ -1681,6 +1713,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - Hand joint action의 target/delta/velocity 방식, 실제 제어 자유도·관절 coupling과 controller interface
 - Observation으로 계산할 phase 전환 신호와 privileged state를 사용할 training/evaluation 기준의 분리
 - 전체 phase reward term별 목적·근거·수식·정규화·weight·활성 구간 및 ablation
+- [B81](https://doi.org/10.1109/LRA.2026.3655262)·[B10](https://doi.org/10.1109/LRA.2023.3295236)·[B82](https://doi.org/10.1109/ICRA55743.2025.11128166)–[B86](https://doi.org/10.48550/arXiv.1703.00472)·[B32](https://doi.org/10.15607/RSS.2023.XIX.036)·[B40](https://doi.org/10.48550/arXiv.2309.09979)의 reward를 동일 scale·gate 조건으로 재표현하고, `task progress only → contact shaping 추가 → safety/regularization 추가 → downstream-transition 추가` ablation 순서를 확정
 
 - Baseline 전체 pipeline의 비교: 목표/관측/행동, 접촉 구성 생성·선택, 학습·제어, 실패 해결 방식과 재현·이식 범위
 - 현재 contribution framing을 실현할 새로운 방법과 기존 방법 대비 검증 가능한 차이
@@ -1740,16 +1773,16 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 17. 추천 논문·단순 결합 baseline·sensor ablation은 후보이며 확정 실험이 아니다. Baseline 독해는 정보·Action 명세와 term별 근거 수집에 병행하며, 문헌의 reward 항을 한꺼번에 조합하지 않는다.
 18. Policy observation과 simulation privileged information을 명시적으로 분리한다. Privileged state만으로 계산한 전환·종료 조건을 실제 실행에서도 사용할 수 있다고 간주하지 않는다.
 19. Reward term마다 해결하려는 failure와 근거를 기록한다. 센서값을 observation에 포함한다는 이유만으로 동일 값을 reward에 직접 넣지 않는다.
-20. Observation을 추가할 때 sensor raw data, 전처리 결과와 learned feature를 구분하고, 선행연구·Isaac Lab API·실물 대응을 함께 기록한다.
+20. Observation을 추가할 때 sensor raw data, 전처리 결과와 learned feature를 구분하고, 선행연구·[Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) API·실물 대응을 함께 기록한다.
 21. ContactSensor의 force를 optical tactile image, exact contact point·normal·shear 또는 slip으로 확대 해석하지 않는다. Binary threshold는 문헌값 복사가 아니라 실제 sensor calibration과 domain randomization으로 정한다.
-22. Isaac Lab/Isaac Sim 버전과 실제 RH56E2 17 sensor의 위치·packet이 확인되기 전에는 wrench API, coarse region `M`과 최종 observation dimension을 확정하지 않는다.
+22. [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)/Isaac Sim 버전과 실제 RH56E2 17 sensor의 위치·packet이 확인되기 전에는 wrench API, coarse region `M`과 최종 observation dimension을 확정하지 않는다.
 23. 현재 최소 observation은 5.6.1.6을, 문헌 비교에 따른 조건부 수정과 ablation 판정은 5.6.1.7을 따른다. 이전 5.6.1.1–5.6.1.5의 phase·point-cloud·다수 kinematic feature 제안을 현재안으로 되돌리지 않는다.
 24. Actor에 phase ID를 자동으로 추가하지 않는다. Phase별 reward gate와 action masking을 구분하고, latch가 있다면 MLP history로 추론 가능한지 확인한다.
 25. Goal을 일반적인 final object pose reaching으로 단순화하지 않는다. Target position은 pushing direction·distance에서 나오며 preparatory orientation은 후속 Push를 위한 중간·유지 조건이다.
 26. Unseen object의 OBB를 매 frame 재추정하지 않는다. Episode-local template의 axes·extent 일관성과 symmetry를 관리하고 pose만 tracking하는 방향을 유지한다.
 27. Real 17 taxel과 simulation URDF link/pad는 공통 `M`개 region으로 mapping한다. Taxel별 collision body 구현을 기본안으로 두지 않으며 17-channel 대 coarse tactile는 ablation으로 구분한다.
 28. MLP에서 history는 actor observation tensor의 일부다. 모든 modality에 같은 window를 강제하지 않고 `K_b/K_w/K_a`와 실제 시간 범위를 기록한다.
-29. DexTouch를 previous controller target 사용의 근거로 인용하지 않는다. Binary tactile와 robot proprioception의 근거로 사용하고, previous target과 finite history의 직접 근거는 `Rotating without Seeing`에서 가져온다.
+29. [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)를 previous controller target 사용의 근거로 인용하지 않는다. Binary tactile와 robot proprioception의 근거로 사용하고, previous target과 finite history의 직접 근거는 `[Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)`에서 가져온다.
 30. 현재 delta action은 매 policy step의 measured state를 기준으로 DiffIK/OSC command를 만들고 새 action이 이전 command를 대체한다. Persistent target 또는 controller-target observation을 다시 추가하지 않는다. Previous action은 command–contact response를 위한 history 후보로만 해석한다.
 31. Vision tracking 개선을 현재 method contribution으로 가져오지 않는다. Core simulation의 GT pose·OBB와 real observation 사이에는 tracker log로 calibration한 noise·bias·drift·latency·hold·dropout·outlier·OBB symmetry corruption을 적용한다. `valid/age`는 기본 입력이 아니라 실제 interface가 제공할 때의 deployment 옵션이다.
 32. Phase ID를 주지 않는 reward gate는 actor가 볼 수 없는 latch·counter·privileged transition state에 의존하지 않는다. OBB는 coarse geometry이며 point cloud 기반 surface-level geometry와 동등하다고 서술하지 않는다.
@@ -1760,7 +1793,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 37. Current UR5e arm q 6D는 actor observation에 포함한다. Arm dq·history, absolute EEF pose·twist와 fingertip feature를 함께 자동 추가하지 않는다.
 38. Rotation observation은 EEF frame을 기본으로 하되 planar yaw와 full SO(3) 과업을 구분한다. Planar이면 `sin/cos`, full SO(3)이면 6D continuous representation을 검토하고, OBB symmetry는 별도 equivalent-orientation 처리 없이 해결됐다고 간주하지 않는다.
 39. Yaw-only task라도 EEF가 shelf normal에 고정 정렬되지 않으면 EEF-frame yaw scalar만으로 축소하지 않는다. Current/target full orientation의 EEF-relative 6D observation과 shelf/task-frame yaw-only reward를 분리해 설계한다. 5D는 기본안이 아니라 representation ablation이다.
-40. VLA·IL의 약점을 strawman으로 만들지 않는다. ForceVLA·TLA·TaF-VLA와 Reactive Diffusion Policy·FoAR 같은 최신 반례를 먼저 제시한 뒤, 해당 연구의 실제 data·sensor·task·evaluation 범위 밖에 있는 Track B 조건만 gap으로 주장한다.
+40. VLA·IL의 약점을 strawman으로 만들지 않는다. [ForceVLA](https://doi.org/10.52202/085713-3124)·[TLA](https://doi.org/10.48550/arXiv.2503.08548)·[TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321)와 [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871) 같은 최신 반례를 먼저 제시한 뒤, 해당 연구의 실제 data·sensor·task·evaluation 범위 밖에 있는 Track B 조건만 gap으로 주장한다.
 41. `우리 방법이 극복한다`는 표현은 matched baseline과 ablation 결과가 있을 때만 사용한다. 현재 문헌 단계에서는 `downstream-aware contact transition과 deployable low-dimensional sensing의 공백을 겨냥한다`로 표현하고, 우리 방법의 reward engineering·sim-to-real·semantic generalization 한계도 같은 표에 기록한다.
 42. Motivation은 물류·생활 환경의 넓은 배경에서 시작하되 빠르게 contact-rich execution과 shelf blocker 문제로 좁힌다. Conventional planning/control, RL, IL과 VLA의 강점과 최신 보완 연구를 먼저 인정하고, 각 계열 전체가 해결하지 못한다고 쓰지 않는다.
 
@@ -1769,7 +1802,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 먼저 정보의 종류에 따라 기준 문서를 선택한다.
 
 1. 정리된 motivation·gap·가설은 `motivation.md`에 반영한다.
-2. 논문·서지정보·문헌 평가·baseline 후보는 `papers.md`에 반영한다.
+2. 논문·서지정보·문헌 평가·baseline 후보는 `papers/README.md`에 반영한다.
 3. 현재 연구 명세는 `research_topic.md`에 반영한다.
 4. 그 결론을 확정·변경한 이유, 이전안과의 관계, backlog는 `context.md`에 기록한다.
 
@@ -1781,7 +1814,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 4. `13. 현재 결정 레지스터`의 상태를 갱신한다.
 5. 이 문서의 Change Log에 날짜, 변경 이유와 영향받은 문서를 추가한다.
 
-`motivation.md`, `papers.md`, `research_topic.md`에는 별도 Change Log를 만들지 않는다. 한 내용을 여러 문서에 그대로 복사하지 않고 기준 문서의 링크와 필요한 최소 결론만 둔다.
+`motivation.md`, `papers/README.md`, `research_topic.md`에는 별도 Change Log를 만들지 않는다. 한 내용을 여러 문서에 그대로 복사하지 않고 기준 문서의 링크와 필요한 최소 결론만 둔다.
 
 새 결정 기록은 가능하면 아래 형식을 따른다.
 
@@ -1809,7 +1842,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 - 2026-09-16 사용자 storytelling 초안 및 후속 구체화: 물류·home service 환경의 로봇 활용, contact-rich task의 난점, conventional method의 부담, RL·IL·VLA의 등장과 한계에서 Track B로 이어지는 배경을 요청했다. 이를 model uncertainty·partial observability·hybrid dynamics, data/reward/Sim-to-Real/deployment-sensing trade-off와 Rotation-terminal/Push-initial contact compatibility로 구체화했다.
 - 2026-09-16 사용자 문서화 결정: Research motivation을 별도 `motivation.md`로 분리하고 초안을 작성했다. 실제 문제–문헌 비교–gap–method 대응–가설–claim evidence–논문 paragraph의 구조를 사용하며 기존 세 문서에는 역할에 맞는 요약과 링크를 유지한다.
-- 2026-09-16 사용자 요구 및 최신 문헌 검토: Research motivation은 VLA·IL의 한계를 구체적 최신 사례로 분석하고 장단점 표를 통해 Track B의 대응을 설명해야 한다. OpenVLA·π0.5·OpenVLA-OFT·ForceVLA·TLA·TaF-VLA·ACT·Diffusion Policy·Reactive Diffusion Policy·FoAR·3D-ViTac·SafeVLA·TORL-VLA 등을 우선 비교했으며, 일반적인 VLA/IL 비판 대신 shelf blocker의 downstream-aware contact transition과 제한된 deployable sensing으로 gap을 좁혔다.
+- 2026-09-16 사용자 요구 및 최신 문헌 검토: Research motivation은 VLA·IL의 한계를 구체적 최신 사례로 분석하고 장단점 표를 통해 Track B의 대응을 설명해야 한다. [OpenVLA](https://doi.org/10.48550/arXiv.2406.09246)·[π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[ForceVLA](https://doi.org/10.52202/085713-3124)·[TLA](https://doi.org/10.48550/arXiv.2503.08548)·[TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321)·[ACT](https://doi.org/10.48550/arXiv.2304.13705)·[Diffusion Policy](https://doi.org/10.48550/arXiv.2303.04137)·[Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)·[3D-ViTac](https://doi.org/10.48550/arXiv.2410.24091)·[SafeVLA](https://doi.org/10.52202/085713-5128)·[TORL-VLA](https://doi.org/10.48550/arXiv.2606.09337) 등을 우선 비교했으며, 일반적인 VLA/IL 비판 대신 shelf blocker의 downstream-aware contact transition과 제한된 deployable sensing으로 gap을 좁혔다.
 - 2026-09-16 사용자 결정: Research motivation의 구체화·정리를 정보·Action 명세와 공동 1순위로 진행한다. Motivation은 실제 shelf 문제, direct-push failure, preparatory rotation·contact transition·multimodal feedback의 필요성, 기존 연구의 해결 범위와 남은 gap, 검증 가설과 실험을 연결하는 작업으로 구체화했다.
 - 2026-09-15 Observation 범위 후속 확인: 사용자는 shelf·workspace state를 actor에 주지 않고 collision penalty·termination으로 제약하며, tactile은 접촉 상대에 상관없이 any-contact on으로 처리한다고 확인했다. History는 test로 정하고 F/T preprocessing은 학습환경 구성 단계에서 논의하기로 했다. Arm joint state 자체를 제외하려던 것이 아니라 과도한 kinematic feature가 문제였음을 정정했다. Rotation 연구의 통상적 표현과 EEF-frame 적용도 추가 검토했다.
 - 2026-09-15 Action·Vision 후속 확인: 사용자는 delta action이 이전 desired target에 누적되지 않고 매 순간의 current state를 기준으로 DiffIK/OSC가 새 command를 수행한다고 명확히 했다. 또한 vision tracker 안정성 개선은 연구 범위가 아니며, simulation GT observation과 real tracker 사이의 차이는 Sim-to-Real noise 주입으로 다룰 것을 제안했다. 이를 Stage 15와 최신 observation 판정에 반영했다.
@@ -1823,33 +1856,57 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 
 ### 15.2 문헌 기록 위치
 
-논문 목록, DOI·게재 상태, 논문별 방법·연결점·주의사항, 목적별 그룹과 baseline 평가는 [`papers.md`](./papers.md)를 단일 기준으로 사용한다.
+논문 목록, DOI·게재 상태, 논문별 방법·연결점·주의사항, 목적별 그룹과 baseline 평가는 [`papers/README.md`](./papers/README.md)를 단일 기준으로 사용한다.
 
-이 문서에는 문헌이 연구 결정을 바꾼 경우의 근거만 Stage·결정 레지스터·Provenance에 남긴다. 과거 B01–B27 상세 목록과 후속 탐색 자료는 내용 손실 없이 `papers.md`의 B-ID 목록과 목적별 그룹으로 통합했다.
+이 문서에는 문헌이 연구 결정을 바꾼 경우의 근거만 Stage·결정 레지스터·Provenance에 남긴다. 과거 [B01](https://doi.org/10.48550/arXiv.2509.18455)–[B27](https://openreview.net/forum?id=jf7C7EGw21) 상세 목록과 후속 탐색 자료는 내용 손실 없이 `papers/README.md`의 B-ID 목록과 목적별 그룹으로 통합했다.
 
 ## 16. Change Log
+
+### 2026-09-16 — 논문 언급의 DOI 링크 표준화
+
+- JH.Jeong의 모든 Markdown에서 논문 제목·약칭·B-ID를 DOI 중심 링크로 통일했다.
+- `core_papers.md`의 제목 자체를 DOI에 연결하고 누락되어 있던 출판 DOI·arXiv DOI를 보강했다.
+- DOI가 존재하지 않는 [B22](https://openreview.net/forum?id=dT3ZciXvNX)와 [B27](https://openreview.net/forum?id=jf7C7EGw21)은 공식 OpenReview를 명시적 예외로 유지했다.
+- 표기 우선순위와 새 논문 추가 규칙을 `papers/README.md`, Stage 28과 D-067에 기록했다.
+
+### 2026-09-16 — Pushing·Rotation/Pivoting RL Reward 문헌 확장
+
+- Pushing과 rotation/pivoting RL의 reward 항, 항을 둔 이유, Track B 활용점과 이식 한계를 원문 기준으로 비교했다.
+- 최신 IEEE RA-L 2026의 pushing·pivoting 공통 연구를 포함해 [B81](https://doi.org/10.1109/LRA.2026.3655262)–[B86](https://doi.org/10.48550/arXiv.1703.00472)을 핵심 corpus에 추가했다.
+- `papers/reward_formulation.md`를 생성하고 paper index, 목적별 그룹과 독해 가이드에 연결했다.
+- Target-orientation과 continuous rotation, task progress와 contact shaping·safety constraint를 구분했다.
+- Rotation terminal contact의 downstream Push feasibility가 기존 reward에서 직접 다뤄지지 않는다는 현재 문헌 해석을 Stage 27과 D-066에 기록했다.
+- 최종 reward 수식·weight·gate는 여전히 미결이며 논문 항을 한꺼번에 합치지 않는다는 원칙을 유지했다.
+
+### 2026-09-16 — Paper 문서 디렉터리 분할
+
+- `papers/README.md`를 문헌 포털로 만들고 질문별 추천 경로와 갱신 규칙을 추가했다.
+- 핵심 B-ID 목록, 목적별 그룹과 우선 독해 가이드를 각각 별도 페이지로 분리했다.
+- ICRA·IROS screening을 학회별 목록과 task/retrieval, sensing/state, Sim-to-Real/learning, transition/safety/geometry 주제 페이지로 나눴다.
+- 기존 `papers.md`는 새 index로 연결되는 호환 문서로 축약하고 다른 문서의 canonical link를 갱신했다.
+- Stage 26과 D-065에 디렉터리 구조와 운영 원칙을 기록했다.
 
 ### 2026-09-16 — Motivation 핵심 구조 재편
 
 - `motivation.md` 상단에 실제 상황, failure, gap, Track B 대응과 필수 검증을 한 표로 요약했다.
 - 반복되던 background·problem statement·literature comparison·RQ·claim–evidence 내용을 하나의 인과 구조로 통합했다.
 - Orientation-success와 Transition-success를 명시적으로 구분하고, MH1–MH4를 baseline·metric·가능한 주장과 한 표에서 연결했다.
-- 상세 문헌 평가는 `papers.md`에 남기고 motivation에는 대표 연구가 제거한 단순 비판과 남은 질문만 유지했다.
+- 상세 문헌 평가는 `papers/README.md`에 남기고 motivation에는 대표 연구가 제거한 단순 비판과 남은 질문만 유지했다.
 - Stage 25와 D-064에 재구성 이유와 운영 원칙을 기록했다.
 
 ### 2026-09-16 — 문서 역할과 기준 정보 재분리
 
-- `motivation.md`는 정리된 motivation, `papers.md`는 문헌 inventory·평가, `research_topic.md`는 현재 명세, `context.md`는 결정 근거·변경 이력·backlog를 담당하도록 역할을 확정했다.
-- `motivation.md`의 citation snapshot·baseline 선정 절차·참고문헌 목록·Change Log를 제거하고 문헌 정보는 `papers.md` 3.8절로 옮겼다.
+- `motivation.md`는 정리된 motivation, `papers/README.md`는 문헌 inventory·평가, `research_topic.md`는 현재 명세, `context.md`는 결정 근거·변경 이력·backlog를 담당하도록 역할을 확정했다.
+- `motivation.md`의 citation snapshot·baseline 선정 절차·참고문헌 목록·Change Log를 제거하고 문헌 정보는 `papers/README.md` 3.8절로 옮겼다.
 - `research_topic.md`의 중복 motivation 표·문헌 검토 과정·작업 우선순위를 요약·링크로 바꾸고 현재 명세만 남겼다.
-- `context.md`의 B01–B27 상세 문헌 목록을 `papers.md`로 일원화하고 Stage 24, D-062–D-063과 문서 갱신 규칙을 추가했다.
+- `context.md`의 [B01](https://doi.org/10.48550/arXiv.2509.18455)–[B27](https://openreview.net/forum?id=jf7C7EGw21) 상세 문헌 목록을 `papers/README.md`로 일원화하고 Stage 24, D-062–D-063과 문서 갱신 규칙을 추가했다.
 
 ### 2026-09-16 — 최신 구체 연구 기반 Baseline 계층화
 
-- π0 공개일 이후의 정식 게재를 최신 baseline 선정 기준으로 확정하고 venue·citation·task directness·reproducibility를 함께 평가하도록 했다.
-- π0.5·OpenVLA-OFT·ForceVLA, RDP·FoAR, VTDexManip·FORGE·Privileged Action·OmniReset, DyWA·DexMove·GD2P의 역할을 구체화했다.
+- [π0](https://doi.org/10.48550/arXiv.2410.24164) 공개일 이후의 정식 게재를 최신 baseline 선정 기준으로 확정하고 venue·citation·task directness·reproducibility를 함께 평가하도록 했다.
+- [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)·[ForceVLA](https://doi.org/10.52202/085713-3124), [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871), [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21)·[FORGE](https://doi.org/10.1109/LRA.2025.3551637)·[Privileged Action](https://doi.org/10.48550/arXiv.2502.15442)·[OmniReset](https://doi.org/10.48550/arXiv.2603.15789), [DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)의 역할을 구체화했다.
 - Matched experimental, component, closest-task system, high-impact reference baseline을 분리했다.
-- Stage 23, D-060–D-061, backlog와 B73–B80 문헌을 반영하고 OpenVLA-OFT venue를 RSS 2025로 정정했다.
+- Stage 23, D-060–D-061, backlog와 [B73](https://doi.org/10.1109/LRA.2025.3551637)–[B80](https://doi.org/10.48550/arXiv.2405.10315) 문헌을 반영하고 [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017) venue를 RSS 2025로 정정했다.
 
 ### 2026-09-16 — 연구 시작 배경 Storytelling 구체화
 
@@ -1857,13 +1914,13 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - Conventional method의 장점과 정확한 모델·contact mode·uncertainty 표현 부담을 함께 서술하도록 정정했다.
 - RL·IL·VLA의 장점과 reward·demonstration coverage·physical grounding·Sim-to-Real 한계를 구분했다.
 - 최종 gap을 Rotation terminal contact와 downstream Push initial contact의 compatibility로 좁혔다.
-- Stage 22, D-059, provenance, 후속 Agent 지침과 B66–B72 문헌을 반영했다.
+- Stage 22, D-059, provenance, 후속 Agent 지침과 [B66](https://doi.org/10.15607/RSS.2023.XIX.039)–[B72](https://doi.org/10.48550/arXiv.2412.09743) 문헌을 반영했다.
 
 ### 2026-09-16 — Research Motivation 전용 문서 생성
 
 - `motivation.md`를 새로 만들고 problem statement, shelf failure, 최신 VLA·IL 및 task-specific 비교, research gap과 method 대응을 통합했다.
 - MH1–MH4와 claim–evidence matrix, 논문용 paragraph, 예상 반론과 최소 검증 실험을 초안으로 작성했다.
-- `research_topic.md`, `papers.md`와 `context.md`에 새 문서의 역할과 링크를 추가했다.
+- `research_topic.md`, `papers/README.md`와 `context.md`에 새 문서의 역할과 링크를 추가했다.
 - Stage 21, D-058과 provenance를 갱신했다.
 
 ### 2026-09-16 — 최신 VLA·IL 사례 기반 Motivation 비교표 추가
@@ -1871,7 +1928,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - Generalist·fast VLA, force/tactile VLA, demonstration IL, reactive multimodal IL과 RL-refined VLA의 장점·Track B 관점 한계·우리 대응·우리 한계를 같은 표에서 비교했다.
 - `VLA는 force를 모른다`, `IL은 reactive하지 않다` 같은 오래된 일반화를 폐기하고 최신 반례를 명시했다.
 - 현재 gap을 unknown shelf blocker의 downstream-aware Rotation→Push contact transition, deployable coarse sensing과 privileged simulation supervision으로 좁혔다.
-- `papers.md`에 B41–B65를 추가하고 목적별 VLA·IL motivation 그룹을 만들었다.
+- `papers/README.md`에 [B41](https://doi.org/10.48550/arXiv.2406.09246)–[B65](https://doi.org/10.52202/085713-3671)를 추가하고 목적별 VLA·IL motivation 그룹을 만들었다.
 - Stage 20, D-056–D-057, backlog, provenance와 후속 Agent 지침을 함께 갱신했다.
 
 ### 2026-09-16 — Research Motivation을 공동 1순위로 설정
@@ -1879,7 +1936,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - Research motivation의 구체화·정리를 observation·privileged information·action contract 작업과 공동 1순위로 올렸다.
 - `research_topic.md`에 practical/scientific motivation의 인과 구조와 MH1–MH4 검증 가설을 추가했다.
 - Direct push, preparatory rotation, downstream-aware contact transition, multimodal feedback과 unseen-object adaptation을 baseline·metric으로 연결할 작업을 정의했다.
-- `papers.md`의 우선 독해를 motivation과 observation 두 경로로 나누고, 신규 ICRA·IROS screening을 gap matrix 작성에 사용하는 방법을 명시했다.
+- `papers/README.md`의 우선 독해를 motivation과 observation 두 경로로 나누고, 신규 ICRA·IROS screening을 gap matrix 작성에 사용하는 방법을 명시했다.
 - Stage 19, D-055, backlog, provenance와 후속 Agent 지침을 갱신했다.
 
 ### 2026-09-15 — Stage 17까지의 Observation 명세 전반 동기화
@@ -1888,7 +1945,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - 전체 MLP 차원을 `33+K_bM+6K_w+12K_a`, 모든 history가 한 step일 때를 `51+M`으로 정정했다.
 - Full orientation observation과 shelf/task-frame yaw-only reward를 분리하고, symmetry-aware yaw error를 current criterion으로 명시했다.
 - 과거 `27+...` 차원과 planar/full 양자택일 제안은 Stage·결정 레지스터의 이력으로 남기고 current specification이 아님을 표시했다.
-- Robot/hand state 표의 arm q 제외 문장을 최신 합의에 맞게 정정하고 `papers.md` B38에 5D/6D 구현 차이와 공식 project link를 추가했다.
+- Robot/hand state 표의 arm q 제외 문장을 최신 합의에 맞게 정정하고 `papers/README.md` [B38](https://doi.org/10.1109/CVPR.2019.00589)에 5D/6D 구현 차이와 공식 project link를 추가했다.
 
 ### 2026-09-15 — 5D Rotation 해석과 Moving EEF의 Yaw Observation 검토
 
@@ -1896,7 +1953,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - EEF가 roll/pitch까지 움직일 때 EEF-frame yaw가 shelf-plane yaw와 같지 않다는 좌표계 조건을 명시했다.
 - Current/target orientation은 EEF-relative 6D로 관측하고 reward·success는 shelf/task-frame yaw만 평가하는 조합을 Agent 권고안으로 추가했다.
 - 6D를 baseline, 5D를 representation ablation 후보로 구분하고 전체 observation 차원 영향을 기록했다.
-- `research_topic.md`의 rotation 검토와 `papers.md` B38 활용 근거를 함께 갱신했다.
+- `research_topic.md`의 rotation 검토와 `papers/README.md` [B38](https://doi.org/10.1109/CVPR.2019.00589) 활용 근거를 함께 갱신했다.
 
 ### 2026-09-15 — Shelf·Tactile·Arm 범위 확정과 Rotation 표현 검토
 
@@ -1905,7 +1962,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - UR5e current arm q 6D를 최소 observation에 복원해 차원식을 `27+K_bM+6K_w+12K_a`로 갱신했다.
 - History 길이는 실험 항목으로, F/T preprocessing과 normalization 수치는 학습환경 구현 단계로 이관했다.
 - Arbitrary reorientation, continuous-axis rotation과 planar pushing의 goal 표현을 비교하고 EEF-frame planar `sin/cos` 및 full-SO(3) 6D 후보를 정리했다.
-- `papers.md`에 B38–B40을 추가했다.
+- `papers/README.md`에 [B38](https://doi.org/10.1109/CVPR.2019.00589)–[B40](https://doi.org/10.48550/arXiv.2309.09979)을 추가했다.
 
 ### 2026-09-15 — DiffIK/OSC Delta Action과 Vision Sim-to-Real 범위 정정
 
@@ -1921,7 +1978,7 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - 누적 delta controller의 current target과 stale vision의 valid/age를 조건부 필수 후보로 분리했다.
 - Previous action, controller target, hand motion과 object motion history를 확정 추가하지 않고 failure-driven ablation으로 구분했다.
 - Phase-free actor의 gate observability 조건과 OBB의 coarse-geometry 주장 범위를 명시했다.
-- DexTouch가 previous controller target을 사용한다는 잘못된 귀속을 수정하고, 해당 근거를 `Rotating without Seeing`로 한정했다.
+- [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)가 previous controller target을 사용한다는 잘못된 귀속을 수정하고, 해당 근거를 `[Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)`로 한정했다.
 
 ### 2026-09-15 — 사용자 검토를 반영한 최소 MLP Observation 구체화
 
@@ -1934,36 +1991,36 @@ Sweeping과 Handling은 폐기하지 않고 Track 내부의 task/mode 후보로 
 - MLP history를 tactile·wrench·action의 observation block으로 명시하고 modality별 `K_b/K_w/K_a`와 차원식을 추가했다.
 - Phase, velocity, 다수 중복 kinematic feature와 raw/dense perception을 현재 최소 observation에서 제외했다.
 
-### 2026-09-15 — 선행연구와 Isaac Lab 구현 범위를 연결한 Observation 초안
+### 2026-09-15 — 선행연구와 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 범위를 연결한 Observation 초안
 
-- 각 observation 후보를 문헌의 실제 입력·가공, Isaac Lab 원천 데이터, policy 표현, 실물 대응과 한계로 연결하는 형식을 도입했다.
-- DexTouch, Rotating without Seeing, VTDexManip, Robot Synesthesia, Visuotactile Estimation and Control과 DexMove의 observation 구성을 비교했다.
+- 각 observation 후보를 문헌의 실제 입력·가공, [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 원천 데이터, policy 표현, 실물 대응과 한계로 연결하는 형식을 도입했다.
+- [DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036), [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21), [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532), [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157)과 [DexMove](https://openreview.net/forum?id=dT3ZciXvNX)의 observation 구성을 비교했다.
 - Structured goal·pose·OBB, proprioception·kinematics, filtered wrist wrench, binary tactile, previous action과 validity/age로 이루어진 최소 vector baseline을 Agent 추천안으로 정리했다.
 - ContactSensor binary의 hysteresis·debounce·randomization, vision perception proxy, F/T frame·bias 보정과 multi-rate history 처리 방안을 기록했다.
-- Geometry point cloud, spatial tactile, continuous force, raw RGB와 TacSL/TacEx optical tactile를 확장·ablation으로 분리했다.
-- Isaac Lab/Isaac Sim 버전 및 RH56E2 tactile variant·실제 packet 확인을 구현 전 blocker로 추가했다.
+- Geometry point cloud, spatial tactile, continuous force, raw RGB와 [TacSL](https://doi.org/10.1109/TRO.2025.3547267)/[TacEx](https://doi.org/10.48550/arXiv.2411.04776) optical tactile를 확장·ablation으로 분리했다.
+- [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)/Isaac Sim 버전 및 RH56E2 tactile variant·실제 packet 확인을 구현 전 blocker로 추가했다.
 
 ### 2026-09-15 — 전체 Phase Reward 설계를 위한 정보·Action 명세 우선
 
 - Baseline 독해를 단독 최우선으로 두던 순서를 변경하고, policy observation과 privileged information을 먼저 구분한 뒤 전체 phase reward를 설계하기로 했다.
 - Action은 EEF frame의 delta pose와 hand joint action으로 구성하는 방향을 기록했다. 세부 action semantics와 controller interface는 미결로 남겼다.
 - 각 reward term에 task·물리·안전·failure mode 또는 문헌 근거를 연결하는 원칙을 추가했다.
-- 기존 baseline·GD2P·Approach reward 분석은 폐기하지 않고 reward 근거와 비교 실험을 위한 병행 자료로 보존했다.
+- 기존 baseline·[GD2P](https://doi.org/10.48550/arXiv.2509.18455)·Approach reward 분석은 폐기하지 않고 reward 근거와 비교 실험을 위한 병행 자료로 보존했다.
 
 ### 2026-09-15 — Baseline 우선 검토와 1단계 contribution·목표 선택 경계 명확화
 
-- Reward formulation보다 baseline의 전체 해결 방식을 먼저 검토하도록 현재 우선순위를 수정했다. 이전 GD2P energy·Approach reward 분석과 당시 읽기 순서는 이력으로 보존했다.
+- Reward formulation보다 baseline의 전체 해결 방식을 먼저 검토하도록 현재 우선순위를 수정했다. 이전 [GD2P](https://doi.org/10.48550/arXiv.2509.18455) energy·Approach reward 분석과 당시 읽기 순서는 이력으로 보존했다.
 - 목표 방향의 pushing을 위한 준비 조작이라는 사용자 관점을 반영하고, contribution을 Approach에만 한정하는 해석을 정정했다.
 - 1단계에서 적합한 목표 물체 자세를 선택하는 주체는 상위 모듈이며, policy는 주어진 회전·병진 목표에 맞춰 손 구성과 접촉 상태를 형성·전환·보정한다는 경계를 재확인했다.
 - 합의된 contribution 후보 표현과 아직 검증되지 않은 method novelty·성능·비교 실험을 분리했다.
 - Stage 8–10에 baseline 추천의 변경 과정, Agent의 모호한 표현, 사용자의 지적과 최종 확인을 기록했다.
-- 현재 요약·대체 관계·결정 레지스터·backlog·후속 Agent 지침을 함께 갱신하고 B21–B27 및 후보별 역할·한계를 추가했다.
+- 현재 요약·대체 관계·결정 레지스터·backlog·후속 Agent 지침을 함께 갱신하고 [B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011)–[B27](https://openreview.net/forum?id=jf7C7EGw21) 및 후보별 역할·한계를 추가했다.
 - `research_topic.md`에도 현재 역할 경계와 후보 framing을 반영했다. Track A, Track B 센서 조건, 기존 2단계 확장과 미결 설계는 유지했다.
 
-### 2026-09-14 — Track B 1단계 초점·GD2P 분석·DOI 참고문헌 보강
+### 2026-09-14 — Track B 1단계 초점·[GD2P](https://doi.org/10.48550/arXiv.2509.18455) 분석·DOI 참고문헌 보강
 
 - Track B의 1단계 low-level policy와 Approach hand configuration reward를 현재 우선 작업으로 명시했다.
-- GD2P의 생성 대상·학습 방식·실행 방식에 대한 정정, energy 6항의 의미와 공개 코드 차이를 기록했다.
+- [GD2P](https://doi.org/10.48550/arXiv.2509.18455)의 생성 대상·학습 방식·실행 방식에 대한 정정, energy 6항의 의미와 공개 코드 차이를 기록했다.
 - Wrench-space 평가와 downstream execution value를 후속 동작 적합성의 작업 가설로 구분했다.
 - 관련 논문 17편과 배경 논문 3편의 DOI·출판 상태·방법·활용점·한계를 추가했다.
 - 현재 요약·우선 읽기 순서·Stage 7·대체 관계·결정 레지스터·미결 목록을 함께 갱신했다.
