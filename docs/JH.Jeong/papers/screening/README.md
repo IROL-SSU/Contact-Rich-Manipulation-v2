@@ -2,6 +2,8 @@
 
 > [Paper Index](../README.md) · [ICRA 연도별](./icra.md) · [IROS 연도별](./iros.md)
 
+이 디렉터리는 핵심 논문을 설명하는 본문이 아니라 **새 후보를 빠짐없이 찾기 위한 screening appendix**다. 먼저 아래 선정 범위와 근거 수준을 확인한 뒤, 연구 질문에 맞는 주제 페이지로 이동한다. 연도별 목록은 특정 conference paper를 찾을 때만 사용한다.
+
 ## 검토 범위와 선정 기준
 
 `docs/ICRA&IROS`의 10개 CSV에 수록된 **2,050편 전부**를 제목·초록·Author Keywords·IEEE Terms 기준으로 확인했다. 모든 논문이 reinforcement learning 검색 결과에 포함되었더라도, 아래 목록에는 Track B의 현재 문제 또는 문서화된 설계 미결 항목에 구체적인 근거를 주는 논문만 남겼다.

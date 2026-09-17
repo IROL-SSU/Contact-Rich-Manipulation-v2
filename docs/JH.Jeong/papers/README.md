@@ -1,46 +1,66 @@
-﻿# JH.Jeong Paper Index
+# Track B Literature Map
 
-> **범위:** Track B 연구를 위해 수집·검토한 논문과 baseline 후보의 탐색 포털
+> **문서 역할:** 논문을 나열하는 목록이 아니라, 현재 연구 질문에서 필요한 근거로 이동하는 진입점이다.
 >
-> **최종 갱신:** 2026-09-16
+> **최종 갱신:** 2026-09-17
 
 ---
 
-## 빠른 탐색
+## 1. 처음 들어왔다면
 
-| 찾으려는 정보 | 이동할 페이지 |
-| --- | --- |
-| [B01](https://doi.org/10.48550/arXiv.2509.18455)–[B86](https://doi.org/10.48550/arXiv.1703.00472)의 제목·게재 정보·DOI·공식 자료 | [핵심 B-ID 논문 목록](./core_papers.md) |
-| 연구 목적별 관련 논문과 Track B 연결점 | [목적별 논문 그룹](./topic_groups.md) |
-| Motivation·observation을 위한 우선 독해 순서 | [우선 독해 가이드](./reading_guide.md) |
-| Pushing·rotation/pivoting RL의 reward 항과 설계 이유 | [Reward formulation 문헌 비교](./reward_formulation.md) |
-| ICRA·IROS 2021–2025 전수 screening | [Conference Screening Index](./screening/README.md) |
+문헌 전체를 ID 순서로 읽지 않는다. 현재 목적에 따라 다음 경로 중 하나를 선택한다.
 
-## 질문별 추천 경로
+### 연구의 필요성과 gap을 검토할 때
 
-| 현재 질문 | 먼저 볼 페이지 | 함께 볼 페이지 |
+1. [`../motivation.md`](../motivation.md)에서 현재 주장과 research question을 확인한다.
+2. [`topic_groups.md`](./topic_groups.md#8-최신-vlail-기반-research-motivation)에서 최신 VLA·IL·RL이 이미 해결한 부분과 남은 질문을 비교한다.
+3. [`reading_guide.md`](./reading_guide.md#1-motivation을-검증하는-독해-경로)의 순서대로 핵심 원문을 읽는다.
+4. 정확한 서지정보와 공식 원문은 [`core_papers.md`](./core_papers.md)에서 찾는다.
+
+### Policy observation을 설계할 때
+
+1. [`../policy_learning.md`](../policy_learning.md#3-observation-v03)에서 현재 66D baseline을 확인한다.
+2. [`reading_guide.md`](./reading_guide.md#2-observation을-검증하는-독해-경로)에서 각 입력을 사용한 이유를 따라간다.
+3. 더 넓은 후보가 필요하면 [`topic_groups.md`](./topic_groups.md#7-policy-observation-표현과-isaac-lab-구현-근거)와 [Sensing and State screening](./screening/sensing_and_state.md)을 검색한다.
+
+### Reward를 설계할 때
+
+1. [`reward_formulation.md`](./reward_formulation.md)에서 pushing·pivoting reward를 failure별로 비교한다.
+2. [`reading_guide.md`](./reading_guide.md#3-reward를-검증하는-독해-경로)의 순서로 원문을 확인한다.
+3. 넓은 reward·safety·transition 후보는 [Sim-to-Real and Learning](./screening/sim2real_and_learning.md)과 [Transitions, Safety and Geometry](./screening/transitions_safety_geometry.md)에서 찾는다.
+
+---
+
+## 2. 문서별 역할
+
+| 문서 | 용도 | 읽는 방식 |
 | --- | --- | --- |
-| 최신 VLA·IL·RL과 Track B의 gap은 무엇인가? | [목적별 그룹 — 최신 VLA·IL motivation](./topic_groups.md#8-최신-vlail-기반-research-motivation) | [핵심 B-ID 목록](./core_papers.md) |
-| Rotation–Push transition과 contact configuration을 어떻게 비교할 것인가? | [목적별 그룹 — Rotation–Push 연결](./topic_groups.md#2-rotationpush-연결과-phasecontact-전환) | [우선 독해 가이드](./reading_guide.md) |
-| Pushing과 rotation/pivoting reward를 어떤 근거로 구성할 것인가? | [Reward formulation 문헌 비교](./reward_formulation.md) | [목적별 그룹 — Reward formulation](./topic_groups.md#10-reward-formulation--pushing과-rotationpivoting) |
-| Observation·history·tactile·F/T의 근거는 무엇인가? | [목적별 그룹 — Policy Observation](./topic_groups.md#7-policy-observation-표현과-isaac-lab-구현-근거) | [Observation 독해 가이드](./reading_guide.md#2-observation-formulation) |
-| 특정 ICRA/IROS 논문을 연도별로 찾고 싶다. | [ICRA 목록](./screening/icra.md) 또는 [IROS 목록](./screening/iros.md) | [Screening Index](./screening/README.md) |
-| Broad screening 결과를 연구 주제별로 찾고 싶다. | [Screening Index의 주제별 링크](./screening/README.md#주제별-screening) | 해당 주제 페이지 |
+| [`core_papers.md`](./core_papers.md) | B-ID, 제목, venue, DOI와 공식 자료의 기준 목록 | 특정 ID나 제목을 찾는 lookup table |
+| [`topic_groups.md`](./topic_groups.md) | 논문을 Track B의 연구 질문별로 묶고 활용점·한계를 비교 | 필요한 질문의 절만 읽는 synthesis |
+| [`reading_guide.md`](./reading_guide.md) | Motivation, observation, reward별 우선 독해 순서 | 위에서 아래로 읽는 작업 순서 |
+| [`reward_formulation.md`](./reward_formulation.md) | Reward term, 해결 failure, 이식 가능성과 위험 분석 | 결론→pushing→rotation→Track B 합성 순으로 읽는 분석문 |
+| [`screening/`](./screening/README.md) | ICRA·IROS 2021–2025의 넓은 후보군 | 핵심 corpus 밖의 후보를 검색하는 appendix |
 
-## 문서 체계
+`core_papers.md`와 `screening/`은 순차 서술문이 아니다. 반대로 `reading_guide.md`와 `reward_formulation.md`는 논리가 이어지도록 처음부터 읽을 수 있게 구성한다.
 
-- `[B01](https://doi.org/10.48550/arXiv.2509.18455)–[B86](https://doi.org/10.48550/arXiv.1703.00472)`은 핵심 corpus의 고정 ID다. 새 핵심 논문은 검토 후 `B87`부터 부여한다.
-- `ICRAyy-NNN`과 `IROSyy-NNN`은 conference screening용 ID이며 핵심 B-ID와 구분한다.
-- 목록 포함은 baseline 선정, 방법 채택 또는 재현 완료를 뜻하지 않는다.
-- 모든 문서에서 논문 제목·약칭·B-ID는 해당 논문의 DOI URL에 직접 연결한다. 정식 출판 DOI를 우선하고, 정식 DOI가 없지만 arXiv 원문이 있으면 arXiv DOI(`10.48550/arXiv...`)를 사용한다.
-- DOI와 arXiv 원문이 모두 없는 논문은 예외적으로 공식 학회 원문에 연결하고 `DOI 없음`을 명시한다. 현재 이 예외는 [B22](https://openreview.net/forum?id=dT3ZciXvNX)와 [B27](https://openreview.net/forum?id=jf7C7EGw21)이다.
-- 논문이 연구 결정을 바꾼 이유는 [`../context.md`](../context.md), 정리된 gap은 [`../motivation.md`](../motivation.md), 현재 명세는 [`../research_topic.md`](../research_topic.md)를 따른다.
+---
 
-## 갱신 원칙
+## 3. ID와 근거 수준
 
-1. 새 핵심 논문은 [핵심 B-ID 목록](./core_papers.md)에 먼저 추가한다.
-2. 관련된 모든 목적 그룹에 같은 B-ID를 연결한다.
-3. 읽기 우선순위가 달라질 때만 [우선 독해 가이드](./reading_guide.md)를 수정한다.
-4. Conference screening에서 승격한 논문은 기존 screening ID를 유지하면서 새 B-ID와 교차참조한다.
-5. 문헌 때문에 연구 명세·motivation이 바뀌면 변경 이유는 `context.md`에 기록한다.
-6. 논문을 다른 문서에서 새로 언급할 때는 plain text로 두지 않고 위 DOI 우선순위에 따라 제목 또는 약칭 자체에 링크한다.
+- `B01–B89`는 상세 검토 대상으로 승격한 핵심 corpus의 고정 ID다. 새 논문은 검토 후 `B90`부터 부여한다.
+- `ICRAyy-NNN`, `IROSyy-NNN`은 conference screening ID이며 핵심 B-ID와 구분한다.
+- 목록에 포함됐다는 사실은 baseline 채택, 방법 재현 또는 논문 claim의 검증을 의미하지 않는다.
+- `screening`은 초록 수준, `core_papers`는 서지 확인, `topic_groups`와 `reward_formulation`은 연구 질문에 연결한 분석이라는 근거 수준 차이가 있다.
+
+논문 링크는 정식 출판 DOI를 우선하고, 정식 DOI가 없으면 arXiv DOI를 사용한다. 두 DOI가 모두 없을 때만 공식 학회 원문을 사용하며 `DOI 없음`을 표시한다. 현재 명시적 예외는 [B22](https://openreview.net/forum?id=dT3ZciXvNX)와 [B27](https://openreview.net/forum?id=jf7C7EGw21)이다.
+
+---
+
+## 4. 갱신 절차
+
+1. 새 논문의 venue, DOI와 공식 원문을 확인한다.
+2. 핵심 corpus에 포함할 가치가 있으면 [`core_papers.md`](./core_papers.md)에 B-ID를 부여한다.
+3. 논문이 답하는 연구 질문에 따라 [`topic_groups.md`](./topic_groups.md)의 관련 절에 연결한다.
+4. 독해 우선순위를 바꿀 정도로 중요할 때만 [`reading_guide.md`](./reading_guide.md)를 수정한다.
+5. Reward term의 근거가 되면 [`reward_formulation.md`](./reward_formulation.md)에 `항 → 해결 failure → Track B 이식 조건`을 기록한다.
+6. 연구 명세나 motivation이 바뀌면 해당 기준 문서를 갱신하고 변경 이유는 [`../context.md`](../context.md)에 남긴다.

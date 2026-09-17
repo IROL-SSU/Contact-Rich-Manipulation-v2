@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [Paper Index](../README.md)
 
+> **읽는 순서:** Sim-to-Real mismatch를 먼저 파악하고, 이를 실행하는 action·controller interface를 확인한 뒤, reward·curriculum·exploration 방법으로 이어서 본다.
+
 ## 1. Sim-to-Real·Domain Randomization·System Identification
 
 마찰·강성·actuator·sensor parameter 식별, domain randomization/adaptation과 real-to-sim-to-real 절차를 전이 전략에 연결한다.

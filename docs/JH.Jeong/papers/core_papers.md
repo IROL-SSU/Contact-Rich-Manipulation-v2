@@ -2,7 +2,12 @@
 
 > [Paper Index](./README.md) · [목적별 그룹](./topic_groups.md) · [우선 독해](./reading_guide.md) · [Conference Screening](./screening/README.md)
 
-[B01](https://doi.org/10.48550/arXiv.2509.18455)–[B86](https://doi.org/10.48550/arXiv.1703.00472)의 서지정보와 공식 자료를 ID 순서로 정리한다. 목적별 해석과 baseline 역할은 [목적별 논문 그룹](./topic_groups.md)을 따른다.
+[B01](https://doi.org/10.48550/arXiv.2509.18455)–[B89](https://doi.org/10.1109/ICRA57147.2024.10611300)의 서지정보와 공식 자료를 ID 순서로 정리한다. 이 페이지는 **논문을 순서대로 설명하는 본문이 아니라 서지정보의 단일 기준표**다.
+
+- 연구 질문별 해석과 baseline 역할이 필요하면 [목적별 논문 그룹](./topic_groups.md)으로 이동한다.
+- 실제로 읽을 순서가 필요하면 [우선 독해 가이드](./reading_guide.md)로 이동한다.
+- 넓은 후보군에서 새 논문을 찾으려면 [Conference Screening](./screening/README.md)으로 이동한다.
+- 아래 표에서는 브라우저 검색으로 B-ID, 제목, 약칭 또는 venue를 찾는다.
 
 
 | ID | 논문 | 발표 | 핵심 분류 | DOI | 원문·공식 자료 |
@@ -93,5 +98,8 @@
 | [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | [Learning Goal-Oriented Non-Prehensile Pushing in Cluttered Scenes](https://doi.org/10.1109/IROS47612.2022.9981873) | IROS 2022; screening [IROS22-013](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal/path distance; contact maintenance; collision reward | [Publication DOI](https://doi.org/10.1109/IROS47612.2022.9981873) | [Paper](https://arxiv.org/abs/2203.02389) |
 | [B85](https://doi.org/10.1109/ICRA48891.2023.10161271) | [Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) | ICRA 2023; screening [ICRA23-103](https://doi.org/10.1109/ICRA48891.2023.10161271) | Target-orientation pivoting; state/action projection; zero-shot object generalization | [Publication DOI](https://doi.org/10.1109/ICRA48891.2023.10161271) | [Paper](https://arxiv.org/abs/2305.02554) |
 | [B86](https://doi.org/10.48550/arXiv.1703.00472) | [Reinforcement Learning for Pivoting Task](https://doi.org/10.48550/arXiv.1703.00472) | arXiv 2017 | Target-angle-error pivoting; historical minimal reward baseline | [arXiv DOI](https://doi.org/10.48550/arXiv.1703.00472) | [Paper](https://arxiv.org/abs/1703.00472) |
+| [B87](https://doi.org/10.48550/arXiv.2509.17812) | [Tac2Motion: Contact-Aware Reinforcement Learning with Tactile Feedback for Robotic Hand Manipulation](https://doi.org/10.48550/arXiv.2509.17812) | arXiv 2025 | Firm-contact reward; contact-release reward; tactile RL; finger gaiting | [arXiv DOI](https://doi.org/10.48550/arXiv.2509.17812) | [Paper](https://arxiv.org/abs/2509.17812) |
+| [B88](https://doi.org/10.1109/LRA.2026.3677744) | [Grasp to Act: Dexterous Grasping for Tool Use in Dynamic Settings](https://doi.org/10.1109/LRA.2026.3677744) | IEEE RA-L 2026 | Task-informed grasp optimization; residual RL grasp adaptation; slip reduction | [Publication DOI](https://doi.org/10.1109/LRA.2026.3677744) | [Publication](https://ieeexplore.ieee.org/document/11455929/), [Project](https://grasp2act.github.io/) |
+| [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) | [Dexterous In-hand Manipulation by Guiding Exploration with Simple Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) | ICRA 2024; arXiv 2023 | Guided RL exploration; contact switching; finger gaiting | [Publication DOI](https://doi.org/10.1109/ICRA57147.2024.10611300) | [Paper](https://arxiv.org/abs/2303.03533), [Project](https://roamlab.github.io/vge/) |
 
 ---

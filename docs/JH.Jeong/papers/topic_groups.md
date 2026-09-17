@@ -2,7 +2,21 @@
 
 > [Paper Index](./README.md) · [핵심 B-ID 목록](./core_papers.md) · [우선 독해](./reading_guide.md) · [Conference Screening](./screening/README.md)
 
-아래 그룹은 논문을 읽고 비교할 목적에 따른 분류다. 동일 논문을 여러 그룹에 중복해 배치한다.
+이 문서는 핵심 논문을 연구 질문별로 다시 묶은 **lookup-oriented synthesis**다. 처음부터 모든 절을 순서대로 읽기보다 아래 경로에서 현재 질문에 맞는 절로 이동한다. 동일 논문이 여러 질문에 답하면 중복 배치한다.
+
+## 이 문서를 사용하는 순서
+
+| 현재 목적 | 먼저 읽을 절 | 다음에 읽을 절 |
+| --- | --- | --- |
+| 연구 motivation과 최신 baseline 파악 | 8. 최신 VLA·IL 기반 motivation | 9. Conventional/Learning trade-off → 1–2. closest task·transition |
+| Approach hand configuration 검토 | 1. Hand·Contact Configuration | 6. Hand-pose·접촉 품질 → 2. Phase 전환 |
+| Tactile·F/T observation 검토 | 3. Closed-loop contact 보정 | 7. Observation 표현과 구현 근거 |
+| Goal-conditioned manipulation 범위 검토 | 4. Nonprehensile manipulation | 5. Retrieval·2단계 확장 |
+| Reward formulation 검토 | 10. Reward formulation | [`reward_formulation.md`](./reward_formulation.md) |
+
+각 절의 표는 `관련 논문 → 이미 해결한 부분 → Track B에서 남는 질문`의 순서로 읽는다.
+
+---
 
 ## 1. Track B 1단계 핵심 — 주어진 방향의 Pushing을 위한 Hand·Contact Configuration
 
@@ -10,6 +24,7 @@
 | --- | --- | --- | --- |
 | ★ | [B01](https://doi.org/10.48550/arXiv.2509.18455) | [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | 물체 geometry와 pushing direction으로 다지 손 pre-contact pose를 생성·선택하고 실제 push 성공으로 검증하는 방법 |
 | ★ | [B02](https://doi.org/10.1109/IROS58592.2024.10802652) | [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) | Task wrench에 적합한 다지 손 contact configuration을 평가·합성하는 방법 |
+| ★ | [B88](https://doi.org/10.1109/LRA.2026.3677744) | [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) | Task-informed 초기 grasp와 작은 residual joint correction을 결합해 동적 외력 아래 slip을 줄이는 방법 |
 | ★ | [B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011) | [Learning Contact Locations for Pushing and Orienting Unknown Objects](https://doi.org/10.1109/HUMANOIDS.2013.7030011) | 안정적인 직선 밀기와 준비 회전을 위한 contact location을 물체 형상에서 선택하는 고전적 관점 |
 |  | [B23](https://doi.org/10.1109/IROS47612.2022.9982177) | [Task-Oriented Contact Optimization](https://doi.org/10.1109/IROS47612.2022.9982177) | 주어진 물체 궤적을 적은 접촉력으로 수행하기 위한 contact placement 최적화 |
 |  | [B30](https://doi.org/10.48550/arXiv.2305.03942) | [HACMan](https://doi.org/10.48550/arXiv.2305.03942) | Point cloud에서 contact location과 접촉 후 motion parameter를 함께 학습하는 action representation |
@@ -36,6 +51,9 @@
 | [B74](https://doi.org/10.48550/arXiv.2502.15442) | [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442) | Virtual force·constraint relaxation curriculum으로 phase label 없이 push·pivot·grasp를 포함한 long-horizon behavior를 탐색하는 방식 |
 | [B75](https://doi.org/10.48550/arXiv.2603.15789) | [Emergent Dexterity / OmniReset](https://doi.org/10.48550/arXiv.2603.15789) | Diverse reset state가 multi-phase contact behavior와 recovery 탐색을 단순화하는 방식 |
 | [B76](https://doi.org/10.48550/arXiv.2510.11019) | [Refinery](https://doi.org/10.48550/arXiv.2510.11019) | 개별 contact policy의 취약한 initial-state 영역을 fine-tuning하고 policy chaining 성공률을 높이는 방식 |
+| [B87](https://doi.org/10.48550/arXiv.2509.17812) | [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812) | Firm contact와 선택적 contact release를 함께 보상하여 grasp 유지와 smooth finger gaiting을 동시에 학습하는 방식 |
+| [B88](https://doi.org/10.1109/LRA.2026.3677744) | [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) | 좋은 초기 grasp를 유지하되 residual joint correction으로 slip과 외력 변화에 적응하는 방식 |
+| [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) | [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) | 나머지 손가락의 지지를 유지하면서 한 손가락의 접촉을 해제·재형성하는 contact switching이 큰 조작 범위에 필요한 사례 |
 
 ## 3. Tactile·F/T 기반 Closed-Loop Contact 형성·보정
 
@@ -64,6 +82,7 @@
 | [B80](https://doi.org/10.48550/arXiv.2405.10315) | [TRANSIC](https://doi.org/10.48550/arXiv.2405.10315) | Simulation base policy의 real-world failure를 human correction 기반 residual policy로 보완하는 Sim-to-Real baseline |
 | [B81](https://doi.org/10.1109/LRA.2026.3655262) | [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) | Wrist force와 extrinsic contact를 deployment observation과 privileged training signal로 분리하고 force magnitude가 아닌 방향을 reference와 맞추는 방식 |
 | [B83](https://doi.org/10.3389/fnbot.2023.1271607) | [Adaptive Reaching and Pushing](https://doi.org/10.3389/fnbot.2023.1271607) | Contact-force 방향과 lever arm을 privileged reward로 사용해 goal-directed translation을 유도하는 방식 |
+| [B87](https://doi.org/10.48550/arXiv.2509.17812) | [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812) | Tactile observation과 firm-contact·contact-release reward를 결합하며, release만 장려해서는 유의미한 finger gaiting이 형성되지 않았다는 ablation |
 
 ## 4. Goal-Conditioned Nonprehensile Manipulation과 Contact 선택
 
@@ -107,22 +126,24 @@
 | [B18](https://doi.org/10.1109/LRA.2021.3129138) | [Differentiable Force Closure Estimator](https://doi.org/10.1109/LRA.2021.3129138) | Differentiable force-closure surrogate의 물리 가정과 한계 |
 | [B19](https://doi.org/10.48550/arXiv.2210.02697) | [DexGraspNet](https://doi.org/10.48550/arXiv.2210.02697) | Distance·joint-limit·penetration energy와 physics validation 기반 pose generation |
 | [B20](https://doi.org/10.48550/arXiv.2410.23701) | [Get a Grip](https://doi.org/10.48550/arXiv.2410.23701) | 정적 geometry surrogate와 실제 rollout 성공 evaluator를 분리하는 방식 |
+| [B88](https://doi.org/10.1109/LRA.2026.3677744) | [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) | 초기 task-informed grasp를 고정 정답으로 보지 않고, 동적 작업 중 residual finger adaptation으로 안정성을 유지하는 방식 |
+| [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) | [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) | Contact switching을 별도 조작 sub-skill로 보고 exploration을 유도한 사례; reconfiguration 자체를 금지하면 조작 범위를 제한할 수 있다는 반례 |
 
 ## 7. Policy Observation 표현과 [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) 구현 근거
 
 | ID | 논문 | 이 목적에서 확인할 내용 |
 | --- | --- | --- |
-| [B09](https://doi.org/10.1109/LRA.2024.3478571) | [DexTouch](https://doi.org/10.1109/LRA.2024.3478571) | Arm·hand q/dq, palm pose·velocity, fingertip relative positions, task prior와 16D binary tactile의 구성; wrist F/T ablation |
+| [B09](https://doi.org/10.1109/LRA.2024.3478571) | [DexTouch](https://doi.org/10.1109/LRA.2024.3478571) | History 없는 current 16D binary tactile, full-hand spatial coverage와 zero-shot sim-to-real 결과; wrist F/T·sensor deactivation ablation |
 | [B12](https://doi.org/10.48550/arXiv.2412.13157) | [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157) | Object-pose observation의 occlusion·noise, EEF pose·wrench history, recurrent pose estimator와 uncertainty-conditioned policy |
 | [B22](https://openreview.net/forum?id=dT3ZciXvNX) | [DexMove](https://openreview.net/forum?id=dT3ZciXvNX) | Wrist·finger·object·contact state의 5-frame history와 marker-level normal/shear tactile field를 쓰는 고정보량 상한선 |
 | [B27](https://openreview.net/forum?id=jf7C7EGw21) | [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21) | 224×224 RGB–ResNet 계열과 force-threshold binary tactile–MLP를 proprioception과 결합하는 구조 |
 | [B32](https://doi.org/10.15607/RSS.2023.XIX.036) | [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036) | Binary tactile, hand q, previous joint target, rotation axis를 4-step stack하여 MLP에 입력하는 최소 tactile policy |
 | [B33](https://doi.org/10.1109/ICRA57147.2024.10610532) | [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532) | Depth-camera point cloud, robot mesh point cloud와 active tactile-sensor point cloud를 palm frame에서 융합하는 표현 |
 | [B34](https://doi.org/10.1109/TRO.2025.3547267) | [TacSL](https://doi.org/10.1109/TRO.2025.3547267) | 고충실도 visuotactile image·force field를 사용할 때 필요한 별도 sensor simulation 경로와 비용 |
-| [B35](https://doi.org/10.48550/arXiv.2511.04831) | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) | Camera, ContactSensor, FrameTransformer, joint wrench와 ObservationManager를 통한 구현 가능 범위 |
+| [B35](https://doi.org/10.48550/arXiv.2511.04831) | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) | Camera, ContactSensor, FrameTransformer, joint wrench, quaternion과 `last_action` observation term을 통한 구현 가능 범위 |
 | [B36](https://doi.org/10.48550/arXiv.2411.04776) | [TacEx](https://doi.org/10.48550/arXiv.2411.04776) | Vanilla ContactSensor를 넘어 GelSight 영상까지 모사할 때의 외부 Isaac Sim 확장 후보 |
 | [B37](https://doi.org/10.1109/TRO.2021.3104471) | [Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) | Local tactile pose와 global proprioceptive goal을 분리한 이유; binary tactile로 그대로 재현할 수 없는 정보의 경계 |
-| [B38](https://doi.org/10.1109/CVPR.2019.00589) | [Continuity of Rotation Representations](https://doi.org/10.1109/CVPR.2019.00589) | 5D는 6D의 마지막 네 성분을 normalized stereographic projection으로 3D에 압축한 full-SO(3) 표현이며, 6D는 두 3D vector를 Gram–Schmidt로 복원하는 더 직접적인 표현이다. 원 논문은 point-cloud regression에서 5D의 gradient distortion 가능성을 지적하므로 현재 baseline은 6D, 5D는 ablation 근거로 사용 |
+| [B38](https://doi.org/10.1109/CVPR.2019.00589) | [Continuity of Rotation Representations](https://doi.org/10.1109/CVPR.2019.00589) | Quaternion의 antipodal discontinuity와 5D/6D continuous representation의 근거. 현재는 Isaac Lab interface와 차원 단순성을 우선해 canonical quaternion 4D를 baseline으로 선택하며, 6D는 sign-boundary failure를 확인할 representation ablation으로 사용 |
 | [B39](https://doi.org/10.48550/arXiv.2111.03043) | [General In-Hand Object Re-Orientation](https://doi.org/10.48550/arXiv.2111.03043) | 임의 goal orientation에는 quaternion difference를, symmetric-object vision 평가에는 shape-equivalent criterion을 둔 사례 |
 | [B40](https://doi.org/10.48550/arXiv.2309.09979) | [RotateIt](https://doi.org/10.48550/arXiv.2309.09979) | 연속 회전 task에서 hand-centric 3D rotation-axis vector를 observation에 추가한 이유 |
 
@@ -149,7 +170,7 @@
 | Generalist VLA | [B43](https://doi.org/10.48550/arXiv.2504.16054) [π0.5](https://doi.org/10.48550/arXiv.2504.16054), CoRL 2025 | 1,764 citations | 이종 robot·web data와 semantic subtask prediction으로 새로운 가정의 장기 household task까지 일반화 | Semantic generalization이 제한된 shelf의 contact feasibility와 force safety도 보장하는가 | Literature upper reference |
 | Efficient VLA | [B44](https://doi.org/10.15607/RSS.2025.XXI.017) [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017), RSS 2025 | 850 citations | Parallel decoding·action chunking·continuous action으로 VLA adaptation의 속도와 성공률을 개선 | 낮은 latency가 contact observability와 Rotation→Push terminal-contact quality도 해결하는가 | VLA adaptation reference |
 | Contact-aware VLA | [B46](https://doi.org/10.52202/085713-3124) [ForceVLA](https://doi.org/10.52202/085713-3124), NeurIPS 2025 | 121 citations | 6축 force를 first-class modality로 통합해 contact-rich task 성능을 개선 | 대규모 backbone·task-specific multimodal data 없이 coarse tactile+F/T로 물리적 보정이 가능한가 | 핵심 VLA reference |
-| Reactive IL | [B56](https://doi.org/10.15607/RSS.2025.XXI.052) [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), RSS 2025 | 204 citations | Slow diffusion와 fast tactile/force branch로 action chunk 중 폐루프 반응을 구현 | 고주파 반응이 downstream Push를 고려한 Rotation terminal state도 최적화하는가 | 강한 matched IL 후보 |
+| Reactive IL | [B56](https://doi.org/10.15607/RSS.2025.XXI.052) [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), RSS 2025 | 204 citations | Slow diffusion와 fast tactile/force branch로 action chunk 중 폐루프 반응을 구현 | 고주파 반응이 Approach configuration과 Rotation terminal state를 최종 Push success에 맞게 최적화하는가 | 강한 matched IL 후보 |
 | Force-aware IL | [B57](https://doi.org/10.1109/LRA.2025.3560871) [FoAR](https://doi.org/10.1109/LRA.2025.3560871), IEEE RA-L 2025 | 68 citations | Vision과 high-frequency wrist F/T를 future-contact prediction으로 융합 | 유사한 F/T 조건에서 IL과 simulation RL의 failure coverage·비용은 어떻게 다른가 | 현실적인 matched IL 후보 |
 | Visuotactile RL | [B27](https://openreview.net/forum?id=jf7C7EGw21) [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21), ICLR 2025 | 재확인 필요 | Sparse binary tactile가 policy 성능과 noise robustness에 기여 | Track B에서도 binary tactile가 충분하며 17-channel과 coarse pooling 중 무엇이 필요한가 | Sensor·representation baseline |
 | Sim-to-Real RL | [B73](https://doi.org/10.1109/LRA.2025.3551637) [FORGE](https://doi.org/10.1109/LRA.2025.3551637), IEEE RA-L 2025 | 45 citations | Force threshold와 dynamics randomization으로 pose uncertainty 아래 real transfer | Threshold-conditioned safety와 privileged-force reward 중 무엇이 강건한가 | Force-safety·Sim-to-Real baseline |
@@ -178,7 +199,7 @@
 | Fast·efficient VLA | [B44](https://doi.org/10.15607/RSS.2025.XXI.017) [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017), [B59](https://doi.org/10.52202/085713-3276) [Fast-in-Slow](https://doi.org/10.52202/085713-3276), [B61](https://doi.org/10.52202/085713-5484) [VLA-Cache](https://doi.org/10.52202/085713-5484), [B64](https://doi.org/10.52202/085713-1122) [RTC](https://doi.org/10.52202/085713-1122) | 병렬 decoding, fast action module, caching과 asynchronous chunk execution으로 latency·control frequency를 개선 | 빠른 실행만으로 접촉 관측 가능성, force safety와 downstream contact feasibility까지 해결되는가 |
 | Force·tactile VLA | [B46](https://doi.org/10.52202/085713-3124) [ForceVLA](https://doi.org/10.52202/085713-3124), [B47](https://doi.org/10.48550/arXiv.2503.08548) [TLA](https://doi.org/10.48550/arXiv.2503.08548), [B48](https://doi.org/10.48550/arXiv.2507.09160) [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160), [B49](https://doi.org/10.48550/arXiv.2505.09577) [VTLA](https://doi.org/10.48550/arXiv.2505.09577), [B50](https://doi.org/10.48550/arXiv.2512.23864) [DreamTacVLA](https://doi.org/10.48550/arXiv.2512.23864), [B51](https://doi.org/10.48550/arXiv.2601.20321) [TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321), [B52](https://doi.org/10.48550/arXiv.2603.15257) [HapticVLA](https://doi.org/10.48550/arXiv.2603.15257) | Force/tactile을 VLA의 명시적 modality 또는 학습 supervision으로 도입해 contact-rich 성능을 개선 | Specialized sensor와 task-specific multimodal demonstration 비용 없이 coarse binary tactile+F/T로 preparatory rotation과 pushing을 연결할 수 있는가 |
 | Demonstration IL | [B54](https://doi.org/10.48550/arXiv.2304.13705) [ACT](https://doi.org/10.48550/arXiv.2304.13705), [B55](https://doi.org/10.48550/arXiv.2303.04137) [Diffusion Policy](https://doi.org/10.48550/arXiv.2303.04137), [B45](https://doi.org/10.48550/arXiv.2410.07864) [RDT-1B](https://doi.org/10.48550/arXiv.2410.07864) | 자연스러운 multimodal trajectory, action chunk와 expressive action distribution을 reward engineering 없이 학습 | Demonstration 밖의 접촉 이탈·물성 변화·실패 상태를 어떻게 탐색하고 회복할 것인가 |
-| Reactive multimodal IL | [B56](https://doi.org/10.15607/RSS.2025.XXI.052) [RDP](https://doi.org/10.15607/RSS.2025.XXI.052), [B57](https://doi.org/10.1109/LRA.2025.3560871) [FoAR](https://doi.org/10.1109/LRA.2025.3560871), [B58](https://doi.org/10.48550/arXiv.2410.24091) [3D-ViTac](https://doi.org/10.48550/arXiv.2410.24091) | 고주파 tactile/F/T feedback과 vision을 결합해 action chunk 중 반응성과 정밀 접촉을 개선 | 별도 tactile teleoperation·task demonstrations가 필요한 조건과, 후속 Push 성공을 고려한 rotation terminal contact를 직접 학습하는지는 별개인가 |
+| Reactive multimodal IL | [B56](https://doi.org/10.15607/RSS.2025.XXI.052) [RDP](https://doi.org/10.15607/RSS.2025.XXI.052), [B57](https://doi.org/10.1109/LRA.2025.3560871) [FoAR](https://doi.org/10.1109/LRA.2025.3560871), [B58](https://doi.org/10.48550/arXiv.2410.24091) [3D-ViTac](https://doi.org/10.48550/arXiv.2410.24091) | 고주파 tactile/F/T feedback과 vision을 결합해 action chunk 중 반응성과 정밀 접촉을 개선 | 별도 tactile teleoperation·task demonstrations가 필요한 조건과, Approach·Rotation 상태를 후속 Push success에 맞게 직접 학습하는지는 별개인가 |
 | Contact-rich simulation RL | [B73](https://doi.org/10.1109/LRA.2025.3551637) [FORGE](https://doi.org/10.1109/LRA.2025.3551637), [B74](https://doi.org/10.48550/arXiv.2502.15442) [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442), [B75](https://doi.org/10.48550/arXiv.2603.15789) [OmniReset](https://doi.org/10.48550/arXiv.2603.15789), [B76](https://doi.org/10.48550/arXiv.2510.11019) [Refinery](https://doi.org/10.48550/arXiv.2510.11019), [B78](https://doi.org/10.1109/LRA.2026.3681156) [MSDP](https://doi.org/10.1109/LRA.2026.3681156) | Force limit·randomization, privileged curriculum, reset coverage, active fine-tuning과 multisensory pretraining으로 탐색·Sim-to-Real·sensor fusion을 개선 | Phase-gated reward의 이득이 reset/curriculum·randomization·representation을 통제한 뒤에도 남는가 |
 | IL–RL·Sim–Real hybrid | [B77](https://doi.org/10.1109/LRA.2025.3596487) [DP-RRL](https://doi.org/10.1109/LRA.2025.3596487), [B80](https://doi.org/10.48550/arXiv.2405.10315) [TRANSIC](https://doi.org/10.48550/arXiv.2405.10315) | Demonstration 또는 simulation base policy에 residual RL·human correction을 더해 real-world contact error를 보정 | 순수 simulation RL의 data·engineering 비용과 소량의 real correction을 쓰는 hybrid method 중 무엇이 더 효율적인가 |
 | RL-refined VLA | [B53](https://doi.org/10.48550/arXiv.2606.09337) [TORL-VLA](https://doi.org/10.48550/arXiv.2606.09337), [B60](https://doi.org/10.52202/085713-5128) [SafeVLA](https://doi.org/10.52202/085713-5128), [B79](https://doi.org/10.15607/RSS.2025.XXI.019) [ConRFT](https://doi.org/10.15607/RSS.2025.XXI.019) | Offline VLA에 online RL 적응, Q learning 또는 명시적 safety constraint를 결합 | VLA+RL이라는 조합 자체는 gap이 아니며, shelf blocker의 어떤 state transition과 sensor·reward contract를 새로 검증하는가 |
@@ -187,7 +208,7 @@
 
 현재 가장 방어 가능한 gap은 `VLA는 힘을 모른다` 또는 `IL은 반응하지 못한다`가 아니다. 최신 반례가 이미 존재한다. 현재 문헌에서 직접 평가가 부족한 조합은 다음과 같이 더 좁게 정의한다.
 
-> **Unknown shelf blocker를 목표 방향으로 밀기 전에 필요한 preparatory rotation을 수행하면서, 회전 종료 접촉 상태가 후속 pushing에 적합하도록 유지·전환하고, 이를 coarse OBB·binary tactile·wrist F/T라는 배포 가능한 저차원 입력과 simulation privileged supervision으로 학습할 수 있는가?**
+> **Unknown shelf blocker의 선택된 OBB 면을 목표 방향에 정렬하는 preparatory rotation을 수행하면서, Approach의 hand configuration과 Rotation의 terminal contact가 최종 pushing까지 실행 가능하도록 유지·전환하고, 이를 coarse OBB·binary tactile·wrist F/T라는 배포 가능한 저차원 입력과 simulation privileged supervision으로 학습할 수 있는가?**
 
 우리 방법의 우위 주장은 matched baseline, sensor·history ablation, unseen geometry·friction·mass 평가와 데이터·계산·센서 비용 비교가 완료된 뒤에만 사용한다. 그 전에는 `극복한다`가 아니라 `이 공백을 겨냥한다` 또는 `검증한다`로 서술한다.
 
@@ -213,6 +234,7 @@
 | Goal-conditioned pushing | [B10](https://doi.org/10.1109/LRA.2023.3295236), [B82](https://doi.org/10.1109/ICRA55743.2025.11128166), [B83](https://doi.org/10.3389/fnbot.2023.1271607), [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | 거리, 방향, 접촉, 힘의 작용선, collision·toppling을 왜 reward 또는 constraint로 구분했는가? |
 | Target-orientation pivoting | [B81](https://doi.org/10.1109/LRA.2026.3655262), [B85](https://doi.org/10.1109/ICRA48891.2023.10161271), [B86](https://doi.org/10.48550/arXiv.1703.00472) | 목표 각도 오차만으로 충분한가, contact dynamics와 action smoothness가 언제 필요한가? |
 | Continuous rotation | [B32](https://doi.org/10.15607/RSS.2023.XIX.036), [B40](https://doi.org/10.48550/arXiv.2309.09979) | 회전량·angular velocity reward와 terminal orientation reward를 어떻게 구분해야 하는가? |
-| Track B transition | 위 전체 | Rotation orientation success와 후속 Push feasibility를 잇는 reward·terminal metric이 기존 연구에 실제로 존재하는가? |
+| Contact 유지와 configuration 전환 | [B87](https://doi.org/10.48550/arXiv.2509.17812), [B88](https://doi.org/10.1109/LRA.2026.3677744), [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) | 전체 hand–object 지지는 유지하면서 개별 접촉의 release·re-contact와 작은 joint adaptation을 어느 정도 허용해야 하는가? |
+| Track B transition | 위 전체 | Approach contact success와 Rotation face-alignment success를 최종 Push feasibility에 잇는 reward·terminal metric이 기존 연구에 실제로 존재하는가? |
 
 ---

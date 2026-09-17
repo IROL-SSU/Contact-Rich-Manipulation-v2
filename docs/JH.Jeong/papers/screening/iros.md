@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [ICRA 목록](./icra.md) · [Paper Index](../README.md)
 
+> **용도:** IROS screening 결과를 연도별로 찾는 reference table이다. 연구 질문별 해석은 [Screening Index](./README.md)의 주제 페이지를 먼저 사용하고, 이 문서는 특정 연도·논문을 추적할 때 검색한다.
+
 > 등급: **A** = Direct/Core, **B** = Strong method/setup. 관점 태그는 Track B의 검토 축으로 제한했다.
 
 | CSV ID | 등급 | 논문 | 관점 | 현재 연구에서 확인할 점 |

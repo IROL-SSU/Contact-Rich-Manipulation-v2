@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [Paper Index](../README.md)
 
+> **읽는 순서:** 먼저 실제 sensing modality가 주는 정보를 확인하고, 다음으로 observation·history·privileged-information 표현을 비교한 뒤, 마지막 절에서 이를 구현할 simulation sensor와 dataset을 찾는다.
+
 ## 1. Tactile·Wrist F/T·Multimodal Sensing
 
 촉각, wrist F/T, reaction torque, vision–touch fusion을 센서 선택·동기화·noise model·ablation 설계에 활용한다.

@@ -8,14 +8,25 @@
 
 ---
 
+이 문서는 다음 논리로 읽는다.
+
+1. Pushing에서 어떤 failure 때문에 distance 이외의 항이 필요한지 확인한다.
+2. Rotation에서는 target-orientation과 continuous-rotation reward를 구분한다.
+3. 두 문헌군의 근거를 Track B의 Approach→Rotation→Push에 맞게 합성한다.
+4. Task reward, safety constraint와 regularization을 분리한다.
+
+논문별 reward 식을 복사하는 것이 목적이 아니다. 각 항이 해결한 failure와 Track B에서 다시 검증해야 할 조건을 연결하는 것이 목적이다.
+
 ## 1. 먼저 보이는 결론
 
 1. **Pushing reward는 단순한 object–goal distance만으로 끝나지 않는다.** 목표 방향 정렬, 접촉 유지, 힘의 작용선, 충돌·전도 제약과 action-rate regularization을 추가한 이유는 각각 local optimum, 접촉 이탈, 원치 않는 회전, 공격적인 밀기와 불안정한 제어를 막기 위해서다.
-2. **Rotation/pivoting에는 서로 다른 두 목표가 섞여 있다.** `목표 자세에 도달`하는 pivoting은 orientation error를 쓰지만, `계속 회전`하는 in-hand rotation은 매 step 회전량 또는 목표 축 angular velocity를 쓴다. Track B의 준비 회전은 전자에 가깝다.
+2. **Rotation/pivoting에는 서로 다른 두 목표가 섞여 있다.** `목표 자세에 도달`하는 pivoting은 orientation error를 쓰지만, `계속 회전`하는 in-hand rotation은 매 step 회전량 또는 목표 축 angular velocity를 쓴다. Track B는 전자의 angle-error 원리를 사용하되 임의의 목표 quaternion 대신 **선택된 OBB 면의 pushing normal과 push direction 사이의 오차**를 줄인다.
 3. **Contact force magnitude를 크게 만드는 reward는 공통 해법이 아니다.** 최근 연구는 방향만 사용하거나, magnitude mismatch를 이유로 아예 맞추지 않으며, 큰 힘·토크·일은 penalty 또는 constraint로 둔다.
-4. **기존 reward 중 Rotation 종료 접촉이 후속 Push에 좋은지를 직접 평가하는 항은 찾지 못했다.** 자세 도달과 연속 회전 안정성은 다루지만 downstream pushing feasibility는 별도의 연구 공백으로 남는다.
+4. **기존 reward 중 Approach configuration과 Rotation 종료 접촉을 최종 Push 성공으로 함께 평가하는 항은 찾지 못했다.** 접촉 형성, 자세 도달과 연속 회전 안정성은 각각 다루지만 전체 downstream feasibility는 별도의 연구 질문으로 남는다.
 
 ## 2. Pushing RL 비교
+
+먼저 Push 자체에서 반복되는 failure와 reward의 역할을 본다. 이 분석은 마지막 phase의 reward를 정할 뿐 아니라, Approach와 Rotation이 어떤 초기 상태를 남겨야 하는지도 알려준다.
 
 | ID | 과업·학습 | 실제 reward 구성 | 그렇게 설정한 이유 | Track B에서의 활용 | 그대로 쓰기 어려운 점 |
 | --- | --- | --- | --- | --- | --- |
@@ -39,28 +50,32 @@
 
 ## 3. Rotation·Pivoting RL 비교
 
+Pushing 문헌이 최종 이동의 조건을 보여줬다면, Rotation 문헌은 준비 상태를 만드는 angle-based objective를 보여준다. 다만 Track B의 목표는 특정 orientation 자체가 아니라 selected face alignment이며, `목표 각도에 도달`하는 문제와 `계속 회전`하는 문제의 근거를 이 목적에 맞게 구분해서 사용한다.
+
 | ID | 회전 목표 | 실제 reward 구성 | 그렇게 설정한 이유 | Track B에서의 활용 | 그대로 쓰기 어려운 점 |
 | --- | --- | --- | --- | --- | --- |
 | [B81](https://doi.org/10.1109/LRA.2026.3655262) | [지정된 pivoting goal orientation](https://doi.org/10.1109/LRA.2026.3655262) | Orientation error에 대한 linear·quadratic progress, sparse success, action smoothness를 사용한다. Dynamics-conditioned reward는 reference EEF pose·force direction·extrinsic contact state를 더한다. 저자들은 object-size domain randomization에서 quadratic term이 필요했다고 보고한다. | 단순 orientation progress가 다양한 object size에서 부족하고, 동적으로 가능한 contact·force trajectory를 안내해야 하기 때문이다. | 가장 최신의 직접 pivoting reward 근거. 목표 자세와 contact dynamics를 분리해 ablation한 구조가 유용하다. | Demonstration reference에 종속되며, terminal contact가 다음 Push에 적합한지는 평가하지 않는다. |
 | [B85](https://doi.org/10.1109/ICRA48891.2023.10161271) | [물체를 table에 수직인 stand-up orientation으로 pivot](https://doi.org/10.1109/ICRA48891.2023.10161271) | Current–goal rotation matrix의 SO(3) geodesic distance 하나를 dense reward로 사용한다. | Object 종류가 바뀌어도 공통인 task objective를 간단히 정의하고, policy와 state/action projection에 generalization 부담을 맡긴다. | Target-relative orientation error만으로 pivoting이 가능한 최소 baseline | Contact 유지·힘·translation drift·후속 pushing readiness가 reward에 없다. Depth-derived object feature와 privileged object pose도 필요하다. |
 | [B86](https://doi.org/10.48550/arXiv.1703.00472) | [Tool의 지정 target angle 도달](https://doi.org/10.48550/arXiv.1703.00472) | 허용 angle range로 정규화한 absolute target-angle error의 음수만 사용한다. | Pivoting의 최종 목적을 가장 직접적인 scalar로 표현한 초기 baseline이다. | Yaw-error-only baseline과 sparse success 추가 전의 최저 복잡도 비교군 | 2017년의 단일 tool·단일 pivot setting이며 최신 sensor·generalization·downstream transition을 다루지 않는다. 역사적 comparator로만 사용한다. |
 | [B32](https://doi.org/10.15607/RSS.2023.XIX.036) | [지정 축 주위로 계속 in-hand rotation](https://doi.org/10.15607/RSS.2023.XIX.036) | 한 step의 signed rotation angle, object linear-velocity penalty, fall penalty, controller work·torque penalty, fingertip–object distance reward를 사용한다. Position·major-axis deviation이 크면 reset한다. | Simulator angular velocity가 noisy해 vibration을 유발했으므로 projected vector의 finite rotation angle을 사용했다. Linear drift·낙하·과도한 actuation을 억제해 smooth Sim-to-Real rotation을 유도한다. | 회전 진행량 계산, translation drift·fall·work·torque regularization과 failure termination의 근거 | 목표 자세에서 멈추는 과업이 아니라 계속 회전하는 과업이다. Rotation progress를 그대로 쓰면 target을 지나 계속 돌 수 있다. |
-| [B40](https://doi.org/10.48550/arXiv.2309.09979) | [Hand-centric target axis 주위로 계속 in-hand rotation](https://doi.org/10.48550/arXiv.2309.09979) | Target axis angular velocity reward, undesired-axis angular velocity penalty, hand pose deviation, object linear velocity, work와 torque penalty를 사용한다. | 목표 축 회전을 빠르게 만들면서 다른 축 회전, 물체 병진, 비효율적 actuation과 불안정한 hand pose를 억제한다. | Desired/undesired rotation 분해와 효율·안정성 regularizer의 근거 | 역시 terminal orientation이 없는 continuous rotation이다. Preparatory yaw goal에는 angle-to-goal 또는 stopping criterion이 별도로 필요하다. |
+| [B40](https://doi.org/10.48550/arXiv.2309.09979) | [Hand-centric target axis 주위로 계속 in-hand rotation](https://doi.org/10.48550/arXiv.2309.09979) | Target axis angular velocity reward, undesired-axis angular velocity penalty, hand pose deviation, object linear velocity, work와 torque penalty를 사용한다. | 목표 축 회전을 빠르게 만들면서 다른 축 회전, 물체 병진, 비효율적 actuation과 불안정한 hand pose를 억제한다. | Desired/undesired rotation 분해와 효율·안정성 regularizer의 근거 | 역시 terminal orientation이 없는 continuous rotation이다. Preparatory face-alignment goal에는 angle-to-goal 또는 stopping criterion이 별도로 필요하다. |
 
 ### 목표 자세형과 연속 회전형을 구분해야 하는 이유
 
 | 유형 | 대표 | 최적 행동 | Track B와의 관계 |
 | --- | --- | --- | --- |
-| Target-orientation pivoting | [B81](https://doi.org/10.1109/LRA.2026.3655262), [B85](https://doi.org/10.1109/ICRA48891.2023.10161271), [B86](https://doi.org/10.48550/arXiv.1703.00472) | 목표 각도 오차를 줄이고 허용 범위에서 멈춤 | Preparatory rotation의 1차 objective와 직접 대응 |
+| Target-orientation pivoting | [B81](https://doi.org/10.1109/LRA.2026.3655262), [B85](https://doi.org/10.1109/ICRA48891.2023.10161271), [B86](https://doi.org/10.48550/arXiv.1703.00472) | 목표 각도 오차를 줄이고 허용 범위에서 멈춤 | Angle-progress 근거는 사용하되 Track B에서는 face–direction alignment error로 치환 |
 | Continuous-axis rotation | [B32](https://doi.org/10.15607/RSS.2023.XIX.036), [B40](https://doi.org/10.48550/arXiv.2309.09979) | 매 step 원하는 축으로 계속 회전 | 회전 안정성과 regularizer는 참고 가능하지만 task reward를 그대로 가져오면 안 됨 |
 
 ## 4. Track B reward 설계에 주는 잠정적 시사점
+
+앞의 두 문헌군을 그대로 합치면 중복되거나 서로 방해하는 항이 생긴다. 따라서 Track B에서는 task progress, contact shaping, privileged force와 downstream feasibility의 역할을 차례로 구분한다.
 
 아래는 **채택 결정이 아니라 문헌에서 도출한 설계 가설**이다.
 
 ### 4.1 Task progress와 contact shaping을 분리한다
 
-- Task progress는 object-level 결과를 평가한다: preparatory yaw error 감소, 이후 push direction의 signed translation progress.
+- Task progress는 object-level 결과를 평가한다: selected-face normal과 push direction의 alignment error 감소, 이후 push direction의 signed translation progress.
 - Contact shaping은 결과를 달성할 수 있게 돕는 보조항이다: contact formation, desired contact 유지, force-direction alignment.
 - Contact 수·force magnitude를 무조건 키우는 항은 reward hacking과 sensor–simulation mismatch 위험이 크다.
 
@@ -76,9 +91,16 @@
 - Track B에서는 desired force direction, excessive normal force, impact impulse, slip과 shelf contact를 privileged reward·constraint 후보로 둘 수 있다.
 - Actor가 binary tactile와 wrist F/T만 보는 상황에서 식별할 수 없는 per-contact force distribution을 정답 행동으로 강제하지 않는다.
 
-### 4.4 Rotation reward에는 downstream Push 항이 추가로 필요하다
+### 4.4 Approach와 Rotation의 종료 상태는 downstream feasibility로 평가해야 한다
 
-Target yaw 도달만 평가하면 같은 orientation success 안에서도 다음 상태가 달라질 수 있다.
+Approach에서 거리 감소나 최초 접촉만 평가하면, 물체에는 닿았지만 회전 모멘트를 만들기 어렵거나 arm·hand motion margin이 부족한 dead-end configuration도 성공처럼 보일 수 있다. 따라서 Approach의 task-level 품질은 다음 두 수준으로 분리해 검토한다.
+
+- `Rotation feasibility`: 현재 wrist–hand configuration과 contact state에서 selected face를 push direction에 정렬할 수 있는가
+- `Rotation→Push feasibility`: 필요한 재접촉·손 재구성을 포함해 최종 pushing까지 성공할 수 있는가
+
+[B03](https://doi.org/10.1109/ICRA55743.2025.11127792)은 후속 manipulation critic으로 초기 grasp를 scoring하고, [B08](https://doi.org/10.48550/arXiv.2309.00987)은 transition feasibility로 앞 policy의 종료 분포를 뒤 policy가 실행 가능한 상태로 조정한다. 이는 Approach configuration을 고정 pose 유사도보다 **후속 실행 가능성**으로 평가할 근거다. [B01](https://doi.org/10.48550/arXiv.2509.18455)은 pushing direction에 맞는 pre-contact hand pose를 physics로 검증하고, [B02](https://doi.org/10.1109/IROS58592.2024.10802652)는 task wrench와 grasp wrench capability의 적합성을 평가한다. 다만 두 연구의 정적 pose·wrench score를 Rotation→Push 중 동적 reconfiguration 성공률과 동일시할 수는 없다.
+
+Face alignment만 평가하면 같은 alignment success 안에서도 다음 상태가 달라질 수 있다.
 
 - 손이 pushing 반대쪽에 남아 있는가
 - 유효한 object contact가 유지되는가
@@ -86,9 +108,43 @@ Target yaw 도달만 평가하면 같은 orientation success 안에서도 다음
 - shelf와 과도한 force contact가 없는가
 - 짧은 push rollout 또는 downstream critic에서 실제 progress가 가능한가
 
-기존 pivoting reward의 orientation error는 유지할 수 있지만, 위 조건을 평가하는 `transition/downstream feasibility` 항 또는 별도 terminal metric이 Track B의 핵심 비교 대상이다.
+따라서 OBB까지의 접근 거리는 비접촉 exploration을 위한 보조 shaping으로만 사용하고, contact onset 자체를 Approach success로 두지 않는다. Core baseline에서는 shared policy의 실제 future return이 Approach action까지 전달되게 하고, saved-state continuation rollout의 Rotation 성공률과 최종 Rotation→Push 성공률을 별도 metric으로 기록한다. Long-horizon credit assignment가 부족할 때만 별도로 calibration한 downstream-success estimator 또는 transition shaping을 추가한다.
 
-## 5. 우선 독해 순서
+기존 pivoting reward의 angle-error 원리는 face–direction alignment progress로 사용할 수 있지만, 위 조건을 평가하는 `transition/downstream feasibility` 항 또는 별도 terminal metric이 Track B의 핵심 비교 대상이다. 이 결론은 네 논문의 수식을 그대로 복사한 것이 아니라, 각각의 grasp scoring·skill chaining·pre-contact synthesis·task-wrench 평가 원리를 Track B의 shared-policy sequence에 확장한 연구 가설이다.
+
+### 4.5 Aggregate contact는 유지하되 contact configuration은 고정하지 않는다
+
+접촉 유지와 hand reconfiguration은 같은 제약이 아니다. Track B가 우선 보존할 것은 `항상 같은 tactile bit가 켜진 상태`가 아니라 **적어도 하나의 hand–object contact가 남아 있는 aggregate support**다.
+
+- [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744)은 task-informed 초기 grasp와 작은 residual joint correction을 결합해 동적 외력 아래 slip을 줄였다. 이는 좋은 Approach configuration과 제한적인 online adaptation을 함께 쓰는 근거다.
+- [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300)은 나머지 손가락의 지지를 유지하면서 일부 접촉을 해제·재형성하는 contact switching이 finger gaiting 탐색에 필요함을 보였다.
+- [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)은 firm-contact reward와 contact-release reward를 함께 사용했으며, release만 장려하는 구성은 충분하지 않았다.
+
+따라서 baseline reward는 모든 hand–object contact가 사라지는 transition을 불리하게 하되, per-taxel pattern change나 개별 finger release 자체를 벌점화하지 않는다. Contact loss는 failure termination이 아니라 다시 접근·정렬할 수 있는 recoverable event로 둔다. `최소한의 재구성이 더 효율적인가`는 first-contact 이후 hand joint travel, contact-loss event와 contact-switch count를 기록하고 `fixed hand / free adaptation / mild hand-motion cost`로 비교한다.
+
+## 5. Sequential shaping과 safety를 분리한 근거
+
+Phase별 task reward를 정한 뒤에도 collision·toppling·overload를 같은 weighted sum에 넣으면 큰 task progress가 안전 위반을 상쇄할 수 있다. 이 때문에 마지막으로 safety와 control regularization의 위치를 별도로 정한다.
+
+| 자료 | 실제 구분 | Track B에서의 의미 |
+| --- | --- | --- |
+| [Stage-Wise Reward Shaping](https://doi.org/10.1109/ICRA55743.2025.11128552) | Sequential task를 stage로 나누고 stage별 reward와 cost를 constrained multi-objective RL로 최적화 | Approach·Rotation·Push reward를 나누되 collision·overload 같은 cost를 task reward와 교환하지 않는 구조의 근거 |
+| [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166) | Object goal·surface reach·direction-only motion·action rate는 reward, collision·toppling·actuator limit는 constraint | Task progress, exploration shaping, regularization과 safety constraint의 역할을 실제 pushing에서 분리한 직접 사례 |
+| [CaT](https://doi.org/10.1109/IROS58592.2024.10802334) | Constraint 위반을 stochastic termination으로 바꾸어 future reward를 잃게 함 | 일반 PPO의 작은 penalty로 안전 위반이 상쇄될 때 termination 기반 constraint를 비교할 근거 |
+| [Safe Self-Supervised Visuo-Tactile Learning](https://doi.org/10.1109/ICRA48891.2023.10160763) | 실제 insertion data collection에서 wrist F/T를 안전 조건에 사용 | Force magnitude를 task reward로 최대화하지 않고 overload·impact threshold에 사용하는 근거 |
+
+따라서 `phase reward + 기타 penalty`의 두 묶음보다 다음 네 층이 더 명확하다.
+
+1. Final task success
+2. Phase-specific dense shaping
+3. Safety cost·termination
+4. Control regularization
+
+정확한 Track B gate 식은 위 논문에서 복사할 수 없다. 선행연구는 distance/contact/stage 조건으로 reward 의미를 바꿀 근거를 제공하지만, `Approach → Rotation → Push`의 gate와 threshold는 본 과업에서 ablation해야 한다. 현재 구현 구조와 식 후보는 [`../policy_learning.md`](../policy_learning.md#10-reward-formulation-v03--구조)를 따른다.
+
+## 6. 우선 독해 순서
+
+위 결론을 원문에서 재확인하려면 다음 순서로 읽는다. 각 논문을 읽을 때에는 reward 식보다 `어떤 failure 때문에 그 항을 넣었는가`를 먼저 확인한다.
 
 1. **[B81](https://doi.org/10.1109/LRA.2026.3655262)** — 2026년의 pushing·pivoting 공통 formulation, demonstration-conditioned contact·force reward
 2. **[B10](https://doi.org/10.1109/LRA.2023.3295236)** — goal-conditioned pushing에서 reward gate를 둔 이유와 stable normal contact
@@ -98,8 +154,9 @@ Target yaw 도달만 평가하면 같은 orientation success 안에서도 다음
 6. **[B83](https://doi.org/10.3389/fnbot.2023.1271607)** — privileged contact-force direction과 lever-arm shaping
 7. **[B84](https://doi.org/10.1109/IROS47612.2022.9981873)** — clutter에서 contact 유지·collision·distance normalization
 8. **[B40](https://doi.org/10.48550/arXiv.2309.09979) → [B86](https://doi.org/10.48550/arXiv.1703.00472)** — continuous-axis reward와 역사적 angle-error-only baseline의 경계 확인
+9. **[B88](https://doi.org/10.1109/LRA.2026.3677744) → [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) → [B87](https://doi.org/10.48550/arXiv.2509.17812)** — task-informed initial configuration, 필요한 contact switching과 firm-contact 유지의 균형
 
-## 6. 공식 자료
+## 7. 공식 자료
 
 | ID | 공식 자료 |
 | --- | --- |
@@ -112,6 +169,12 @@ Target yaw 도달만 평가하면 같은 orientation success 안에서도 다음
 | [B86](https://doi.org/10.48550/arXiv.1703.00472) | [arXiv](https://arxiv.org/abs/1703.00472), [arXiv DOI](https://doi.org/10.48550/arXiv.1703.00472) |
 | [B32](https://doi.org/10.15607/RSS.2023.XIX.036) | [RSS](https://roboticsproceedings.org/rss19/p036.html), [Publication DOI](https://doi.org/10.15607/RSS.2023.XIX.036) |
 | [B40](https://doi.org/10.48550/arXiv.2309.09979) | [PMLR](https://proceedings.mlr.press/v229/qi23a.html), [arXiv](https://arxiv.org/abs/2309.09979) |
+| [B87](https://doi.org/10.48550/arXiv.2509.17812) | [arXiv](https://arxiv.org/abs/2509.17812), [arXiv DOI](https://doi.org/10.48550/arXiv.2509.17812) |
+| [B88](https://doi.org/10.1109/LRA.2026.3677744) | [IEEE publication](https://ieeexplore.ieee.org/document/11455929/), [Publication DOI](https://doi.org/10.1109/LRA.2026.3677744) |
+| [B89](https://doi.org/10.1109/ICRA57147.2024.10611300) | [arXiv](https://arxiv.org/abs/2303.03533), [Publication DOI](https://doi.org/10.1109/ICRA57147.2024.10611300) |
+| [ICRA25-135](https://doi.org/10.1109/ICRA55743.2025.11128552) | [arXiv](https://arxiv.org/abs/2409.15755), [Publication DOI](https://doi.org/10.1109/ICRA55743.2025.11128552) |
+| [IROS24-209](https://doi.org/10.1109/IROS58592.2024.10802334) | [Official project](https://constraints-as-terminations.github.io/), [Publication DOI](https://doi.org/10.1109/IROS58592.2024.10802334) |
+| [ICRA23-168](https://doi.org/10.1109/ICRA48891.2023.10160763) | [arXiv](https://arxiv.org/abs/2210.01340), [Publication DOI](https://doi.org/10.1109/ICRA48891.2023.10160763) |
 
 ---
 

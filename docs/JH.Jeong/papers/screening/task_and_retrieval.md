@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [Paper Index](../README.md)
 
+> **읽는 순서:** Low-level contact manipulation에서 현재 1단계 실행 방법을 찾은 뒤, blocker·clutter·retrieval 절에서 2단계 system utility와 상위 planner 근거를 찾는다. 각 절 안에서는 ICRA와 IROS를 별도 표로 유지한다.
+
 ## 1. Low-level Contact Manipulation
 
 접촉 모드 전환, 삽입·조립, in-hand/extrinsic dexterity와 비선점 조작을 1단계 접촉 정책·baseline 설계에 연결한다.

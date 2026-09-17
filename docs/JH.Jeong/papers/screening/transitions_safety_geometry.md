@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [Paper Index](../README.md)
 
+> **읽는 순서:** Phase transition과 skill chaining으로 long-horizon 연결 문제를 본 뒤, safety·termination으로 허용 범위를 정하고, geometry·contact representation으로 상태 표현 근거를 찾는다.
+
 ## 1. Phase Transition·Skill Chaining·Hierarchical Policy
 
 접근–접촉–조작 단계 분해, primitive/skill 조합, switch 조건, hierarchical policy와 장기 task orchestration을 1→2단계 구조에 연결한다.

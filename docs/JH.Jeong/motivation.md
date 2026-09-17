@@ -1,195 +1,174 @@
-﻿# Track B Research Motivation
+# Track B Research Motivation
 
-> **연구 주제:** Shelf retrieval을 위한 goal-conditioned blocker-object contact manipulation
+> **핵심 질문:** Shelf blocker의 선택 면을 목표 방향에 맞춘 뒤 밀어야 할 때, Approach의 hand configuration과 Rotation의 terminal contact를 최종 Push 성공에 유리하도록 학습할 수 있는가?
 >
-> **문서 상태:** Working synthesis — 핵심 문제, research gap과 검증 가설을 구조화한 문서
+> **문서 역할:** 실제 문제에서 research gap, Track B의 대응과 검증 가설까지 하나의 논리로 연결한다.
 >
-> **최종 갱신:** 2026-09-16
+> **최종 갱신:** 2026-09-17
 
 ---
 
-## 0. 한눈에 보는 핵심
+## 1. 실제 문제에서 출발한다
 
-| 항목 | 핵심 내용 |
-| --- | --- |
-| 실제 상황 | Shelf 안의 target을 꺼내려면 앞의 blocker를 재배치해야 한다. |
-| 핵심 failure | 제한된 접근 방향과 blocker의 초기 자세 때문에 direct push가 불가능하거나 불안정할 수 있다. |
-| 중요한 전환 | Preparatory Rotation은 target yaw에 도달하는 것으로 끝나지 않고, 후속 Push가 사용할 수 있는 접촉 상태를 남겨야 한다. |
-| Research gap | 최신 VLA·IL·RL은 범용성, tactile/force feedback, 반응성과 contact-rich learning을 발전시켰지만, 제한된 shelf에서 **Rotation terminal contact를 Push initial contact로 최적화하는 문제**는 직접적인 평가 대상이 아니었다. |
-| Track B의 접근 | Coarse pose·OBB, binary tactile, wrist F/T와 proprioception을 사용하는 shared policy가 Approach–Rotation–Push의 접촉 전환을 폐루프로 실행하도록 학습한다. |
-| 입증해야 할 것 | Direct push 대비 preparatory rotation의 필요성, orientation-only 대비 downstream-aware transition의 이점, tactile/F/T의 보완 효과와 unseen condition 강건성을 분리 검증한다. |
+물류 선반과 생활환경에서는 target object가 다른 물체에 가려지거나 접근 경로가 blocker에 막힐 수 있다. 이때 로봇은 target을 바로 grasp하기 전에 주변 물체를 밀거나 돌려 시야와 접근 공간을 확보해야 한다. 따라서 필요한 능력은 환경과의 접촉을 피하는 collision-free motion만이 아니라, **의도적인 접촉으로 물체를 재배치하고 접촉 결과에 맞춰 행동을 수정하는 것**이다.
 
-> **핵심 주장 후보:** 제한된 shelf에서 preparatory rotation의 성공은 목표 orientation 도달만으로 정의할 수 없으며, 후속 pushing에 실행 가능한 contact configuration을 형성했는지까지 포함해야 한다.
+그러나 contact-rich manipulation에서는 stick, slip, pivot과 충돌에 따라 dynamics와 constraint가 바뀐다. 국소 형상, 마찰, 질량 분포와 작은 pose 오차도 서로 다른 물체 운동과 접촉력으로 이어진다. 정확한 모델과 contact mode를 알면 model-based planning과 control이 강력하지만, unseen object와 occlusion이 있는 shelf마다 이를 정확히 구성하는 데에는 큰 부담이 따른다.
+
+이 어려움 때문에 최근 RL, IL과 VLA가 contact-rich manipulation에 적극적으로 도입되고 있다. 문제는 학습 방법을 사용한다는 사실 자체가 아니라, **무엇을 성공으로 정의하고 어떤 접촉 상태까지 학습해야 하는가**이다.
+
+---
+
+## 2. Direct push만으로는 충분하지 않다
+
+Blocker를 원하는 방향으로 바로 밀 수 있다면 문제는 단순해진다. 하지만 다음 조건에서는 direct push가 불가능하거나 불안정하다.
+
+| 원인 | 나타나는 failure | 필요한 대응 |
+| --- | --- | --- |
+| 제한된 접근 방향 | 원하는 pushing direction에 손이 접근하지 못하거나 shelf와 충돌 | 다른 면을 사용할 수 있도록 물체와 손의 관계 변경 |
+| 불리한 OBB face 방향 | 선택 면의 pushing normal과 목표 방향이 어긋나 off-center push가 slip·unintended rotation 유발 | Preparatory rotation으로 선택 면을 push direction에 정렬 |
+| Coarse geometry의 오차 | OBB가 실제 국소 표면·마찰·질량 분포를 설명하지 못함 | Tactile·F/T feedback으로 접촉 후 보정 |
+| 단계 사이의 불량한 접촉 | 물체에는 닿았지만 Rotation이 어렵거나, face alignment는 맞았지만 Push에 부적합 | 다음 단계의 실행 가능성을 고려한 hand/contact state 형성 |
+
+앞의 두 조건은 preparatory rotation이 필요한 이유를 설명한다. 뒤의 두 조건은 rotation을 수행하는 것만으로는 문제가 끝나지 않는 이유를 설명한다.
 
 ```text
-Shelf retrieval을 막는 blocker
-        ↓
 Direct push의 실행 가능 영역이 제한됨
         ↓
-Preparatory Rotation 필요
+Approach에서 Rotation-ready hand configuration 필요
         ↓
-Rotation terminal contact가 Push initial contact를 결정
+Preparatory Rotation 수행
         ↓
-Downstream-aware contact transition을 학습·평가
+Rotation terminal contact가 Push initial condition을 결정
+        ↓
+전체 Rotation→Push 성공으로 각 상태를 평가해야 함
 ```
 
-현재 명세는 [`research_topic.md`](./research_topic.md), 논문과 baseline 근거는 [`papers/README.md`](./papers/README.md), 결정 과정은 [`context.md`](./context.md)를 따른다.
+따라서 Approach의 성공을 최초 접촉으로, Rotation의 성공을 선택 면 정렬만으로 정의하면 부족하다.
 
 ---
 
-## 1. 왜 이 문제가 필요한가
+## 3. 기존 연구가 해결한 것과 남은 문제
 
-### 1.1 Shelf retrieval은 collision-free reaching만으로 끝나지 않는다
+### 3.1 이미 해결되고 있는 부분
 
-물류 선반과 생활환경에서는 target이 다른 물체에 가려지거나 접근 경로가 막힐 수 있다. 이 경우 로봇은 target을 바로 grasp하기 전에 blocker를 밀거나 돌려 시야와 접근 공간을 확보해야 한다. 즉 환경과의 접촉을 피하는 것이 아니라, 접촉을 의도적으로 만들고 그 결과에 따라 행동을 수정해야 한다.
+최신 연구를 `VLA는 힘을 모른다`, `IL은 접촉 변화에 반응하지 못한다`와 같이 일반화해서 비판할 수는 없다.
 
-Contact-rich manipulation에서는 stick·slip·pivot·충돌에 따라 dynamics와 constraint가 바뀐다. 또한 국소 형상, 마찰, 질량 분포와 pose의 작은 오차가 다른 물체 운동과 접촉력으로 이어진다. 정확한 모델이 있으면 model-based planning과 control이 강력하지만, unseen object와 occlusion이 있는 shelf에서는 contact model·mode sequence를 매번 정확히 구성하는 부담이 커진다.
-
-### 1.2 Direct push가 실패하는 이유
-
-| 원인 | 대표적인 failure |
-| --- | --- |
-| 접근 제약 | 원하는 pushing direction과 가능한 EEF 접근 방향이 맞지 않거나 hand·arm이 shelf와 충돌함 |
-| 초기 물체 자세 | 안정적인 접촉 surface를 사용할 수 없고, off-center contact가 slip이나 unintended rotation을 유발함 |
-| 물리적 불확실성 | Coarse geometry가 실제 국소 형상·마찰·질량 분포를 충분히 설명하지 못함 |
-| 접촉 전환 실패 | Rotation orientation은 맞았지만 손목·손가락 배치가 Push에 부적합하여 re-contact, contact loss 또는 과도한 힘이 발생함 |
-
-앞의 세 원인은 preparatory rotation의 필요성을 만들고, 마지막 원인은 본 연구의 중심 질문을 만든다.
-
-### 1.3 Preparatory Rotation의 목적
-
-Preparatory rotation은 물체를 특정 자세로 만드는 독립 과업이 아니다. 목표 방향으로 pushing wrench를 전달할 surface와 object–hand 관계를 만들고, shelf constraint 안에서 후속 Push를 수행할 손목·손가락 configuration을 준비하는 수단이다.
-
-따라서 다음 두 상태는 구분해야 한다.
-
-- **Orientation-success state:** 물체가 목표 orientation에 도달했지만 후속 Push를 위해 접촉을 다시 만들어야 하는 상태
-- **Transition-success state:** 목표 orientation과 함께 후속 Push를 즉시 또는 안정적으로 시작할 수 있는 접촉 상태
-
-Track B는 두 번째 상태를 학습 목표와 평가 대상으로 삼는다.
-
----
-
-## 2. 기존 연구가 해결한 것과 남은 Gap
-
-구체 논문의 서지정보·게재 상태·영향력과 baseline 역할은 [`papers/topic_groups.md`](./papers/topic_groups.md)의 8절에서 관리한다. 여기서는 motivation에 필요한 결론만 사용한다.
-
-### 2.1 최신 연구가 이미 제거한 단순한 비판
-
-| 연구 흐름과 대표 사례 | 이미 확인된 발전 | Track B에서 별도로 남는 질문 |
+| 연구 흐름과 대표 사례 | 이미 보여준 발전 | Track B에서 별도로 확인할 질문 |
 | --- | --- | --- |
 | Generalist·efficient VLA — [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017) | 장기 household task 일반화와 빠른 VLA adaptation | Semantic generalization과 낮은 latency가 shelf 내부의 contact feasibility·force safety까지 보장하는가 |
-| Force·tactile-aware policy — [ForceVLA](https://doi.org/10.52202/085713-3124), [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), [FoAR](https://doi.org/10.1109/LRA.2025.3560871) | Force/tactile을 이용한 contact grounding과 고주파 반응 | 반응성이 Rotation 종료 접촉을 downstream Push 성공에 맞게 최적화하는가 |
-| Contact-rich·long-horizon RL — [FORGE](https://doi.org/10.1109/LRA.2025.3551637), [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442), [OmniReset](https://doi.org/10.48550/arXiv.2603.15789) | Sim-to-Real randomization, exploration curriculum과 reset coverage 개선 | 동일 exploration 조건에서도 downstream-aware objective와 phase-free transition의 이점이 남는가 |
-| 인접 nonprehensile·dexterous 연구 — [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Dynamics adaptation, tactile wrist–finger control과 geometry-conditioned contact pose | Coarse deployable sensing으로 Rotation–Push contact transition 전체를 폐루프로 실행할 수 있는가 |
+| Force·tactile-aware VLA/IL — [ForceVLA](https://doi.org/10.52202/085713-3124), [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), [FoAR](https://doi.org/10.1109/LRA.2025.3560871) | Force·tactile grounding과 action 실행 중의 빠른 반응 | 반응성이 각 phase의 contact state를 최종 Push 성공에 맞게 최적화하는가 |
+| Contact-rich·long-horizon RL — [FORGE](https://doi.org/10.1109/LRA.2025.3551637), [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442), [OmniReset](https://doi.org/10.48550/arXiv.2603.15789) | Sim-to-Real randomization, exploration curriculum과 reset coverage 개선 | 같은 exploration 조건에서도 downstream-aware objective의 이점이 남는가 |
+| 인접 dexterous·nonprehensile 연구 — [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Dynamics adaptation, tactile wrist–finger control과 geometry-conditioned contact pose | Coarse deployable sensing으로 Approach→Rotation→Push 전체를 폐루프로 연결할 수 있는가 |
 
-따라서 다음은 research gap으로 사용하지 않는다.
+이 연구들은 범용성, 반응성, 접촉 sensing과 탐색이라는 중요한 문제를 해결한다. 따라서 Track B의 gap은 이 계열 전체가 contact-rich manipulation을 못한다는 주장이 아니다.
 
-- VLA가 force나 tactile을 전혀 사용하지 못한다는 주장
-- IL이 contact 변화에 반응할 수 없다는 주장
-- RL, tactile, 다지 손 또는 Rotation–Push를 결합했다는 사실 자체
-- VLA와 RL을 결합하면 그 자체로 새롭다는 주장
+### 3.2 남아 있는 구체적 gap
 
-### 2.2 남아 있는 구체적 Gap
+기존 연구와의 차이는 네 질문으로 좁힌다.
 
-| Gap | 기존 연구와 구분되는 검증 대상 |
+| Gap | Track B에서 검증할 내용 |
 | --- | --- |
-| **Downstream objective gap** | Rotation의 성공을 orientation error가 아니라 후속 Push feasibility까지 포함해 정의 |
-| **Contact-transition gap** | Approach–Rotation–Push를 개별 성공으로 평가하지 않고 이전 phase의 terminal contact와 다음 phase의 initial contact를 연결 |
-| **Deployable-sensing gap** | Dense mesh·optical tactile 대신 coarse OBB·binary tactile·wrist F/T만으로 contact mismatch를 보정할 수 있는지 검증 |
-| **Fair-evaluation gap** | Direct push, orientation-only transition, sensor 제거와 fixed contact를 분리 비교하여 어떤 요소가 실제 이득을 만드는지 확인 |
+| **Downstream objective** | Approach를 최초 contact가 아니라 Rotation→Push feasibility로, Rotation을 face-alignment error뿐 아니라 subsequent Push feasibility까지 포함해 평가 |
+| **Contact transition** | Approach·Rotation·Push를 독립 성공으로 보지 않고 앞 단계의 terminal contact와 다음 단계의 initial condition을 연결 |
+| **Deployable sensing** | Dense mesh·optical tactile 없이 coarse OBB·binary tactile·wrist F/T로 geometry–contact mismatch를 보정할 수 있는지 확인 |
+| **Fair attribution** | Direct push, face-alignment-only objective, sensor 제거와 fixed-hand baseline을 분리 비교해 실제 이득의 원인을 확인 |
 
-> **Research question:** Unknown shelf blocker를 목표 방향으로 밀기 위한 preparatory rotation에서, terminal contact가 downstream Push의 실행 가능성·접촉 안정성·힘 안전성을 보존하도록 학습할 수 있는가?
+이로부터 현재의 research question이 나온다.
 
-이 질문의 두 번째 층위는 그러한 학습이 고해상도 tactile image나 대규모 real multimodal demonstration 없이 가능한가이다. 이는 real data 부담을 줄일 가능성에 관한 가설이지, simulation interaction·reward engineering·domain randomization 비용까지 제거한다는 뜻은 아니다.
+> **Unknown shelf blocker의 선택된 OBB 면을 목표 방향에 정렬한 뒤 밀 때, Approach의 wrist–hand configuration과 Rotation의 terminal contact를 최종 Rotation→Push의 실행 가능성·접촉 안정성·힘 안전성을 보존하도록 학습할 수 있는가?**
+
+두 번째 질문은 이를 고해상도 tactile image나 대규모 real multimodal demonstration 없이 달성할 수 있는가이다. 이는 real data 부담을 줄일 가능성에 관한 가설이며, simulation interaction, reward engineering과 domain randomization 비용까지 사라진다는 뜻은 아니다.
 
 ---
 
-## 3. Track B가 제안하는 대응
+## 4. Track B는 이 문제에 어떻게 대응하는가
 
-### 3.1 문제 formulation
+Track B는 continuous object pose와 coarse OBB, binary tactile, wrist F/T와 proprioception을 사용하는 phase-ID-free shared policy를 학습한다.
 
 ```text
-Approach / Contact Formation
-          ↓
-Rotation: object goal + Push-feasible contact 형성
-          ↓
-Contact를 유지·전환
-          ↓
-Push: target direction·distance 달성
+Coarse pose·OBB
+  → 접근 위치와 초기 hand configuration 제안
+
+Binary tactile·wrist F/T
+  → 실제 접촉이 geometry 예측과 어떻게 다른지 보정
+
+Downstream-aware objective
+  → 보정된 hand/contact state가 Rotation과 Push로 이어지도록 학습
 ```
 
-Policy에는 phase ID를 주지 않는다. Shared policy가 pose, proprioception, tactile·F/T와 action history에서 현재 접촉 상태와 필요한 전환을 추론한다. Phase별 reward gate는 학습 신호의 활성 조건이며 action을 phase별로 고정하는 장치가 아니다.
-
-### 3.2 Method contract와 motivation의 연결
-
-| 구성 | 현재 방향 | 해결하려는 문제 |
+| 구성 | 현재 선택 | 이 선택이 답하려는 문제 |
 | --- | --- | --- |
-| Goal | 상위 모듈이 제공한 pushing target position과 preparatory object orientation | 목표 선택과 low-level contact execution을 분리 |
-| Geometry | Continuous object pose와 episode-consistent coarse OBB | Unseen object·occlusion에서 안정적인 저차원 geometric prior 제공 |
-| Contact observation | Binary any-contact tactile, wrist 6D F/T와 modality별 history | Geometry만으로 알 수 없는 접촉 위치·강도·action response 보완 |
-| Proprioception | Current arm·hand joint state와 previous action history | 현재 hand configuration과 actuator/contact response 구분 |
-| Action | Measured state 기준 EEF-frame delta pose + hand joint action | Wrist와 fingers를 함께 조절해 접촉을 형성·유지·전환 |
-| Training-only information | Exact contact force, collision pair와 task state를 reward·termination·critic에 사용 | 실제 actor에 불가능한 정보를 노출하지 않으면서 학습 신호를 정밀화 |
-| Actor structure | Phase-ID-free shared MLP policy | 관측 가능한 상태만으로 long-horizon contact transition을 수행하는지 검증 |
+| Goal | 상위가 제공한 target position, push direction과 selected OBB face | 목표 선택과 low-level contact execution 분리; 목표 quaternion 제거 |
+| Geometry | Continuous pose + episode-consistent OBB | Occlusion 아래에서 안정적인 저차원 prior 제공 |
+| Contact feedback | Current 17D binary tactile + current wrist 6D F/T | 접촉 위치와 전체 force·moment를 상보적으로 관측 |
+| Proprioception | Current arm·hand q + previous action 1-step | 현재 configuration과 직전 명령 이후 반응 구분 |
+| Action | EEF-frame delta pose + hand joint action | Wrist와 fingers를 함께 조절해 contact 형성·전환 |
+| Training supervision | Exact contact·force·collision은 reward·termination·evaluation에만 사용 | 실물 actor가 얻을 수 없는 정보를 deployment input에서 분리 |
 
-핵심 메커니즘은 다음과 같다.
-
-> **Coarse vision은 어디에 어떻게 접근할지 제시하고, tactile·F/T는 실제 접촉이 예상과 어떻게 다른지 보정하며, downstream-aware objective는 그 보정이 다음 Push에 유효한 방향으로 이루어지도록 제약한다.**
+Approach에서는 특정 hand pose를 정답으로 imitation하지 않는다. Shared policy의 실제 future return이 좋은 configuration을 학습하게 하고, saved-state continuation으로 face-alignment 성공률과 최종 Rotation→Push 성공률을 따로 측정한다. 최초 접촉 이후에는 aggregate hand–object contact 유지를 선호하지만 개별 contact migration은 허용한다. [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744)는 task-informed 초기 grasp와 작은 online adaptation의 결합을 지지하고, [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300)와 [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)은 필요한 contact switching까지 금지하면 조작 범위를 제한할 수 있음을 보여준다. 따라서 Track B는 `minimum necessary reconfiguration`을 검증 가설로 두며 고정 contact set을 정답으로 강제하지 않는다. 세부 구현은 [`policy_learning.md`](./policy_learning.md)를 따른다.
 
 ---
 
-## 4. 검증 가설과 필요한 증거
+## 5. 무엇으로 가설을 검증할 것인가
 
-아래 MH1–MH4는 아직 결과가 아닌 working hypotheses다.
+아래 MH1–MH4는 연구 결과가 아니라 현재 검증할 working hypotheses다.
 
-| ID | 검증 가설 | 핵심 비교 | 주요 지표 | 지지될 때 가능한 주장 |
-| --- | --- | --- | --- | --- |
-| MH1 | 접근 제약과 초기 orientation 때문에 direct push가 어려운 영역에서 preparatory rotation이 성공 영역을 넓힌다. | Direct push vs. rotate-then-push | 전체 성공률, 성공 가능한 initial-state volume, collision·slip | Preparatory rotation이 필요한 조건과 효과를 규명 |
-| MH2 | Orientation-only Rotation보다 downstream Push feasibility를 고려한 transition objective가 전체 성공률을 높인다. | Orientation-only vs. downstream-aware transition | Rotation success를 통제한 Push success, 즉시 Push 가능률, re-contact, peak force | Terminal contact quality의 독립적 가치 입증 |
-| MH3 | Binary tactile와 wrist F/T가 coarse pose·OBB의 contact uncertainty를 보완한다. | Vision/OBB only, F/T only, tactile only, tactile+F/T; coarse vs. 17-channel | Contact loss, force, recovery, disturbance robustness | 배포 가능한 contact feedback의 효과와 필요한 tactile granularity 규명 |
-| MH4 | Goal-conditioned wrist–finger adaptation이 fixed contact보다 unseen condition에 강건하다. | Fixed hand/contact vs. adaptive policy | Held-out geometry·friction·mass 성공률과 seen–unseen gap | 정의한 randomization 범위에서 adaptive contact control의 이점 입증 |
+| ID | 가설 | 핵심 비교 | 주요 지표 |
+| --- | --- | --- | --- |
+| MH1 | Direct push가 어려운 영역에서 preparatory rotation이 성공 영역을 넓힌다. | Direct push vs. rotate-then-push | 전체 성공률, 성공 가능한 initial-state volume, collision·slip |
+| MH2 | Face-alignment-only objective보다 downstream-aware contact transition이 전체 성공률을 높인다. | Alignment-only vs. downstream-aware | Alignment 성공을 통제한 Push success, $F_{R\rightarrow P}$, contact loss, peak force |
+| MH3 | Binary tactile와 wrist F/T가 coarse pose·OBB의 contact uncertainty를 보완한다. | Vision/OBB only, F/T only, tactile only, tactile+F/T; coarse vs. 17D | Contact loss, force, recovery와 disturbance robustness |
+| MH4 | Task-conditioned 초기 configuration과 필요한 만큼의 wrist–finger adaptation이 fixed hand 또는 unconstrained reconfiguration보다 효율적·강건하다. | Fixed hand vs. free adaptation vs. mild reconfiguration cost | Held-out success, contact loss·switch, hand joint travel와 seen–unseen gap |
 
-결과가 가설을 지지하지 않으면 표현도 제한한다.
+가설이 지지되지 않으면 주장도 다음과 같이 줄인다.
 
-- MH1 미지지: `preparatory rotation이 필요하다`가 아니라 `필요 조건을 분석했다`고 서술
-- MH2 미지지: downstream-aware transition을 contribution으로 주장하지 않음
-- MH3 미지지: coarse sensing을 장점으로 주장하지 않고 sensor limitation으로 보고
-- MH4 미지지: unseen-object robustness 대신 학습 분포 내부의 task execution으로 범위를 축소
+- MH1 미지지: Preparatory rotation의 보편적 필요성이 아니라 필요 조건 분석으로 한정
+- MH2 미지지: Downstream-aware transition을 contribution에서 제외
+- MH3 미지지: Coarse sensing을 장점이 아닌 limitation으로 보고
+- MH4 미지지: Unseen-object robustness 대신 학습 분포 내부의 실행 문제로 한정
 
 ---
 
-## 5. 예상 Contribution과 주장 경계
+## 6. 가능한 contribution과 주장 경계
 
-### 5.1 실험이 지지할 경우의 Contribution 후보
+### 6.1 실험이 지지할 때 가능한 contribution
 
-1. **Downstream-aware contact-transition formulation:** Preparatory Rotation의 terminal state를 후속 Push feasibility와 연결하는 문제 정의와 objective
-2. **Deployable multimodal contact policy:** Coarse OBB·binary tactile·wrist F/T로 wrist–finger contact configuration을 폐루프 조절하는 phase-ID-free policy
-3. **Privileged-to-deployable learning and evaluation:** Simulation의 정확한 contact 정보를 학습에만 사용하고 direct push·orientation-only·sensor·contact adaptation baseline으로 가설을 분리 검증하는 체계
+1. **Downstream-aware contact-transition formulation:** Approach와 Rotation의 상태를 최종 Push feasibility에 연결하는 문제 정의와 objective
+2. **Deployable multimodal contact policy:** Coarse OBB·binary tactile·wrist F/T로 wrist–finger configuration을 폐루프 조절하는 shared policy
+3. **분리 가능한 평가 체계:** Direct push, face-alignment-only, sensor와 contact-adaptation baseline으로 각 가설의 원인을 구분하는 평가
 
-### 5.2 주장하지 않는 범위
+### 6.2 현재 주장하지 않는 범위
 
 - Open-world language instruction과 generalist household-task 성능
 - 여러 robot embodiment 사이의 범용 transfer
-- Vision tracker 자체의 개선
-- 고해상도 tactile reconstruction이나 정확한 contact localization
+- Vision tracker 또는 고해상도 tactile reconstruction의 개선
 - Real-world online adaptation 전반
 - Reward engineering·simulation data·Sim-to-Real 비용의 제거
 - Domain-randomization 범위를 넘는 임의의 물체·물성 일반화
 
-### 5.3 가장 방어 가능한 Positioning
+가장 방어 가능한 positioning은 다음과 같다.
 
-> Track B는 VLA·IL·RL 전체를 대체하는 방법이 아니라, generalist reasoning이나 고정보량 tactile sensing과 구분되는 **제한된 shelf의 downstream-aware physical execution layer**를 연구한다.
+> Track B는 VLA·IL·RL 전체를 대체하는 방법이 아니라, 제한된 shelf에서 **다음 조작까지 실행 가능한 hand/contact state를 형성하는 physical execution layer**를 연구한다.
 
-`기존 방법을 극복한다`는 표현은 observation·action·budget을 합리적으로 맞춘 강한 baseline에서 task success, force safety, robustness와 비용의 일관된 이점이 확인된 뒤에만 사용한다.
+`기존 방법을 극복한다`는 표현은 observation, action, data·compute와 실물 trial budget을 합리적으로 맞춘 baseline에서 일관된 이점이 확인된 뒤에만 사용한다.
 
 ---
 
-## 6. 논문 Introduction용 압축 초안
+## 7. 논문 Introduction용 압축 초안
 
-로봇의 적용 범위가 구조화된 산업 환경에서 물류 선반과 가정으로 확대되면서, 목표 물체에 접근하기 위해 주변 물체를 밀거나 돌리는 contact-rich manipulation의 중요성이 커지고 있다. 이러한 환경에서는 접촉 mode가 계속 바뀌고 국소 형상·마찰·pose 오차가 물체 운동과 힘에 큰 영향을 주기 때문에, unseen object마다 정확한 contact model과 mode sequence를 구성하는 부담이 크다.
+로봇의 적용 범위가 구조화된 산업 환경에서 물류 선반과 가정으로 확대되면서, 목표 물체에 접근하기 위해 주변 물체를 밀거나 돌리는 contact-rich manipulation의 중요성이 커지고 있다. 이러한 환경에서는 접촉 mode가 바뀌고 국소 형상·마찰·pose 오차가 물체 운동과 힘에 큰 영향을 주기 때문에, unseen object마다 정확한 contact model과 mode sequence를 구성하는 부담이 크다.
 
-최근 VLA·IL·RL은 장기 task 일반화, 빠른 action generation, force/tactile grounding과 contact-rich Sim-to-Real을 빠르게 발전시켰다. 따라서 기존 policy가 contact를 보지 못하거나 반응하지 못한다는 일반적 비판은 더 이상 충분하지 않다. 그러나 제한된 shelf에서 direct push가 어려운 blocker를 먼저 회전할 때, 목표 orientation뿐 아니라 후속 Push가 즉시 사용할 수 있는 terminal contact를 형성하는 문제는 별도의 검증 대상으로 남는다.
+최근 VLA·IL·RL은 장기 task 일반화, 빠른 action generation, force/tactile grounding과 contact-rich Sim-to-Real을 발전시켰다. 따라서 기존 policy가 contact를 보지 못하거나 반응하지 못한다는 일반적 비판은 충분하지 않다. 그러나 direct push가 어려운 shelf blocker의 선택 면을 목표 방향에 먼저 정렬해야 할 때, Approach의 hand configuration과 Rotation의 terminal contact가 최종 Push까지 실행 가능한지를 명시적으로 학습·평가하는 문제는 별도로 남는다.
 
-본 연구는 continuous object pose와 coarse OBB, binary tactile, wrist F/T와 proprioception을 사용하는 goal-conditioned RL policy로 Approach–Rotation–Push의 contact transition을 폐루프로 조절한다. Simulation의 정확한 contact·force 정보는 reward와 critic에만 사용하며, 실제 actor는 배포 가능한 저차원 sensing에 제한한다. 이를 통해 preparatory rotation의 필요 조건, downstream-aware transition, contact sensing과 adaptive hand configuration이 전체 pushing 성공과 force safety에 미치는 효과를 분리 검증한다.
+본 연구는 continuous object pose와 coarse OBB, binary tactile, wrist F/T와 proprioception을 사용하는 goal-conditioned RL policy로 Approach→Rotation→Push의 contact transition을 폐루프로 조절한다. Simulation의 정확한 contact·force 정보는 학습 신호에만 사용하고 실제 actor는 배포 가능한 저차원 sensing으로 제한한다. 이를 통해 preparatory rotation의 필요 조건, downstream-aware transition, contact sensing과 adaptive hand configuration이 전체 pushing success와 force safety에 미치는 효과를 분리 검증한다.
 
-> **One-sentence version:** We study goal-conditioned manipulation of unseen shelf blockers, where a preparatory rotation must terminate not only at a target orientation but also in a contact configuration that remains feasible for subsequent pushing.
+> **One-sentence version:** We study goal-conditioned manipulation of unseen shelf blockers, where a selected object face is aligned with the desired push direction while the approach configuration and rotation-terminal contact remain feasible for subsequent pushing.
+
+---
+
+## 8. 근거를 더 확인하려면
+
+- 최신 VLA·IL·RL과 Track B 비교: [`papers/topic_groups.md`](./papers/topic_groups.md#8-최신-vlail-기반-research-motivation)
+- 핵심 논문의 서지정보와 공식 링크: [`papers/core_papers.md`](./papers/core_papers.md)
+- Reward와 transition 근거: [`papers/reward_formulation.md`](./papers/reward_formulation.md)
+- 현재 연구 범위: [`research_topic.md`](./research_topic.md)

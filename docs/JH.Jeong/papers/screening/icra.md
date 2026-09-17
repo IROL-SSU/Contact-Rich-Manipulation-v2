@@ -2,6 +2,8 @@
 
 > [Screening Index](./README.md) · [IROS 목록](./iros.md) · [Paper Index](../README.md)
 
+> **용도:** ICRA screening 결과를 연도별로 찾는 reference table이다. 연구 질문별 해석은 [Screening Index](./README.md)의 주제 페이지를 먼저 사용하고, 이 문서는 특정 연도·논문을 추적할 때 검색한다.
+
 ## ICRA 2021
 
 | CSV ID | 등급 | 논문 | 관점 | 현재 연구에서 확인할 점 |

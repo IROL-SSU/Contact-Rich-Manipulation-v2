@@ -1,48 +1,96 @@
-﻿# 우선 독해 순서와 검토 관점
+# Track B Literature Reading Guide
 
-> [Paper Index](./README.md) · [핵심 B-ID 목록](./core_papers.md) · [목적별 그룹](./topic_groups.md) · [Conference Screening](./screening/README.md)
+> [Literature Map](./README.md) · [핵심 B-ID 목록](./core_papers.md) · [목적별 그룹](./topic_groups.md) · [Conference Screening](./screening/README.md)
 
-## 1. Research motivation 구체화
-
-단순히 유사한 논문을 많이 모으는 것이 아니라 다음 네 축의 비교표를 만드는 것이 목적이다.
-
-1. **Shelf retrieval의 실제 필요:** [B17](https://doi.org/10.48550/arXiv.2502.18423) [RetrDex](https://doi.org/10.48550/arXiv.2502.18423), [IROS21-081](https://doi.org/10.1109/IROS51168.2021.9636230) [Occlusion-Aware Search](https://doi.org/10.1109/IROS51168.2021.9636230), [IROS22-016](https://doi.org/10.1109/IROS47612.2022.9981962) [parallel MCTS retrieval](https://doi.org/10.1109/IROS47612.2022.9981962)과 [ICRA24-169](https://doi.org/10.1109/ICRA57147.2024.10611541) [Unknown Object Retrieval](https://doi.org/10.1109/ICRA57147.2024.10611541)을 통해 blocker 조작이 target visibility·reachability·retrieval에 주는 효용과 상위 planner의 범위를 확인한다.
-2. **Direct push와 preparatory rotation의 경계:** [B21](https://doi.org/10.1109/HUMANOIDS.2013.7030011) [Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011), [ICRA23-103](https://doi.org/10.1109/ICRA48891.2023.10161271) [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271), [IROS22-013](https://doi.org/10.1109/IROS47612.2022.9981873) [Goal-Oriented Non-Prehensile Pushing](https://doi.org/10.1109/IROS47612.2022.9981873)과 [ICRA25-189](https://doi.org/10.1109/ICRA55743.2025.11128166) [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)을 비교해 어떤 초기 pose·geometry·contact 조건에서 rotation이 필요한지 정리한다.
-3. **Contact configuration과 phase 연결:** [B01](https://doi.org/10.48550/arXiv.2509.18455) [GD2P](https://doi.org/10.48550/arXiv.2509.18455), [B02](https://doi.org/10.1109/IROS58592.2024.10802652) [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652), [B03](https://doi.org/10.1109/ICRA55743.2025.11127792) [critic-based grasp scoring](https://doi.org/10.1109/ICRA55743.2025.11127792), [B08](https://doi.org/10.48550/arXiv.2309.00987) [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)와 [ICRA25-147](https://doi.org/10.1109/ICRA55743.2025.11128462) [impedance-primitive HRL](https://doi.org/10.1109/ICRA55743.2025.11128462)을 비교해 rotation terminal state가 후속 pushing 실행 가능성을 어떻게 보존해야 하는지 검토한다.
-4. **Multimodal feedback의 필요:** [B09](https://doi.org/10.1109/LRA.2024.3478571) [DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [IROS21-003](https://doi.org/10.1109/IROS51168.2021.9636836) [COCOI](https://doi.org/10.1109/IROS51168.2021.9636836), [B32](https://doi.org/10.15607/RSS.2023.XIX.036) [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)와 [ICRA25-166](https://doi.org/10.1109/ICRA55743.2025.11127409) [tactile sensing 비교](https://doi.org/10.1109/ICRA55743.2025.11127409)를 통해 coarse geometry·vision만으로 남는 불확실성과 tactile/F/T가 실제로 보완하는 정보를 구분한다.
-
-각 논문은 `문제 설정 / object·scene 조건 / observation / action·controller / contact representation / rotation–translation 관계 / downstream objective / generalization / real validation / 우리 gap에 주는 근거` 열로 정리한다. 이 비교가 끝나기 전에는 `rotate-then-push`, `multimodal`, `multi-finger` 또는 `phase-free RL`의 결합만으로 novelty를 주장하지 않는다.
-
-## 2. Observation formulation
-
-현재 Track B 1단계의 **coarse OBB + arm/hand q + binary tactile + wrist F/T + MLP history** observation을 구체화하기 위한 순서다. 최종 실험 baseline 선정은 아니다. Point cloud·raw RGB·optical tactile는 현재 actor 최소안이 아니라 비교 배경 또는 후속 확장으로 읽는다.
-
-1. **[B09](https://doi.org/10.1109/LRA.2024.3478571) [DexTouch](https://doi.org/10.1109/LRA.2024.3478571) → [B32](https://doi.org/10.15607/RSS.2023.XIX.036) [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036):** Binary tactile와 spatial coverage의 이유를 [B09](https://doi.org/10.1109/LRA.2024.3478571)에서, previous controller target과 finite history의 이유를 [B32](https://doi.org/10.15607/RSS.2023.XIX.036)에서 확인
-2. **[B10](https://doi.org/10.1109/LRA.2023.3295236) [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236) → [B37](https://doi.org/10.1109/TRO.2021.3104471) [Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471):** Pusher/EEF-relative goal과 local contact state를 분리하는 이유, raw tactile image와 contact-pose feature의 차이
-3. **[B35](https://doi.org/10.48550/arXiv.2511.04831) [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831):** URDF link/pad ContactSensor, joint wrench와 ObservationManager history의 실제 구현 경계
-4. **[B12](https://doi.org/10.48550/arXiv.2412.13157) [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157):** Continuous vision의 occlusion·latency와 force history, validity·uncertainty를 처리하는 이유
-5. **[B27](https://openreview.net/forum?id=jf7C7EGw21) [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21):** Image–ResNet과 binary tactile–MLP를 분리한 근거 및 raw image를 현재안에서 제외할 근거
-6. **[B33](https://doi.org/10.1109/ICRA57147.2024.10610532) [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532):** Spatial tactile/point-cloud 표현이 coarse binary보다 주는 정보와 추가 구현 비용의 비교 배경
-7. **[B15](https://doi.org/10.15607/RSS.2024.XX.130) [RoboPack](https://doi.org/10.15607/RSS.2024.XX.130) → [B26](https://doi.org/10.48550/arXiv.2503.16806) [DyWA](https://doi.org/10.48550/arXiv.2503.16806):** Action–contact history로 관측되지 않는 물성·동역학을 추론하는 이유와 recurrent model의 역할
-8. **[B22](https://openreview.net/forum?id=dT3ZciXvNX) [DexMove](https://openreview.net/forum?id=dT3ZciXvNX) → [B34](https://doi.org/10.1109/TRO.2025.3547267) [TacSL](https://doi.org/10.1109/TRO.2025.3547267) → [B36](https://doi.org/10.48550/arXiv.2411.04776) [TacEx](https://doi.org/10.48550/arXiv.2411.04776):** 고차원 tactile·optical tactile가 제공할 수 있는 상한과 현재 ContactSensor baseline의 차이
-9. **[B39](https://doi.org/10.48550/arXiv.2111.03043) [General In-Hand Re-Orientation](https://doi.org/10.48550/arXiv.2111.03043) → [B40](https://doi.org/10.48550/arXiv.2309.09979) [RotateIt](https://doi.org/10.48550/arXiv.2309.09979) → [B38](https://doi.org/10.1109/CVPR.2019.00589) [Rotation Representation](https://doi.org/10.1109/CVPR.2019.00589):** Arbitrary orientation goal, continuous-axis rotation goal과 neural-network용 SO(3) 표현을 구분
-
-현재 tactile 관련 직접 ablation은 `F/T only`, `URDF coarse M-region binary + F/T`, `17-channel binary + F/T`다. 논문의 history 길이와 force threshold는 출발 근거일 뿐 그대로 복사하지 않고 실제 policy rate·sensor latency·hardware calibration으로 정한다.
-
-기존 [GD2P](https://doi.org/10.48550/arXiv.2509.18455)·[Hermans et al.](https://doi.org/10.1109/HUMANOIDS.2013.7030011)·[TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) 중심의 baseline 독해는 폐기하지 않으며, observation 명세 후 reward와 접촉 구성 설계를 진행할 때 이어간다.
-
-## 3. Reward formulation
-
-세부 비교표는 [Reward formulation 문헌 비교](./reward_formulation.md)를 기준으로 한다. 우선순위는 단순히 최신순이 아니라 Track B에서 답해야 할 질문 순서다.
-
-1. **[B81](https://doi.org/10.1109/LRA.2026.3655262):** 2026년 IEEE RA-L의 pushing·pivoting 공통 reward, CITO 시연의 contact·force direction을 reward로 쓰는 이유와 magnitude를 제외한 이유
-2. **[B10](https://doi.org/10.1109/LRA.2023.3295236):** Goal에서 멀 때 orientation, 가까울 때 distance로 전환하고 normal contact term을 항상 유지한 이유
-3. **[B82](https://doi.org/10.1109/ICRA55743.2025.11128166):** OBB keypoint pose reward, direction-only velocity, surface exploration curriculum과 collision·toppling constraint 분리
-4. **[B32](https://doi.org/10.15607/RSS.2023.XIX.036):** Continuous rotation에서 simulator angular velocity 대신 finite rotation angle을 사용하고 drift·fall·work·torque를 억제한 이유
-5. **[B85](https://doi.org/10.1109/ICRA48891.2023.10161271):** Target orientation error 하나로 pivoting을 학습한 최소 formulation과 그 한계
-6. **[B83](https://doi.org/10.3389/fnbot.2023.1271607) → [B84](https://doi.org/10.1109/IROS47612.2022.9981873):** Privileged contact-force direction·lever arm과 contact-maintenance·collision reward의 서로 다른 역할
-7. **[B40](https://doi.org/10.48550/arXiv.2309.09979) → [B86](https://doi.org/10.48550/arXiv.1703.00472):** Continuous-axis rotation과 target-angle pivoting을 혼동하지 않기 위한 경계 사례
-
-독해 결과는 `term 목록`이 아니라 `term → 해결 failure → 필요한 privileged information → 활성 조건 → 예상 부작용 → ablation`으로 기록한다. 기존 논문의 모든 항을 합치는 대신, Track B의 Approach·Rotation·Push와 transition에서 실제로 필요한 항만 단계적으로 검증한다.
+이 문서는 논문을 최신순이나 B-ID순으로 읽지 않고, **하나의 연구 질문에 필요한 전제를 차례로 확인하는 순서**를 제공한다. 각 경로의 마지막에는 독해 후 남겨야 할 결과를 명시한다.
 
 ---
+
+## 1. Motivation을 검증하는 독해 경로
+
+### Step 1. Shelf에서 blocker manipulation이 왜 필요한가
+
+[RetrDex](https://doi.org/10.48550/arXiv.2502.18423), [Occlusion-Aware Search](https://doi.org/10.1109/IROS51168.2021.9636230), [Parallel MCTS Retrieval](https://doi.org/10.1109/IROS47612.2022.9981962)과 [Unknown Object Retrieval](https://doi.org/10.1109/ICRA57147.2024.10611541)을 읽는다.
+
+확인할 내용은 blocker 조작이 target visibility, reachability와 retrieval success에 어떻게 기여하는지, 그리고 blocker 선택·순서 결정이 상위 planner에 얼마나 남아 있는지다.
+
+### Step 2. Direct push와 preparatory rotation의 경계를 찾는다
+
+[Learning Contact Locations](https://doi.org/10.1109/HUMANOIDS.2013.7030011), [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271), [Goal-Oriented Non-Prehensile Pushing](https://doi.org/10.1109/IROS47612.2022.9981873)과 [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)을 비교한다.
+
+여기서는 어떤 initial pose, geometry, 접근 방향과 contact condition에서 straight pushing이 실패하고 rotation이 필요한지를 추출한다.
+
+### Step 3. 좋은 hand configuration을 어떻게 평가하는지 본다
+
+[GD2P](https://doi.org/10.48550/arXiv.2509.18455) → [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) → [RL-Critic Grasp Selection](https://doi.org/10.1109/ICRA55743.2025.11127792) → [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)의 순서로 읽는다.
+
+이 순서는 geometry-conditioned pre-contact pose, task-wrench capability, downstream critic scoring, transition feasibility로 평가 관점이 확장되는 흐름이다. 정적 pose score와 실제 Rotation→Push continuation success를 동일시하지 않는다.
+
+이어서 [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) → [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) → [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)을 비교한다. 첫 논문은 task-informed 초기 grasp와 작은 online adaptation의 결합을, 뒤의 두 논문은 contact switching과 firm-contact 유지가 함께 필요한 조건을 보여준다. 여기서 검증할 명제는 `Approach 후 손 자세를 고정해야 한다`가 아니라 `전체 접촉 지지는 유지하되 성공에 필요하지 않은 재구성은 줄여야 한다`이다.
+
+### Step 4. Contact feedback이 무엇을 보완하는지 확인한다
+
+[DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [COCOI](https://doi.org/10.1109/IROS51168.2021.9636836), [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)과 [Tactile Sensing Comparison](https://doi.org/10.1109/ICRA55743.2025.11127409)을 읽는다.
+
+목표는 `tactile이 유용하다`는 일반론이 아니라, coarse geometry와 vision만으로 관측되지 않는 contact location, force response와 temporal state 중 무엇을 각 센서가 제공하는지 구분하는 것이다.
+
+### 이 경로의 산출물
+
+`환경 조건 → direct-push failure → rotation 필요성 → downstream contact gap → sensing 필요성`이 이어지는 비교표를 만든다. 이 연결이 성립하기 전에는 rotate-then-push, multimodal sensing과 multi-finger control의 결합 자체를 novelty로 주장하지 않는다.
+
+---
+
+## 2. Observation을 검증하는 독해 경로
+
+현재 baseline은 `target position + push direction + selected-face normal + current object pose + coarse OBB + arm/hand q + current 17D binary tactile + current wrist F/T + previous action 1-step`의 66D 입력이다. 다음 순서는 각 입력이 왜 필요한지와 무엇을 제외할지를 판단하기 위한 것이다.
+
+1. **Task command와 current state의 분리:** [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236)과 [Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471)에서 pusher/EEF-relative goal, object state와 local contact feature의 역할을 구분하고, Track B에서는 목표 quaternion 대신 target position·fixed push direction·selected-face normal을 사용하는 이유를 검토한다.
+2. **Current binary tactile의 근거와 반례:** [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)에서 history 없는 spatial binary tactile를, [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)에서 finite state stack이 필요했던 조건을 비교한다.
+3. **구현 가능한 interface:** [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831)에서 ContactSensor, joint wrench, 4D quaternion, `last_action`과 observation history의 실제 API 경계를 확인한다.
+4. **Vision 불확실성과 F/T history:** [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157)에서 occlusion, latency, validity와 temporal force inference가 필요한 이유를 확인한다.
+5. **고차원 tactile의 상한:** [VTDexManip](https://openreview.net/forum?id=jf7C7EGw21), [Robot Synesthesia](https://doi.org/10.1109/ICRA57147.2024.10610532), [TacSL](https://doi.org/10.1109/TRO.2025.3547267)과 [TacEx](https://doi.org/10.48550/arXiv.2411.04776)를 통해 optical/spatial tactile가 추가로 주는 정보와 구현 비용을 비교한다.
+6. **History와 latent dynamics:** [RoboPack](https://doi.org/10.15607/RSS.2024.XX.130)과 [DyWA](https://doi.org/10.48550/arXiv.2503.16806)에서 action–contact history가 물성·동역학 추론에 필요한 조건을 확인한다.
+7. **Orientation 표현:** [General In-Hand Re-Orientation](https://doi.org/10.48550/arXiv.2111.03043), [RotateIt](https://doi.org/10.48550/arXiv.2309.09979)과 [Continuity of Rotation Representations](https://doi.org/10.1109/CVPR.2019.00589)을 통해 task goal과 neural-network representation을 구분한다.
+
+### 이 경로의 산출물
+
+각 observation에 대해 `필요한 task information / sensor source / policy 표현 / sim–real 대응 / 제외 시 예상 failure / ablation`을 한 행으로 기록한다. 논문의 threshold나 history 길이는 복사하지 않고 실제 hardware rate와 calibration으로 다시 정한다.
+
+---
+
+## 3. Reward를 검증하는 독해 경로
+
+세부 비교표는 [`reward_formulation.md`](./reward_formulation.md)를 기준으로 한다. 아래 순서는 term을 많이 수집하기 위한 것이 아니라, Track B reward의 각 층을 순서대로 정당화하기 위한 것이다.
+
+1. **Task progress와 success:** [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)에서 pushing·pivoting의 공통 task progress, sparse success와 demonstration-conditioned reward를 확인한다.
+2. **Gate가 필요한 이유:** [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236)에서 goal distance에 따라 orientation·position reward의 의미를 바꾼 이유를 본다.
+3. **Shaping과 safety의 분리:** [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)에서 OBB goal, surface exploration과 action rate를 collision·toppling constraint와 구분한 이유를 확인한다.
+4. **Rotation goal의 종류:** [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036), [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271)과 [RotateIt](https://doi.org/10.48550/arXiv.2309.09979)을 비교해 target orientation과 continuous rotation reward를 구분한다.
+5. **Privileged force의 용도:** [Adaptive Reaching and Pushing](https://doi.org/10.3389/fnbot.2023.1271607)과 [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)에서 force magnitude보다 direction·lever arm과 safety 결과를 사용한 이유를 본다.
+6. **Downstream feasibility:** [RL-Critic Grasp Selection](https://doi.org/10.1109/ICRA55743.2025.11127792), [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)과 [Value-Informed Skill Chaining](https://doi.org/10.1109/IROS55552.2023.10342180)을 통해 이전 상태를 후속 성공으로 평가하는 근거와 critic overestimation 위험을 확인한다.
+
+### 이 경로의 산출물
+
+Reward 검토 결과는 `term 이름`이 아니라 다음 형식으로 남긴다.
+
+> `해결할 failure → 계산 신호 → actor/privileged 경계 → 활성 조건 → 예상 부작용 → 검증할 ablation`
+
+기존 논문의 모든 항을 합치지 않는다. Final task success를 먼저 고정하고, phase shaping, safety constraint, regularization과 downstream candidate를 한 층씩 추가한다.
+
+---
+
+## 4. 논문 한 편을 기록하는 공통 형식
+
+새 논문을 읽을 때 다음 순서로 요약한다.
+
+1. 논문이 실제로 해결한 task와 environment
+2. Object·scene·robot·sensor 조건
+3. Observation과 전처리
+4. Action과 controller
+5. Reward·loss·training data
+6. Contact representation과 phase transition
+7. Generalization과 real validation
+8. Track B에 직접 가져올 수 있는 근거
+9. 그대로 이식할 수 없는 조건
+
+이 형식으로 확인한 뒤에만 [`topic_groups.md`](./topic_groups.md)의 해석이나 [`reward_formulation.md`](./reward_formulation.md)의 설계 근거로 사용한다.
