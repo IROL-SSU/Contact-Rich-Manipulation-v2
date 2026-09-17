@@ -4,7 +4,7 @@
 
 ## 처음 읽는 사람의 권장 순서
 
-1. [`motivation.md`](./motivation.md) — 왜 이 문제가 필요하고 기존 연구에서 무엇이 남았는가
+1. [`Intro/`](./Intro/README.md) — Research Motivation → Research Trend → Previous Works → Candidate Contributions
 2. [`research_topic.md`](./research_topic.md) — 현재 연구가 무엇을 포함하고 어디까지를 다루는가
 3. [`policy_learning.md`](./policy_learning.md) — actor input, action, privileged information과 reward를 어떻게 구현할 것인가
 4. [`papers/README.md`](./papers/README.md) — 각 판단을 뒷받침하는 논문을 어디서 찾는가
@@ -16,7 +16,7 @@
 
 | 문서 | 답하는 질문 | 포함하지 않는 내용 |
 | --- | --- | --- |
-| [`motivation.md`](./motivation.md) | 왜 연구해야 하며 기존 연구 대비 gap은 무엇인가? | 센서 수치·reward 식의 세부 구현 |
+| [`Intro/`](./Intro/README.md) | 왜 연구해야 하며 기존 연구 대비 gap과 contribution 후보는 무엇인가? | 센서 수치·reward 식의 세부 구현 |
 | [`research_topic.md`](./research_topic.md) | 현재 연구의 대상·단계·역할 경계와 평가 수준은 무엇인가? | 과거 제안과 상세 결정 과정 |
 | [`policy_learning.md`](./policy_learning.md) | Policy 학습 환경을 어떤 observation·action·reward로 구현하는가? | 광범위한 문헌 목록과 연구 배경 서술 |
 | [`papers/`](./papers/README.md) | 어떤 논문이 어떤 주장과 설계의 근거인가? | 현재 연구 명세의 중복 서술 |
@@ -28,7 +28,7 @@ Track B는 shelf blocker의 선택된 OBB 면을 목표 방향에 정렬한 뒤 
 
 ## 문서 갱신 원칙
 
-- 연구 배경이나 핵심 주장이 바뀌면 `motivation.md`를 수정한다.
+- 연구 배경, research trend, previous works 또는 contribution 후보가 바뀌면 `Intro/`의 해당 문서를 수정한다.
 - 현재 범위와 역할 경계가 바뀌면 `research_topic.md`를 수정한다.
 - Actor·critic·environment 계약이 바뀌면 `policy_learning.md`를 수정한다.
 - 논문을 추가하거나 해석을 보강하면 `papers/`의 해당 페이지를 수정한다.

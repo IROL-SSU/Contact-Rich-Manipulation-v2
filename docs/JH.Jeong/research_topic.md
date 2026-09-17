@@ -16,7 +16,7 @@
 
 현재 연구의 핵심은 물체를 단순히 돌린 뒤 미는 동작의 나열이 아니다. Approach에서 만든 wrist–hand configuration이 Rotation을 가능하게 하고, Rotation이 끝났을 때의 접촉 상태가 다음 Push의 실행 가능성을 결정한다. 따라서 각 단계의 성공은 다음 단계까지 이어지는지를 포함해 평가해야 한다.
 
-연구 배경과 기존 연구 대비 gap은 [`motivation.md`](./motivation.md), actor·reward의 구현 계약은 [`policy_learning.md`](./policy_learning.md), 문헌은 [`papers/README.md`](./papers/README.md), 결정 과정은 [`context.md`](./context.md)를 따른다.
+연구 배경과 기존 연구 대비 gap은 [`Intro/`](./Intro/README.md), actor·reward의 구현 기준은 [`policy_learning.md`](./policy_learning.md), 문헌은 [`papers/README.md`](./papers/README.md), 결정 과정은 [`context.md`](./context.md)를 따른다.
 
 ---
 
@@ -213,7 +213,7 @@ Rotation terminal state에서는 face-alignment success와 subsequent Push succe
 
 ## 7. 다음에 읽을 문서
 
-1. 문제의 필요성과 문헌상 gap: [`motivation.md`](./motivation.md)
+1. 문제의 필요성과 문헌상 gap: [`Intro/`](./Intro/README.md)
 2. Actor·reward의 구현 명세: [`policy_learning.md`](./policy_learning.md)
 3. 목적별 논문과 독해 순서: [`papers/README.md`](./papers/README.md)
 4. 결정 근거와 변경 이력: [`context.md`](./context.md)

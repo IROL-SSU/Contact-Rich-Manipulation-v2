@@ -12,10 +12,12 @@
 
 ### 연구의 필요성과 gap을 검토할 때
 
-1. [`../motivation.md`](../motivation.md)에서 현재 주장과 research question을 확인한다.
-2. [`topic_groups.md`](./topic_groups.md#8-최신-vlail-기반-research-motivation)에서 최신 VLA·IL·RL이 이미 해결한 부분과 남은 질문을 비교한다.
-3. [`reading_guide.md`](./reading_guide.md#1-motivation을-검증하는-독해-경로)의 순서대로 핵심 원문을 읽는다.
-4. 정확한 서지정보와 공식 원문은 [`core_papers.md`](./core_papers.md)에서 찾는다.
+1. [`../Intro/README.md`](../Intro/README.md)에서 Intro의 전체 논리와 research question을 확인한다.
+2. [`../Intro/research_trend.md`](../Intro/research_trend.md)에서 2021년 이후 planning/control·RL·IL·VLA의 흐름과 비교 기준을 확인한다.
+3. [`../Intro/previous_works.md`](../Intro/previous_works.md)에서 closest work와 contribution 경계를 확인한다.
+4. [`topic_groups.md`](./topic_groups.md#8-최신-vlail-기반-research-motivation)에서 최신 VLA·IL·RL이 이미 해결한 부분과 남은 질문을 비교한다.
+5. [`reading_guide.md`](./reading_guide.md#1-motivation을-검증하는-독해-경로)의 순서대로 핵심 원문을 읽는다.
+6. 정확한 서지정보와 공식 원문은 [`core_papers.md`](./core_papers.md)에서 찾는다.
 
 ### Policy observation을 설계할 때
 
@@ -36,6 +38,8 @@
 | 문서 | 용도 | 읽는 방식 |
 | --- | --- | --- |
 | [`core_papers.md`](./core_papers.md) | B-ID, 제목, venue, DOI와 공식 자료의 기준 목록 | 특정 ID나 제목을 찾는 lookup table |
+| [`../Intro/research_trend.md`](../Intro/research_trend.md) | 2021년 이후 method-family timeline과 장단점 | 발표의 Research Trend 및 RL 선택 근거 |
+| [`../Intro/previous_works.md`](../Intro/previous_works.md) | Nonprehensile manipulation의 environment·agent·system 비교 | Closest-work gap을 판정하는 비교문 |
 | [`topic_groups.md`](./topic_groups.md) | 논문을 Track B의 연구 질문별로 묶고 활용점·한계를 비교 | 필요한 질문의 절만 읽는 synthesis |
 | [`reading_guide.md`](./reading_guide.md) | Motivation, observation, reward별 우선 독해 순서 | 위에서 아래로 읽는 작업 순서 |
 | [`reward_formulation.md`](./reward_formulation.md) | Reward term, 해결 failure, 이식 가능성과 위험 분석 | 결론→pushing→rotation→Track B 합성 순으로 읽는 분석문 |
@@ -47,7 +51,7 @@
 
 ## 3. ID와 근거 수준
 
-- `B01–B89`는 상세 검토 대상으로 승격한 핵심 corpus의 고정 ID다. 새 논문은 검토 후 `B90`부터 부여한다.
+- `B01–B98`는 상세 검토 대상으로 승격한 핵심 corpus의 고정 ID다. 새 논문은 검토 후 `B99`부터 부여한다.
 - `ICRAyy-NNN`, `IROSyy-NNN`은 conference screening ID이며 핵심 B-ID와 구분한다.
 - 목록에 포함됐다는 사실은 baseline 채택, 방법 재현 또는 논문 claim의 검증을 의미하지 않는다.
 - `screening`은 초록 수준, `core_papers`는 서지 확인, `topic_groups`와 `reward_formulation`은 연구 질문에 연결한 분석이라는 근거 수준 차이가 있다.

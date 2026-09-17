@@ -1,6 +1,6 @@
 # Track B Literature Reading Guide
 
-> [Literature Map](./README.md) · [핵심 B-ID 목록](./core_papers.md) · [목적별 그룹](./topic_groups.md) · [Conference Screening](./screening/README.md)
+> [Literature Map](./README.md) · [Intro](../Intro/README.md) · [Previous Works 비교](../Intro/previous_works.md) · [핵심 B-ID 목록](./core_papers.md) · [목적별 그룹](./topic_groups.md) · [Conference Screening](./screening/README.md)
 
 이 문서는 논문을 최신순이나 B-ID순으로 읽지 않고, **하나의 연구 질문에 필요한 전제를 차례로 확인하는 순서**를 제공한다. 각 경로의 마지막에는 독해 후 남겨야 할 결과를 명시한다.
 
@@ -8,19 +8,33 @@
 
 ## 1. Motivation을 검증하는 독해 경로
 
-### Step 1. Shelf에서 blocker manipulation이 왜 필요한가
+### Step 1. 상위 task category와 method trend를 먼저 구분한다
+
+먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)를 읽고, 2021년의 [Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)·[Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471)에서 2025–2026년의 [HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154)·[Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[ForceVLA](https://doi.org/10.52202/085713-3124)·[Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)로 이어지는 변화를 비교한다.
+
+확인할 내용은 planning/control, RL, IL와 VLA가 서로 일방적으로 대체된 것이 아니라 physical model, demonstration prior, semantic prior와 interaction learning을 서로 다른 비율로 결합해 왔다는 점이다. RL 선택은 보편적 우위가 아니라 `명확한 low-level goal + 불확실한 contact outcome + 풍부한 simulation interaction + 제한된 real demonstration`이라는 현재 조건에서 정당화한다.
+
+그다음 [`../Intro/previous_works.md`](../Intro/previous_works.md)의 Environment–Agent–System 표에서 closest systems만 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
+
+### Step 2. Geometry uncertainty를 처리하는 대안을 비교한다
+
+[GD2P](https://doi.org/10.48550/arXiv.2509.18455), [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [PIN-WM](https://doi.org/10.15607/RSS.2025.XXI.153), [Visuotactile Estimation and Control](https://doi.org/10.48550/arXiv.2412.13157)과 [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)을 읽는다.
+
+정확하거나 dense한 geometry를 사용하는 방법, visual history·world model로 dynamics를 추론하는 방법, tactile·F/T로 execution 중 오차를 보완하는 방법을 분리한다. 이 비교를 거쳐야 `approximate OBB + low-dimensional contact feedback`이 단순한 입력 축소인지, 성능·데이터·계산량 사이의 의미 있는 설계점인지 판단할 수 있다.
+
+### Step 3. Shelf blocker가 상위 문제에서 어떤 역할을 하는가
 
 [RetrDex](https://doi.org/10.48550/arXiv.2502.18423), [Occlusion-Aware Search](https://doi.org/10.1109/IROS51168.2021.9636230), [Parallel MCTS Retrieval](https://doi.org/10.1109/IROS47612.2022.9981962)과 [Unknown Object Retrieval](https://doi.org/10.1109/ICRA57147.2024.10611541)을 읽는다.
 
 확인할 내용은 blocker 조작이 target visibility, reachability와 retrieval success에 어떻게 기여하는지, 그리고 blocker 선택·순서 결정이 상위 planner에 얼마나 남아 있는지다.
 
-### Step 2. Direct push와 preparatory rotation의 경계를 찾는다
+### Step 4. Direct push와 preparatory rotation의 경계를 찾는다
 
 [Learning Contact Locations](https://doi.org/10.1109/HUMANOIDS.2013.7030011), [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271), [Goal-Oriented Non-Prehensile Pushing](https://doi.org/10.1109/IROS47612.2022.9981873)과 [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)을 비교한다.
 
 여기서는 어떤 initial pose, geometry, 접근 방향과 contact condition에서 straight pushing이 실패하고 rotation이 필요한지를 추출한다.
 
-### Step 3. 좋은 hand configuration을 어떻게 평가하는지 본다
+### Step 5. 좋은 hand configuration을 어떻게 평가하는지 본다
 
 [GD2P](https://doi.org/10.48550/arXiv.2509.18455) → [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) → [RL-Critic Grasp Selection](https://doi.org/10.1109/ICRA55743.2025.11127792) → [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)의 순서로 읽는다.
 
@@ -28,15 +42,21 @@
 
 이어서 [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) → [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) → [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)을 비교한다. 첫 논문은 task-informed 초기 grasp와 작은 online adaptation의 결합을, 뒤의 두 논문은 contact switching과 firm-contact 유지가 함께 필요한 조건을 보여준다. 여기서 검증할 명제는 `Approach 후 손 자세를 고정해야 한다`가 아니라 `전체 접촉 지지는 유지하되 성공에 필요하지 않은 재구성은 줄여야 한다`이다.
 
-### Step 4. Contact feedback이 무엇을 보완하는지 확인한다
+### Step 6. Contact feedback이 무엇을 보완하는지 확인한다
 
-[DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [COCOI](https://doi.org/10.1109/IROS51168.2021.9636836), [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)과 [Tactile Sensing Comparison](https://doi.org/10.1109/ICRA55743.2025.11127409)을 읽는다.
+[Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135), [DexTouch](https://doi.org/10.1109/LRA.2024.3478571), [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [Rotating without Seeing](https://doi.org/10.15607/RSS.2023.XIX.036)과 [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)을 읽는다.
 
-목표는 `tactile이 유용하다`는 일반론이 아니라, coarse geometry와 vision만으로 관측되지 않는 contact location, force response와 temporal state 중 무엇을 각 센서가 제공하는지 구분하는 것이다.
+목표는 `tactile/F/T가 유용하다`는 일반론이 아니라, coarse geometry와 vision만으로 관측되지 않는 contact location, contact mode, resultant wrench와 temporal state 중 무엇을 각 센서가 제공하는지 구분하는 것이다. High-resolution tactile, binary tactile와 wrist F/T를 동일한 정보로 취급하지 않는다.
+
+### Step 7. Sequence와 transition 주장의 경계를 확인한다
+
+[HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154), [SPIN](https://doi.org/10.48550/arXiv.2502.18015), [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)과 [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442)을 비교한다.
+
+Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 것 자체는 contribution이 아니다. 우리 방법에 explicit downstream-feasibility objective가 없다면 Rotation-to-Push는 우선 분리된 evaluation metric으로만 유지한다.
 
 ### 이 경로의 산출물
 
-`환경 조건 → direct-push failure → rotation 필요성 → downstream contact gap → sensing 필요성`이 이어지는 비교표를 만든다. 이 연결이 성립하기 전에는 rotate-then-push, multimodal sensing과 multi-finger control의 결합 자체를 novelty로 주장하지 않는다.
+`task category → uncertainty 처리 전략 → application boundary → direct-push failure → rotation 필요성 → downstream contact gap → sensing 역할`이 이어지는 비교표를 만든다. 이 연결이 성립하기 전에는 rotate-then-push, multimodal sensing과 multi-finger control의 결합 자체를 novelty로 주장하지 않는다.
 
 ---
 

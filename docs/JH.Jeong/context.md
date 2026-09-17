@@ -16,7 +16,7 @@
 
 ### 1.1 이 문서의 우선순위
 
-이 문서는 현재 연구 정의를 통제하기 위한 기준 문서다. 기존의 [`README.md`](./README.md), [`motivation.md`](./motivation.md), [`research_topic.md`](./research_topic.md), [`policy_learning.md`](./policy_learning.md)와 [`papers/`](./papers/README.md)는 이번 재검토의 근거로 읽었지만 수정하지 않았다. 해당 문서에서 하나의 확정안처럼 서술된 내용도 이 문서에서 `[Baseline]`, `[Open]` 또는 `[Candidate]`로 재분류되었다면 최신 판단은 이 문서를 따른다.
+이 문서는 현재 연구 정의를 통제하기 위한 기준 문서다. [`README.md`](./README.md), [`Intro/`](./Intro/README.md), [`research_topic.md`](./research_topic.md), [`policy_learning.md`](./policy_learning.md)와 [`papers/`](./papers/README.md)의 내용이 하나의 확정안처럼 서술되어 있더라도, 이 문서에서 `[Baseline]`, `[Open]` 또는 `[Candidate]`로 재분류되었다면 최신 판단은 이 문서를 따른다.
 
 상태 표기는 다음 의미로만 사용한다.
 
@@ -438,7 +438,18 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 
 ## 10. Previous Works Classification Criteria
 
-### 10.1 두 문헌 흐름과 연구의 교차점
+### 10.1 Research Trend와 closest Previous Works의 분리
+
+문헌은 발표에서 서로 다른 질문에 답하는 두 층으로 나눈다.
+
+| Layer | Question | Inclusion | Output |
+| --- | --- | --- | --- |
+| **Research Trend** | 2021년 이후 heuristic/planning, RL, IL와 VLA가 contact가 수반되는 manipulation을 어떻게 확장했으며, 왜 현재 문제에 RL을 우선하는가? | Direct nonprehensile work와 method 변화의 중요한 adjacent contact-rich IL/VLA | Timeline, family별 장단점, 조건부 RL 선택 근거 |
+| **Closest Previous Works** | 우리와 유사한 environment·sensing·action·task 조건에서 무엇이 이미 해결되었고 어떤 교차점을 검증해야 하는가? | Nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 연구 | Environment–Agent–System 비교표와 candidate contribution |
+
+`Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
+
+### 10.2 두 문헌 흐름과 연구의 교차점
 
 Previous Works의 주 구조는 method family의 단순 나열이 아니라 다음 두 흐름으로 구성한다.
 
@@ -463,23 +474,29 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 
 `Method Family`는 두 흐름을 대체하는 상위 분류가 아니라, 각 논문의 action generation과 학습 방법을 기록하는 **보조 metadata**로 사용한다.
 
-### 10.2 Main comparison table의 column
+### 10.3 Main comparison table의 column
 
 각 column은 하나의 질문만 답한다.
 
 | Group | Column | Single question | Allowed coding |
 | --- | --- | --- | --- |
-| Environment | Surrounding Objects | 실행 중 조작 대상 외 물체가 존재하는가? | Absent / Present; 개수·이동성·접촉 허용은 별도 environment-detail 표에 기록 |
-| Environment | Geometry Information | Deployment policy가 받는 explicit/implicit shape 정보는 무엇인가? | None / Approximate explicit / Exact explicit / Implicit visual |
-| Agent | Task-Conditioned Hand Configuration | Hand/contact configuration이 manipulation goal에 조건화되는가? | No / Pre-contact only / Online |
-| Agent | Tactile Feedback | Tactile이 실행 중 policy feedback으로 사용되는가? | No / Binary-discrete / Continuous-spatial |
-| Agent | Wrist F/T Feedback | Wrist force/torque가 실행 중 policy feedback으로 사용되는가? | No / Force only / 6-axis wrench |
-| Agent | Online Wrist–Finger Adaptation | 접촉 후 wrist와 finger를 모두 online으로 변경하는가? | None / Wrist only / Finger only / Both |
-| System | Method Family | 핵심 action-generation/training family는 무엇인가? | Heuristic / Optimization or Generative / RL / IL / VLA |
+| Environment | Workspace | 어떤 공간에서 실행하는가? | Open tabletop / Cluttered tabletop / Fixture-constrained / Mixed / General environment / Shelf-constrained |
+| Environment | Non-target Contact | 비표적 물체·환경 접촉의 역할은 무엇인가? | Absent / Avoided / Used / Open |
+| Environment | Geometry Input | Deployment policy/control이 받는 geometry는 무엇인가? | None / Implicit visual / Dense explicit / Approximate explicit / Exact |
+| Agent | End Effector | 무엇으로 물체와 접촉하는가? | Rigid EEF / Tactile pusher / Parallel gripper / Grasped object or tool / Dexterous hand |
+| Agent | Tactile | 별도 tactile array의 정보량은 어느 수준인가? | None / Contact flag / Binary array / High-dimensional |
+| Agent | Wrist F/T | Wrist wrench를 policy/control input으로 쓰는가? | No / Yes / Optional |
+| Agent | Action Authority | Online action이 무엇을 움직이는가? | EEF / EEF + fingers |
+| Agent | Configuration Conditioning | Hand/contact configuration을 task goal에 맞추며 언제 조정하는가? | N/A / Fixed / Goal-conditioned initial / Goal-conditioned online |
+| System | Task Scope | 어떤 nonprehensile behavior를 수행·연결하는가? | Push / Pivot–slide / Push or pivot / Repositioning / Multi-mode / Approach–Rotation–Push |
+| System | Method | Deployment action 생성의 주된 mechanism은 무엇인가? | Control / Optimization / RL / IL / VLA / Hybrid |
+| System | Online Correction | 실행 중 무엇을 주로 수정하는가? | Contact relation / Object motion / State estimate / Contact mode / Object + contact motion |
+
+`Robustness`, `Context awareness`, `Generalizable`처럼 논문마다 의미가 달라지는 포괄적 column은 사용하지 않는다. 대신 실제 perturbation, held-out split과 evaluation condition을 별도 evidence table에 기록한다.
 
 `Subsequent-Action Transition`은 현재 main table column으로 넣지 않는다. 논문이 실제로 terminal-state feasibility, skill chaining 또는 continuation success를 학습·평가하는 경우에만 별도 transition-analysis table에서 비교한다.
 
-### 10.3 Evidence and inclusion rules
+### 10.4 Evidence and inclusion rules
 
 - 공식 출판 페이지와 full text를 먼저 확인한다.
 - DOI는 publisher metadata와 대조한다. DOI가 없으면 `No DOI—preprint` 또는 공식 proceedings URL로 표시한다.
@@ -490,7 +507,7 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 - Heuristic, optimization/generative, RL, IL와 VLA를 균형 있게 포함하되, data·compute·sensor 조건이 다른 방법의 raw success rate를 직접 비교하지 않는다.
 - 최근 연구를 우선하되 reward·contact mechanics의 직접 근거가 되는 오래된 연구는 `foundational comparator`로 별도 표시한다.
 
-### 10.4 균형 잡힌 초기 후보군
+### 10.5 균형 잡힌 초기 후보군
 
 이 표는 최종 baseline 선정이 아니라 비교표를 채울 출발점이다.
 
@@ -638,6 +655,8 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-17 | Intro 관련 논리가 root의 `motivation.md`와 `papers/`의 세부 문서에 분산 | `Intro/`를 만들고 `README.md` → `research_motivation.md` → `research_trend.md` → `previous_works.md` → `contributions.md` 순서로 재배치 | 발표 및 논문 Introduction의 독해 순서를 고정하고, 서론 논리·문헌 registry·policy 설계의 역할을 분리하기 위해 | Documentation topology, 10–13 |
+| 2026-09-17 | Motivation과 Previous Works 안에서 method-family 흐름과 closest-system 비교가 혼재 | `Research Motivation → Research Trend → Closest Previous Works → Candidate Contributions`로 분리하고, trend는 RL 선택 근거, closest comparison은 contribution 검증 근거로 한정 | 발표가 broad application에서 method 선택과 좁은 research gap으로 단계적으로 수렴하도록 하기 위해 | 10–13 |
 | 2026-09-17 | Shelf blocker 문제를 `contact-rich manipulation`이라는 task category로 표현 | 연구 정의를 **Tactile- and Force-Guided Nonprehensile Manipulation under Approximate Geometry**로 통일하고, `nonprehensile manipulation`은 task category, `contact-rich`는 interaction/control challenge로 분리 | 과업의 종류와 접촉 불확실성이라는 해결 과제를 혼동하지 않기 위해 | 1–3, 12 |
 | 2026-09-17 | Previous Works를 method family와 개별 sensor 중심으로 배열 | Nonprehensile manipulation과 contact-feedback-based manipulation의 두 흐름 및 교차점으로 재구성하고 method family는 보조 metadata로 이동 | Research gap이 어느 두 연구축 사이에 있는지 명확히 하기 위해 | 10–11 |
 | 2026-09-17 | Coarse-geometry contact formation과 tactile/F/T adaptation이 넓은 candidate contribution으로 제시 | Geometry-error 보완, downstream contact-state quality와 online adaptation 효과가 실험으로 확인될 때만 C1/C2를 확정하도록 조건 강화 | 센서 사용과 sequential framing 자체를 novelty로 오해하지 않기 위해 | 5, 8, 11–12 |
