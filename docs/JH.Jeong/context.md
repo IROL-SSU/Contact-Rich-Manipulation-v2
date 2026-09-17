@@ -198,7 +198,23 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 
 이 절은 contribution이 아니라 **가설을 검증하기 위한 최초 구현안**이다.
 
-### 6.1 Policy organization
+### 6.1 Primary learning framework
+
+- `[Baseline]` 현재 low-level execution policy의 primary learning framework는 RL이다.
+- `[Baseline]` RL 선택은 다른 방법보다 본질적으로 우월하다는 주장이 아니라, **정확한 contact model보다 simulation interaction을 얻기 쉽고, real tactile/F/T demonstration coverage는 제한되며, contact feedback에 따른 recovery와 full-episode outcome을 함께 최적화해야 한다**는 현재 문제 조건에 따른 선택이다.
+- `[Rejected]` RL 사용 자체를 contribution 또는 novelty로 주장하는 방식.
+- `[Open]` RL 선택의 실험적 타당성은 geometry perturbation과 contact disturbance 조건에서 heuristic/model-based 또는 IL baseline보다 유의한 이득이 있는지, 그리고 Sim-to-Real 성능이 유지되는지로 판단한다.
+
+| Alternative family | 우리 조건에서 단독 적용할 때 남는 문제 | 본 연구에서 유지할 역할 | Status |
+| --- | --- | --- | --- |
+| Heuristic / motion primitive | Approximate geometry로 nominal contact가 달라지고 contact migration·slip·separation의 조합이 증가하면 예외 규칙이 확장됨 | 초기 action prior, reset behavior, 해석 가능한 최소 비교군 | `[Baseline]` |
+| Model-based planning / optimization / control | 정확한 geometry·friction·contact mode 또는 신뢰할 수 있는 online state estimate가 필요하며, wrist–finger contact sequence의 반복 재계획 비용이 발생함 | OSC/Differential IK, safety constraint, optimization-guided baseline | `[Baseline]` |
+| IL | Geometry perturbation, 잘못된 접촉과 failure recovery를 포함하는 tactile/F/T demonstration coverage의 수집 비용이 크며, imitation objective가 final Rotation-to-Push success를 직접 최적화하지는 않음 | 동일 observation/action을 사용하는 강한 learning baseline과 향후 pretraining | `[Candidate]` |
+| VLA | Semantic task prior에는 강하지만 contact-level correction에는 tactile/F/T가 포함된 data와 architecture가 별도로 필요하고, 현재 task의 고정된 semantics에서는 generalist 규모의 직접 이득이 불명확함 | 상위 task command와 goal-generation interface | `[Candidate]` |
+
+이 한계들은 각 family가 contact-rich manipulation을 해결할 수 없다는 뜻이 아니다. Reactive IL과 force-aware VLA는 명시적 반례이며, 최신 흐름은 model·demonstration·RL을 결합하는 hybridization에 가깝다. 따라서 Research Trend는 family의 우열이 아니라 **현재 정보·data·interaction budget에서 RL을 먼저 구현하는 조건부 이유**를 설명한다.
+
+### 6.2 Policy organization
 
 - `[Baseline]` 하나의 shared MLP policy가 세 sub-objective를 수행한다.
 - `[Baseline]` Actor에 phase ID를 주지 않고 current task/contact state에 따라 reward term을 gate한다.
@@ -206,7 +222,7 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 - `[Open]` Shared phase-free policy의 이점은 아직 입증되지 않았다. `phase ID 포함 shared policy`와 `phase-specific policies/controller`를 비교해야 한다.
 - `[Rejected]` Shared policy 또는 phase-ID 제거 자체를 검증 없이 contribution으로 표현하는 방식.
 
-### 6.2 Current observation snapshot
+### 6.3 Current observation snapshot
 
 현재 66D 구성은 구현 가능한 첫 baseline일 뿐 연구 범위가 아니다.
 
@@ -227,7 +243,7 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 - `[Open]` Threshold, filtering, history, action memory와 exact sensor mapping은 실물 log와 ablation으로 결정한다.
 - `[Open]` Selected-face representation과 OBB consistency가 unseen/non-box-like objects에서 충분한지 검증한다.
 
-### 6.3 Action and controller
+### 6.4 Action and controller
 
 | Element | Current choice | Status |
 | --- | --- | --- |
@@ -240,7 +256,7 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 
 6-DoF wrist와 finger action을 함께 쓰는 이유는 contact location, force direction과 configuration을 online으로 바꿀 자유도를 제공하기 위해서다. 이것이 모두 필요하다는 주장은 H4의 control ablation으로 검증한다.
 
-### 6.4 Reward and safety structure
+### 6.5 Reward and safety structure
 
 | Layer | Baseline role | Examples | Status |
 | --- | --- | --- | --- |
@@ -255,7 +271,7 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 - `[Baseline]` Contact loss는 회복 가능한 penalty event이며 자동 failure termination이 아니다.
 - `[Open]` Contact 유지 penalty와 hand-motion cost가 실제로 필요한지 H4에서 비교한다.
 
-### 6.5 Current meaning of next-phase consideration
+### 6.6 Current meaning of next-phase consideration
 
 다음 세 수준을 구분한다.
 
@@ -267,7 +283,7 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 
 현재 method에 명확히 존재하는 것은 N1과 N2다. N3가 없는 상태에서 `explicit downstream-feasibility learning method`를 contribution으로 확정하지 않는다.
 
-### 6.6 Contact and reconfiguration behavior
+### 6.7 Contact and reconfiguration behavior
 
 - `[Baseline]` 최초 접촉 이후 적어도 하나의 hand–blocker contact를 가급적 유지한다.
 - `[Baseline]` 동일 finger, taxel 또는 contact patch를 계속 유지하도록 강제하지 않는다.
@@ -449,6 +465,15 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
+RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른다.
+
+1. Heuristic, planning/optimization/control, IL와 VLA가 이미 해결한 범위를 먼저 제시한다.
+2. 각 family를 단독 적용할 때 approximate geometry, contact-state uncertainty, demonstration coverage와 low-level correction 중 무엇이 남는지 구분한다.
+3. Simulation interaction, perturbation distribution, task-level success metric과 deployable actor observation을 구성할 수 있을 때에만 RL을 현재 primary framework로 선택한다.
+4. Reward design, unsafe exploration과 Sim-to-Real gap은 RL이 새로 만드는 위험으로 함께 제시한다.
+
+따라서 `왜 RL인가`는 `[Baseline]` 방법 선택의 근거이며 contribution이 아니다. RL이 matched baseline보다 robustness 또는 Rotation-to-Push 성능을 개선하지 못하면 이 선택의 실험적 근거도 약해진다.
+
 ### 10.2 두 문헌 흐름과 연구의 교차점
 
 Previous Works의 주 구조는 method family의 단순 나열이 아니라 다음 두 흐름으로 구성한다.
@@ -574,6 +599,8 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 | Aggregate contact maintenance | 동일 contact set을 고정하지 않고 적어도 하나의 hand–object support contact를 선호하는 것 |
 | Transition evaluation | 앞 phase 종료 state에서 다음 phase rollout 성공을 별도로 측정하는 것 |
 | Explicit downstream learning | 다음 phase feasibility를 별도 value/reward/objective로 직접 최적화하는 것 |
+| Ours | Previous Works 비교표에서 현재 제안 연구 시스템을 지칭하는 행 이름; 개별 설계가 확정되었거나 contribution이 검증되었다는 뜻은 아님 |
+| Baseline | 가설 검증을 위해 먼저 구현하는 변경 가능한 내부 방법안 또는 비교 대상; 제안 연구 전체의 고유명사가 아님 |
 
 ### 12.2 Actor, privileged information and metric
 
@@ -599,6 +626,8 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 | Tactile/F/T를 사용한다는 점이 novelty다. | 센서의 상보적 효과와 robustness gain이 H3에서 입증될 때만 method claim의 일부가 된다. | `[Rejected]` |
 | Sequential/downstream-aware contact formation은 현재 contribution이다. | N1/N2/N3의 의미를 구분하고 H2에서 downstream success 향상이 입증될 때만 contribution 후보를 확정한다. | `[Rejected]` |
 | IL은 reactive하지 않고 VLA는 force를 사용하지 못한다. | 최신 reactive IL과 force/tactile VLA가 반례다. Track B의 좁은 execution gap만 비교한다. | `[Rejected]` |
+| RL은 다른 manipulation 방법보다 일반적으로 우월하므로 선택한다. | 현재 문제에서 simulation interaction을 얻을 수 있고 real demonstration coverage가 제한되며 contact-dependent recovery와 episode outcome을 함께 최적화해야 하므로 primary baseline으로 선택한다. | `[Baseline]` |
+| Previous Works 표의 제안 연구 행을 `Our baseline`이라 부른다. | 제안 연구 전체는 `Ours`, 변경 가능한 최초 구현안과 비교군만 `baseline`으로 부른다. | `[Superseded]` |
 | OBB는 mesh/point cloud보다 현실적으로 항상 우월하다. | OBB는 deployability를 위한 baseline이며 정보 손실과 error를 geometry ladder로 평가한다. | `[Rejected]` |
 | 최초 접촉 후 hand reconfiguration은 최소여야 한다. | Minimum-necessary reconfiguration은 H4에서 검증할 효율 가설이다. | `[Hypothesis]` |
 | Surrounding objects는 모두 forbidden collision이다. | S0 baseline에서는 부재하며 S1/S2의 존재·접촉 규칙은 OD-1에서 결정한다. | `[Open]` |
@@ -655,6 +684,8 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-17 | `왜 RL인가`를 주로 RL의 장점과 문제 조건의 대응으로 설명 | 다른 family가 해결한 범위와 단독 적용 시 남는 문제를 먼저 제시하고, simulation interaction·제한된 demonstration coverage·contact-dependent recovery 조건에서 RL을 선택하는 논리로 변경 | 다른 방법을 약한 비교 대상으로 만들지 않고 RL을 조건부 baseline 선택으로 정당화하기 위해 | 6.1, 10.1, 12.3 |
+| 2026-09-17 | Previous Works 비교표의 제안 연구 행을 `Our baseline`으로 표기 | 제안 연구 행은 `Ours`로, 변경 가능한 최초 구현안과 비교 대상은 `baseline`으로 구분 | 제안 연구 전체와 provisional implementation의 의미 혼동을 방지하기 위해 | 10, 12.1–12.3 |
 | 2026-09-17 | Intro 관련 논리가 root의 `motivation.md`와 `papers/`의 세부 문서에 분산 | `Intro/`를 만들고 `README.md` → `research_motivation.md` → `research_trend.md` → `previous_works.md` → `contributions.md` 순서로 재배치 | 발표 및 논문 Introduction의 독해 순서를 고정하고, 서론 논리·문헌 registry·policy 설계의 역할을 분리하기 위해 | Documentation topology, 10–13 |
 | 2026-09-17 | Motivation과 Previous Works 안에서 method-family 흐름과 closest-system 비교가 혼재 | `Research Motivation → Research Trend → Closest Previous Works → Candidate Contributions`로 분리하고, trend는 RL 선택 근거, closest comparison은 contribution 검증 근거로 한정 | 발표가 broad application에서 method 선택과 좁은 research gap으로 단계적으로 수렴하도록 하기 위해 | 10–13 |
 | 2026-09-17 | Shelf blocker 문제를 `contact-rich manipulation`이라는 task category로 표현 | 연구 정의를 **Tactile- and Force-Guided Nonprehensile Manipulation under Approximate Geometry**로 통일하고, `nonprehensile manipulation`은 task category, `contact-rich`는 interaction/control challenge로 분리 | 과업의 종류와 접촉 불확실성이라는 해결 과제를 혼동하지 않기 위해 | 1–3, 12 |
@@ -663,12 +694,12 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 | 2026-09-17 | Fixed scope, 가설, 66D implementation과 contribution 후보가 하나의 `최신 합의`로 혼재 | `[Fixed] / [Hypothesis] / [Baseline] / [Open] / [Candidate]`로 재분류 | 연구 정의와 구현 snapshot을 분리하기 위해 | 1–13 전체 |
 | 2026-09-17 | `research_topic.md`와 `policy_learning.md`의 현재안이 사실상 확정 명세처럼 읽힘 | 기존 문서는 참고 snapshot, 이 문서를 분류 기준으로 지정 | 다른 문서를 수정하지 않고 판단 기준을 안정화하기 위해 | 1.1 |
 | 2026-09-17 | Selected face+direction, 66D observation, shared MLP와 phase-ID 제거가 현재 연구 정의에 포함 | 모두 provisional baseline으로 이동 | 실험 결과와 hardware interface에 따라 바뀔 수 있기 때문 | 3.2, 6, 12.3 |
-| 2026-09-17 | `Downstream-aware`가 shared return, explicit reward와 transition metric을 혼용 | N1 shared return, N2 transition evaluation, N3 explicit learning으로 분리 | 현재 explicit mechanism이 없는데 contribution처럼 보이는 문제를 제거 | 6.5, 7.3, 11, 12 |
+| 2026-09-17 | `Downstream-aware`가 shared return, explicit reward와 transition metric을 혼용 | N1 shared return, N2 transition evaluation, N3 explicit learning으로 분리 | 현재 explicit mechanism이 없는데 contribution처럼 보이는 문제를 제거 | 6.6, 7.3, 11, 12 |
 | 2026-09-17 | Surrounding objects가 존재하는 듯 서술하면서 모두 forbidden collision로 처리 | S0/S1/S2를 open environment decision으로 분리 | 단순 obstacle인지 research variable인지 불명확했기 때문 | 3.6, 7.1, 9 |
 | 2026-09-17 | Marker pose, OBB와 exact geometry의 관계가 명확하지 않음 | No/Approximate/Implicit/Exact geometry taxonomy와 G0–G3 ladder 추가 | Geometry claim과 perturbation 실험을 정의하기 위해 | 3.3, 7.2, 9, 10 |
-| 2026-09-17 | Contact 유지와 fixed contact configuration이 혼동될 수 있음 | Aggregate contact preference와 contact migration/re-contact를 분리 | Online adaptation 가설과 모순을 제거 | 6.6, H4, 12 |
+| 2026-09-17 | Contact 유지와 fixed contact configuration이 혼동될 수 있음 | Aggregate contact preference와 contact migration/re-contact를 분리 | Online adaptation 가설과 모순을 제거 | 6.7, H4, 12 |
 | 2026-09-17 | Candidate contribution이 method description과 섞임 | C1–C4를 필요한 method·실험·확정 조건과 함께 조건부로 정리 | 결과 이전의 novelty 확정을 방지 | 8 |
-| 2026-09-17 | Reward term과 metric이 동일한 성공 정의처럼 사용될 수 있음 | Training signal과 independent evaluation을 명시적으로 분리 | Reward hacking과 순환 논증을 방지 | 6.4, 9 |
+| 2026-09-17 | Reward term과 metric이 동일한 성공 정의처럼 사용될 수 있음 | Training signal과 independent evaluation을 명시적으로 분리 | Reward hacking과 순환 논증을 방지 | 6.5, 9 |
 
 ### 14.2 Preserved history from the previous context
 
