@@ -4,20 +4,20 @@
 >
 > **상태:** Contribution은 closest-work comparison과 실험으로 지지되기 전까지 모두 `Candidate`다.
 >
-> **최종 갱신:** 2026-09-17
+> **최종 갱신:** 2026-09-18
 
 ---
 
 ## 1. 문서 구성
 
-Intro는 위에서 아래로 다음 순서로 읽는다.
+Intro는 위에서 아래로 하나의 논증처럼 읽는다. 각 문서는 앞 문서의 결론을 입력으로 받고, 다음 문서가 답해야 할 질문을 남긴다.
 
-| 순서 | 문서 | 답하는 질문 |
-| ---: | --- | --- |
-| 1 | [Research Motivation](./research_motivation.md) | 왜 nonprehensile manipulation과 contact uncertainty를 연구해야 하는가? |
-| 2 | [Research Trend](./research_trend.md) | 2021년 이후 heuristic/planning·RL·IL·VLA는 어떻게 발전했고, 왜 현재 문제에 RL을 우선하는가? |
-| 3 | [Previous Works](./previous_works.md) | 우리와 가까운 system은 무엇을 해결했으며 어떤 교차점이 남는가? |
-| 4 | [Candidate Contributions](./contributions.md) | 남은 교차점을 어떤 실험으로 검증하고 언제 contribution으로 확정할 수 있는가? |
+| 순서 | 문서 | 앞 단계에서 받는 내용 | 이 단계의 결론과 다음 질문 |
+| ---: | --- | --- | --- |
+| 1 | [Research Motivation](./research_motivation.md) | 실제 환경의 manipulation 수요 | Nonprehensile task와 approximate-geometry contact uncertainty를 연구 문제로 좁힌다. **어떤 method가 이 조건에 적합한가?** |
+| 2 | [Research Trend](./research_trend.md) | 정의된 task·uncertainty·data 조건 | RL을 조건부 baseline으로 선택한다. **가까운 연구가 이미 무엇을 해결했고 무엇이 남았는가?** |
+| 3 | [Previous Works](./previous_works.md) | RL 선택은 novelty가 아니라는 경계 | Closest systems를 비교해 C1·C2 후보와 필요한 transition evaluation을 도출한다. **어떤 결과가 contribution을 지지하거나 기각하는가?** |
+| 4 | [Candidate Contributions](./contributions.md) | 문헌으로 확인된 사실과 남은 질문 | Candidate claim을 matched comparison·metric·지지/기각 조건으로 변환하고 Method·Experiments로 넘긴다. |
 
 ---
 
@@ -36,7 +36,7 @@ Model-based planning/control과 task-specific heuristic만으로 확장하기 �
         ↓
 RL · IL · VLA를 포함한 learning-based manipulation의 발전
         ↓
-현재 문제 조건에는 simulation interaction과 task return을 활용하는 RL이 적합
+현재 model·data·interaction 조건에서 RL을 primary baseline으로 조건부 선택
         ↓
 Approximate geometry와 coarse contact feedback의 교차점에서 남은 질문 식별
         ↓
@@ -86,10 +86,10 @@ Push / Translation
 2. **Task category:** Grasp만으로 어려운 상황과 nonprehensile manipulation의 역할
 3. **Interaction challenge:** Approximate geometry 아래 contact uncertainty
 4. **Research Trend:** 2021–2026 representative timeline
-5. **Method analysis:** Heuristic/planning, RL, IL와 VLA의 강점·한계
+5. **Method analysis:** Heuristic/control/planning, RL, IL, VLA와 Hybrid의 강점·한계
 6. **Why RL here:** 현재 low-level problem과 RL의 조건부 적합성
 7. **Previous Works:** Environment–Agent–System codebook과 closest-work comparison
 8. **Remaining intersection:** Approximate geometry × contact feedback × wrist–finger execution
-9. **Candidate Contributions:** C1–C3와 각각의 falsification experiment
+9. **Candidate Contributions:** C1·C2와 각각의 falsification experiment; Rotation-to-Push 분석은 공통 evaluation protocol로 제시
 
 최종 slide 문구는 논문별 full-text evidence와 실험 설계가 확정된 뒤 작성한다.

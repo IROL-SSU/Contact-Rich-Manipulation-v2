@@ -10,7 +10,7 @@
 
 ### Step 1. 상위 task category와 method trend를 먼저 구분한다
 
-먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)를 읽고, 2021년의 [Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)·[Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471)에서 2025–2026년의 [HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154)·[Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[ForceVLA](https://doi.org/10.52202/085713-3124)·[Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)로 이어지는 변화를 비교한다.
+먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)를 읽고, 2021년의 [Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)·[Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471)에서 2025–2026년의 [HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154)·[Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[ForceVLA](https://doi.org/10.52202/085713-3124)·[Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160)·[Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)로 이어지는 변화를 비교한다.
 
 확인할 내용은 planning/control, RL, IL와 VLA가 서로 일방적으로 대체된 것이 아니라 physical model, demonstration prior, semantic prior와 interaction learning을 서로 다른 비율로 결합해 왔다는 점이다. RL 선택은 보편적 우위가 아니라 `명확한 low-level goal + 불확실한 contact outcome + 풍부한 simulation interaction + 제한된 real demonstration`이라는 현재 조건에서 정당화한다.
 

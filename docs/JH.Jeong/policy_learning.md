@@ -6,7 +6,7 @@
 >
 > **상태**: working baseline — 확정된 방향과 실험으로 결정할 항목을 구분한다.
 >
-> **최종 갱신**: 2026-09-17
+> **최종 갱신**: 2026-09-18
 
 ---
 
@@ -78,6 +78,21 @@ $$
 Episode는 hand–object non-contact 상태에서 시작한다. 초기 wrist–hand pose와 blocker pose의 sampling 규칙은 아직 미결이지만, 초기·목표 상태와 회전 중 swept footprint는 shelf의 사용 가능 영역 안에 있어야 한다. Rotation 중 병진은 허용한다. 다만 object의 support footprint가 shelf 경계를 벗어나거나, robot/object가 pillar·다른 물체와 금지된 접촉을 만들면 safety violation이다. Object 바닥과 shelf support plane의 정상적인 지지 접촉은 허용한다.
 
 선택 면은 episode 시작 시 고정한다. 매 frame OBB를 다시 fitting해 face identity를 재할당하지 않고, 초기 OBB frame과 object pose tracking으로 같은 object-local face label의 방향을 갱신한다. 현재 1단계에서는 face 선택을 상위 task generator의 역할로 두며, policy가 후보 면 중 하나를 고르는 문제는 후속 확장이다.
+
+![기둥과 주변 물체가 있는 개방형 선반에서 5-finger hand가 선택된 OBB 면에 후속 동작이 가능한 접촉을 형성하고, 그 면의 inward pushing normal을 목표 push direction에 정렬한 뒤, 정렬과 접촉을 유지하며 병진하는 과정](assets/approach-rotation-push.svg)
+
+**Figure — 선반 안 Approach–Rotation–Push의 task-level 관계.** 베이지색 점선은 측벽이 없는 shelf deck의 usable boundary이며, 어두운 원은 shelf pillar, 회색 도형은 surrounding object를 나타낸다. Object–support-plane 접촉은 허용하지만 robot/blocker와 pillar·surrounding object의 접촉은 현재 baseline에서 금지한다. 초록색 접촉 도구는 parallel gripper가 아니라 RH56E2 5-finger hand를 단순화한 top-view schematic이다. 주황색 면은 상위 모듈이 선택한 episode-consistent OBB face이며 정확한 mesh contact patch가 아니라 coarse task label이다. 선택 면의 outward normal 반대 방향을 inward pushing normal $\mathbf n_{f,t}^{E}$로 정의한다. Rotation의 정렬 기준은
+
+$$
+c_{\mathrm{align},t}
+=
+(\mathbf n_{f,t}^{E})^{\mathsf T}\mathbf d_{\mathrm{push},t}^{E}
+=
+\cos e_{\mathrm{align},t}
+\rightarrow 1
+$$
+
+이다. 이는 $e_{\mathrm{align},t}\rightarrow0$과 같으며, 목표 quaternion을 따르는 것이 아니라 두 unit vector의 방향을 일치시킨다는 뜻이다. Approach는 이 회전을 시작하고 이후 Push까지 이어갈 수 있는 wrist–hand/contact state를 형성하며, Push는 정렬과 aggregate contact를 유지하면서 목표 위치로 병진한다. 그림의 세 단계는 task-level progress 순서이지 actor에게 phase ID를 주거나 action을 hard-switching한다는 뜻은 아니다. 정확한 alignment success threshold는 reward·evaluation threshold calibration 이후 확정한다.
 
 ### 1.3 Action과 previous action의 의미
 

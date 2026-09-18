@@ -1,4 +1,4 @@
-# Research Motivation
+# Research Motivation — From Application Need to Research Question
 
 > [Intro](./README.md) · [Research Trend](./research_trend.md) · [Previous Works](./previous_works.md) · [Candidate Contributions](./contributions.md)
 >
@@ -38,19 +38,7 @@ Vision과 coarse geometry는 object pose, 접근 방향과 nominal contact face 
 | Wrist F/T | Hand–environment system의 net force/torque와 load 변화 | 개별 contact 위치와 sensor별 force 분포 |
 | Proprioception | Arm/hand configuration과 command 결과 | 외부 contact state와 hidden physical properties |
 
-## 4. Limits of conventional approaches
-
-Conventional approach를 하나의 약한 방법으로 묶지 않는다.
-
-- **Task-specific heuristic**은 계산이 빠르고 구현 의도가 명확하지만, object shape·friction·contact sequence가 바뀔 때 규칙과 threshold를 다시 설계해야 할 수 있다.
-- **Model-based planning/control**은 physical constraint를 명시하고 failure 원인을 해석하기 좋지만, geometry·friction·contact-mode model의 정확도에 민감하며 contact sequence와 clutter가 늘수록 search와 modeling 비용이 커질 수 있다.
-- 두 접근 모두 잘 정의된 model과 범위에서는 강력한 baseline이며 safety layer 또는 demonstration generator로 활용할 수 있다.
-
-[Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)처럼 physics simulation과 search를 결합한 방법과 [Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135)처럼 contact mode를 명시적으로 최적화한 방법은 conventional method의 강점을 보여준다. 문제는 이러한 방법이 무효라는 것이 아니라, **approximate geometry 아래에서 다양한 contact outcome과 recovery를 모두 사전에 열거하고 모델링하기 어렵다**는 점이다.
-
-이 한계 때문에 RL, IL과 VLA를 포함한 learning-based manipulation이 대안으로 발전했다. 각 family의 실제 장단점과 현재 문제에서 RL을 우선하는 이유는 [Research Trend](./research_trend.md)에서 비교한다.
-
-## 5. Application narrowing
+## 4. Broad problem에서 현재 연구 대상으로 좁히기
 
 본 연구는 위 broader problem 가운데 다음 instance를 다룬다.
 
@@ -64,4 +52,18 @@ Conventional approach를 하나의 약한 방법으로 묶지 않는다.
 
 > **Approximate geometry만 주어진 조건에서 contact feedback을 이용해 실제 geometry/contact mismatch를 보완하고, 이후 Rotation과 Push에 유효한 hand/contact state 및 wrist–finger motion을 형성·조정할 수 있는가?**
 
-이 질문에서 곧바로 contribution을 선언하지 않는다. 먼저 [Research Trend](./research_trend.md)에서 method 선택을 설명하고, [Previous Works](./previous_works.md)에서 closest systems와 남은 교차점을 비교한다.
+## 5. Method 선택을 검토해야 하는 이유
+
+이제 문제는 정의되었지만 해결 방법은 아직 정해지지 않았다. Conventional approach를 하나의 약한 방법으로 묶어 배제해서는 안 된다.
+
+- **Task-specific heuristic**은 계산이 빠르고 구현 의도가 명확하지만, object shape·friction·contact sequence가 바뀔 때 규칙과 threshold를 다시 설계해야 할 수 있다.
+- **Model-based planning/control**은 physical constraint를 명시하고 failure 원인을 해석하기 좋지만, geometry·friction·contact-mode model의 정확도에 민감하며 contact sequence와 clutter가 늘수록 search와 modeling 비용이 커질 수 있다.
+- 두 접근 모두 잘 정의된 model과 범위에서는 강력한 baseline이며 safety layer 또는 demonstration generator로 활용할 수 있다.
+
+[Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)처럼 physics simulation과 search를 결합한 방법과 [Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135)처럼 contact mode를 명시적으로 최적화한 방법은 conventional method의 강점을 보여준다. 문제는 이러한 방법이 무효라는 것이 아니라, **approximate geometry 아래에서 다양한 contact outcome과 recovery를 모두 사전에 열거하고 모델링하기 어렵다**는 점이다.
+
+Learning-based method도 자동으로 해답이 되는 것은 아니다. RL은 reward·simulation transfer 문제를, IL은 demonstration coverage 문제를, VLA는 data·compute budget과 low-level contact precision 문제를 각각 가진다. 따라서 Motivation 단계의 결론은 특정 method의 선택이 아니라 다음 질문이다.
+
+> **Heuristic/control, planning, RL, IL와 VLA는 contact-feedback manipulation을 어떻게 확장해 왔으며, 현재의 model·data·interaction 조건에서는 어떤 framework를 우선해야 하는가?**
+
+이 질문은 다음 문서인 [Research Trend](./research_trend.md)에서 다룬다. Method가 선택된 뒤에야 [Previous Works](./previous_works.md)에서 가까운 system과 남은 research gap을 비교한다.
