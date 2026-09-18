@@ -73,15 +73,21 @@ $$
 s_{\mathrm{push}}\mathbf{d}_{\mathrm{push}}^{W}
 $$
 
-상위 모듈은 blocker, 목표 push direction·distance와 사용할 OBB lateral face를 제공한다고 가정한다. Object-local outward normal을 $\mathbf n_{f,\mathrm{out}}^O$라 할 때 실제 힘이 향해야 하는 inward pushing normal은 $\mathbf n_f^O=-\mathbf n_{f,\mathrm{out}}^O$로 정의한다. 정책은 목표 위치, push direction과 현재 선택 면의 pushing normal을 EEF frame으로 받는다.
+상위 모듈은 blocker, 목표 push direction·distance와 사용할 OBB lateral face를 제공한다고 가정한다. Object-local outward normal을 $\mathbf n_{f,\mathrm{out}}^O$라 할 때, 선택 면에서 물체 안쪽을 향하는 inward pushing normal은 $\mathbf n_f^O=-\mathbf n_{f,\mathrm{out}}^O$로 정의한다. 정책은 목표 위치, push direction과 현재 선택 면의 pushing normal을 EEF frame으로 받는다. Push direction은 목표 병진 방향이고, pushing normal은 coarse geometry의 방향이며, 실제 접촉력 방향은 접촉과 마찰에 의해 결정되는 별도 물리량이다.
 
 Episode는 hand–object non-contact 상태에서 시작한다. 초기 wrist–hand pose와 blocker pose의 sampling 규칙은 아직 미결이지만, 초기·목표 상태와 회전 중 swept footprint는 shelf의 사용 가능 영역 안에 있어야 한다. Rotation 중 병진은 허용한다. 다만 object의 support footprint가 shelf 경계를 벗어나거나, robot/object가 pillar·다른 물체와 금지된 접촉을 만들면 safety violation이다. Object 바닥과 shelf support plane의 정상적인 지지 접촉은 허용한다.
 
 선택 면은 episode 시작 시 고정한다. 매 frame OBB를 다시 fitting해 face identity를 재할당하지 않고, 초기 OBB frame과 object pose tracking으로 같은 object-local face label의 방향을 갱신한다. 현재 1단계에서는 face 선택을 상위 task generator의 역할로 두며, policy가 후보 면 중 하나를 고르는 문제는 후속 확장이다.
 
-![기둥과 주변 물체가 있는 개방형 선반에서 5-finger hand가 선택된 OBB 면에 후속 동작이 가능한 접촉을 형성하고, 그 면의 inward pushing normal을 목표 push direction에 정렬한 뒤, 정렬과 접촉을 유지하며 병진하는 과정](assets/approach-rotation-push.svg)
+![5-finger hand가 blocker 후면 모서리에 hook contact를 형성해 회전시키고, 선택 면 normal을 CoM에서 표시한 목표 push direction에 정렬한 뒤 손바닥 접촉으로 밀어 target 접근 공간을 여는 예시](assets/approach-rotation-push.svg)
 
-**Figure — 선반 안 Approach–Rotation–Push의 task-level 관계.** 베이지색 점선은 측벽이 없는 shelf deck의 usable boundary이며, 어두운 원은 shelf pillar, 회색 도형은 surrounding object를 나타낸다. Object–support-plane 접촉은 허용하지만 robot/blocker와 pillar·surrounding object의 접촉은 현재 baseline에서 금지한다. 초록색 접촉 도구는 parallel gripper가 아니라 RH56E2 5-finger hand를 단순화한 top-view schematic이다. 주황색 면은 상위 모듈이 선택한 episode-consistent OBB face이며 정확한 mesh contact patch가 아니라 coarse task label이다. 선택 면의 outward normal 반대 방향을 inward pushing normal $\mathbf n_{f,t}^{E}$로 정의한다. Rotation의 정렬 기준은
+**Figure — Hook contact에서 palm pushing으로 이어지는 동작 예시.** 세 패널에서 target, surrounding objects와 shelf pillar의 위치는 같고, 조작 대상인 blocker와 robot hand만 움직인다. Approach는 비접촉 시작 이후 후면 모서리에 손가락을 걸어 접촉을 형성한 시점을, Rotation은 hook contact로 물체를 돌려 선택 면을 push direction에 정렬한 시점을 보여준다. Push에서는 넓은 손바닥 접촉으로 전환해 정렬을 유지하며 blocker를 이동시킨다. 여기서 후면은 목표 push direction의 반대쪽 측면을 뜻한다. 초록색 영역은 blocker 이동으로 열린 접근 공간이며, target retrieval 자체는 현재 low-level policy의 수행 범위에 포함하지 않는다.
+
+회색 평면은 측벽 없는 shelf deck이며 네 모서리의 원형 부품은 pillar다. 파란 손목과 흰색 하우징·검은 손가락은 UR5e–RH56E2의 개념도다. [RH56E2 공식 제품 자료](https://en.inspire-robots.com/product/rh56e2/)를 참고해 네 손가락의 링크·관절과 별도의 엄지를 구분했으며, 손은 접촉 관계를 설명하기 위한 도식적 투영으로 표현했다. 실제 CAD/URDF 렌더링이나 관절각의 정확한 투영은 아니다. Hook-to-palm 순서는 접촉 변화의 예시로서, 정확한 hand pose의 실행 가능성과 효과는 URDF·joint limit 및 rollout으로 검증해야 한다. 모든 손가락이 물체에 닿는 배치를 의미하지 않으며, 특정 hook이나 다섯 손가락의 동시 접촉을 reward의 필수 조건으로 확정하지 않는다. Object–support-plane 접촉은 허용하고, robot/blocker와 pillar·비표적 물체의 접촉은 현재 baseline에서 금지한다. 주변 물체의 수·배치는 예시이며 randomization 설정을 확정하는 그림은 아니다.
+
+주황색 점선은 approximate OBB, 굵은 주황색 선은 episode 동안 동일하게 추적하는 selected face다. 주황색 화살표는 이 면의 **inward pushing normal**, 파란색 화살표는 **commanded push direction**이다. 그림에서 파란 화살표는 물체의 **CoM에서 시작**해 목표 병진 방향을 나타낸다. 방향 자체는 상위 task goal로 정해지며 CoM 위치만으로 결정되지 않는다. 그림의 균일한 상자에서는 설명을 위해 CoM과 기하 중심을 일치시켰으나, 일반 물체의 CoM은 OBB 중심과 다를 수 있다. 실제 CoM은 actor observation에 추가하지 않고 기존 privileged-information 구분을 유지한다.
+
+두 화살표는 실제 contact-force 측정값을 뜻하지 않으며 selected face도 정확한 mesh contact patch가 아닌 coarse task label이다. 선택 면의 outward normal 반대 방향을 $\mathbf n_{f,t}^{E}$로 정의하면 Rotation의 정렬 기준은
 
 $$
 c_{\mathrm{align},t}
@@ -92,7 +98,11 @@ c_{\mathrm{align},t}
 \rightarrow 1
 $$
 
-이다. 이는 $e_{\mathrm{align},t}\rightarrow0$과 같으며, 목표 quaternion을 따르는 것이 아니라 두 unit vector의 방향을 일치시킨다는 뜻이다. Approach는 이 회전을 시작하고 이후 Push까지 이어갈 수 있는 wrist–hand/contact state를 형성하며, Push는 정렬과 aggregate contact를 유지하면서 목표 위치로 병진한다. 그림의 세 단계는 task-level progress 순서이지 actor에게 phase ID를 주거나 action을 hard-switching한다는 뜻은 아니다. 정확한 alignment success threshold는 reward·evaluation threshold calibration 이후 확정한다.
+이다. 이는 $e_{\mathrm{align},t}\rightarrow0$과 같으며, 두 unit vector가 **같은 방향**을 향하도록 정렬한다는 뜻이다. Figure의 평면상 화살표는 공통 shelf/task frame으로 그렸고, actor에서는 두 벡터를 매 step 현재 EEF frame으로 변환한다. 같은 회전 변환을 적용하므로 두 벡터의 내적과 정렬각은 변하지 않는다. Push 중에도 이 관계와 aggregate contact를 유지하면서 목표 위치로 병진한다.
+
+그림은 이해를 위한 세 snapshot이며 **CoM을 중심으로 회전하도록 요구하지 않는다.** CoM은 목표 병진 방향 화살표를 표시하는 기준점일 뿐 회전축이 아니다. Rotation의 목적은 selected-face normal과 push direction의 정렬이며, CoM 고정이나 지정 pivot 경로 추종을 성공 조건에 넣지 않는다. 접촉 상태에 따라 회전 중심이 달라지거나 이동할 수 있고, Rotation 중 병진과 필요한 contact migration·reconfiguration도 허용한다. 이를 나타내기 위해 Rotation 패널은 초기 점선 OBB와 비교해 orientation과 중심 위치가 모두 변한 snapshot으로 그렸다. 특정 고정 pivot이나 고정 hand pose를 지정한 궤적은 아니다. Initial alignment가 이미 적합하면 Rotation을 생략할 수 있다. 세 단계는 task-level progress 순서이며 phase ID 제공이나 hard action switching을 의미하지 않는다. 정확한 alignment success threshold는 reward·evaluation threshold calibration 이후 확정한다.
+
+면 정렬은 병진을 위한 기하학적 조건이며, 순수 병진을 보장하는 충분조건은 아니다. 접촉력 $\mathbf f_i$가 CoM에 만드는 모멘트는 $(\mathbf p_i-\mathbf p_{\mathrm{CoM}})\times\mathbf f_i$이므로, 여러 finger·palm 접촉의 힘 분배와 shelf의 지지·마찰 반력까지 함께 고려해야 한다. [Adaptive Reaching and Pushing](https://doi.org/10.3389/fnbot.2023.1271607)의 §3.3은 목표 방향에 대한 force alignment와 CoM에 대한 force-line lever arm 감소를 별도로 보상한다. 본 연구에서도 hook-to-palm 전환이 불필요한 회전을 줄이는지는 실제 orientation drift·접촉력·성공률로 검증하며, CoM 관련 force shaping은 기존 Candidate 상태를 유지한다.
 
 ### 1.3 Action과 previous action의 의미
 
@@ -136,7 +146,7 @@ $$
 | ID | Observation | 실물 정보원 | Frame·표현 | 시간 범위 | 차원 | 상태 및 포함 이유 |
 |---|---|---|---|---:|---:|---|
 | O1 | 목표 물체 position $\mathbf{p}_{O,g,t}^{E}$ | 상위 task command + EEF pose | EEF frame, Cartesian | 현재 | 3 | **Core**. 최종 이동 위치와 lateral deviation 판단 |
-| O2 | 목표 push direction $\mathbf{d}_{\mathrm{push},t}^{E}$ | 상위 task command + EEF pose | EEF frame, unit vector | 현재 | 3 | **Core**. 경로에서 벗어나도 변하지 않는 이동·힘 방향 |
+| O2 | 목표 push direction $\mathbf{d}_{\mathrm{push},t}^{E}$ | 상위 task command + EEF pose | EEF frame, unit vector | 현재 | 3 | **Core**. Task/world frame에서 고정한 목표 이동 방향·면 정렬 기준을 매 step EEF frame으로 변환 |
 | O3 | 선택 면의 현재 pushing normal $\mathbf{n}_{f,t}^{E}$ | 선택 face + object pose + EEF pose | EEF frame, inward unit normal | 현재 | 3 | **Core**. Rotation alignment와 Push 중 정렬 유지 판단 |
 | O4 | 현재 object position $\mathbf{p}_{EO,t}^{E}$ | vision tracker | EEF frame, Cartesian | 현재 | 3 | **Core**. 현재 object–EEF 관계 |
 | O5 | 현재 object orientation $\overline{\mathbf{q}}_{EO,t}$ | vision tracker | EEF frame, canonical unit quaternion | 현재 | 4 | **Core**. 현재 3D 자세·tilt와 OBB 축 방향 표현 |

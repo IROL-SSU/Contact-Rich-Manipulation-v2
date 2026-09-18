@@ -461,19 +461,20 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 
 | Layer | Question | Inclusion | Output |
 | --- | --- | --- | --- |
-| **Research Trend** | 2021년 이후 heuristic/planning, RL, IL와 VLA가 contact가 수반되는 manipulation을 어떻게 확장했으며, 왜 현재 문제에 RL을 우선하는가? | Direct nonprehensile work와 method 변화의 중요한 adjacent contact-rich IL/VLA | Timeline, family별 장단점, 조건부 RL 선택 근거 |
+| **Research Trend** | 2021년 이후 heuristic/planning, RL, IL와 VLA가 contact가 수반되는 manipulation을 어떻게 확장했으며, nonprehensile manipulation 자체에서 어떤 구조적 trade-off를 가진 뒤 왜 현재 문제에 RL을 우선하는가? | Direct nonprehensile work와 method 변화의 중요한 adjacent contact-rich IL/VLA | Timeline, NPM 공통 난제에 대한 family별 강점·한계, 조건부 RL 선택 근거 |
 | **Closest Previous Works** | 우리와 유사한 environment·sensing·action·task 조건에서 무엇이 이미 해결되었고 어떤 교차점을 검증해야 하는가? | Nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 연구 | Environment–Agent–System 비교표와 candidate contribution |
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
-Research Trend의 timeline은 `Direct/Adjacent`를 표의 별도 label로 사용하지 않고 `Heuristic/Control/Planning`, `RL`, `IL`, `VLA`, `Hybrid`의 다섯 method lane으로 구성한다. Hybrid 연구는 `(Optimization + RL)`, `(VLA + Control)`처럼 실제 결합 요소를 함께 기록하며 단일 family의 열에 중복 배치하지 않는다. 논문의 우리 task에 대한 직접성은 closest Previous Works의 paper-level evidence에서만 판단한다. Trend의 설명 순서는 `대표 timeline → 각 method가 해결한 부분과 추가 요구 → 현재 조건에서 RL을 우선하는 이유와 반증 조건`으로 고정한다.
+Research Trend의 timeline은 `Direct/Adjacent`를 표의 별도 label로 사용하지 않고 `Heuristic/Control/Planning`, `RL`, `IL`, `VLA`, `Hybrid`의 다섯 method lane으로 구성한다. Hybrid 연구는 `(Optimization + RL)`, `(VLA + Control)`처럼 실제 결합 요소를 함께 기록하며 단일 family의 열에 중복 배치하지 않는다. 논문의 우리 task에 대한 직접성은 closest Previous Works의 paper-level evidence에서만 판단한다. Trend의 설명 순서는 `대표 timeline → NPM 공통 난제에 대한 method별 강점과 구조적 한계 → 현재 조건에 trade-off 적용 → RL을 우선하는 이유와 반증 조건`으로 고정한다.
 
 RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른다.
 
 1. Heuristic, planning/optimization/control, IL와 VLA가 이미 해결한 범위를 먼저 제시한다.
-2. 각 family를 단독 적용할 때 approximate geometry, contact-state uncertainty, demonstration coverage와 low-level correction 중 무엇이 남는지 구분한다.
-3. Simulation interaction, perturbation distribution, task-level success metric과 deployable actor observation을 구성할 수 있을 때에만 RL을 현재 primary framework로 선택한다.
-4. Reward design, unsafe exploration과 Sim-to-Real gap은 RL이 새로 만드는 위험으로 함께 제시한다.
+2. 각 family의 한계는 먼저 hybrid contact-mode transition, model/data coverage, closed-loop recovery, safety와 computation처럼 nonprehensile manipulation의 공통 난제에서 설명한다.
+3. 그 일반적 trade-off를 approximate geometry, contact-state uncertainty, demonstration budget과 sequential outcome이라는 현재 조건에 별도로 대입한다.
+4. Simulation interaction, perturbation distribution, task-level success metric과 deployable actor observation을 구성할 수 있을 때에만 RL을 현재 primary framework로 선택한다.
+5. Reward design, unsafe exploration과 Sim-to-Real gap은 RL이 새로 만드는 위험으로 함께 제시한다.
 
 따라서 `왜 RL인가`는 `[Baseline]` 방법 선택의 근거이며 contribution이 아니다. RL이 matched baseline보다 robustness 또는 Rotation-to-Push 성능을 개선하지 못하면 이 선택의 실험적 근거도 약해진다.
 
@@ -695,6 +696,7 @@ System은 `Method` 한 column으로 제한한다. 이전의 `Evaluated Task`, `T
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-18 | Research Trend의 method별 한계를 approximate OBB, 현재 sensor와 sequential task에 필요한 추가 요소로 직접 설명 | NPM 공통 난제인 underconstrained motion, hybrid contact-mode transition, model/data coverage, closed-loop recovery와 safety를 기준으로 family별 구조적 한계를 먼저 비교하고 현재 조건의 RL 선택은 별도 절로 분리 | Method 자체의 한계와 현재 구현 조건에서 부족한 부분을 혼동하지 않고 공정한 trend comparison을 만들기 위해 | 10.1, `Intro/research_trend.md` |
 | 2026-09-18 | Rotation success와 Rotation-to-Push success의 factorized evaluation을 C3 contribution 후보로 분류하고 unified shared policy도 C4 후보로 병기 | 활성 contribution 후보는 C1·C2만 유지; factorized analysis는 공통 evaluation protocol로, shared policy는 method baseline으로 재분류 | 평가 설계와 algorithmic/scientific contribution을 혼동하지 않기 위해 | 7.3, 8–9, 11, `Intro/README.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
 | 2026-09-18 | Motivation, Trend, Previous Works와 Contributions가 각자의 역할은 가졌지만 문서 전환 시 앞 단계의 결론과 다음 질문이 명시되지 않아 독립 보고서처럼 읽힘 | 각 문서가 `앞 단계의 결론 → 현재 질문 → 현재 출력 → 다음 질문`을 이어받도록 연결하고, 발표 구성 같은 meta 내용은 `Intro/README.md`에 집중 | 네 문서를 `문제 정의 → 조건부 method 선택 → research gap → testable candidate`의 단일 논증으로 읽히게 하기 위해 | 1.2, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
 | 2026-09-18 | Research Trend의 연도별 표, family 장단점과 RL 선택 절에서 유사한 설명을 반복하고 timeline에 `Direct/Adjacent` label을 병기; Hybrid 연구를 단일 family 열에 분산 배치 | Timeline을 다섯 method lane으로 축소하고 Hybrid를 독립 lane으로 표시; GD2P를 generative/planning 흐름에 추가; `해결된 부분–추가 요구–RL 선택–반증 조건`으로 논리를 단일화 | 발표에서 방법론 변화와 hybridization을 함께 보이고 Previous Works의 directness 판정과 역할이 겹치지 않게 하기 위해 | 10.1, `Intro/research_trend.md` |

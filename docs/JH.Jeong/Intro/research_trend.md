@@ -2,22 +2,24 @@
 
 > [Intro](./README.md) · [Research Motivation](./research_motivation.md) · [Previous Works](./previous_works.md) · [Candidate Contributions](./contributions.md) · [Paper Index](../papers/README.md)
 >
-> **문서 역할:** 2021년 이후 nonprehensile 및 contact-feedback manipulation의 방법론적 변화를 보여주고, 현재 연구 조건에서 RL을 우선 구현하는 이유를 도출한다. 개별 논문의 세부 비교와 연구 gap 판정은 [Previous Works](./previous_works.md)에서 수행한다.
+> **문서 역할:** 2021년 이후 nonprehensile 및 contact-feedback manipulation의 방법론적 변화를 보여주고, 각 method family가 nonprehensile manipulation 자체를 해결할 때 갖는 강점과 구조적 한계를 구분한 뒤 현재 연구에서 RL을 우선 구현하는 이유를 도출한다. 개별 논문의 세부 비교와 연구 gap 판정은 [Previous Works](./previous_works.md)에서 수행한다.
 
 ---
 
 ## 1. Motivation에서 넘어온 질문
 
-앞선 [Research Motivation](./research_motivation.md)은 연구 대상을 `approximate geometry 아래의 contact-feedback nonprehensile manipulation`으로 좁혔다. 그러나 문제 정의만으로 RL, IL, VLA 또는 model-based method 중 무엇을 선택할지는 결정되지 않는다. 따라서 이 문서는 다음 질문에서 시작한다.
+앞선 [Research Motivation](./research_motivation.md)은 연구 대상을 `approximate geometry 아래의 contact-feedback nonprehensile manipulation`으로 좁혔다. 그러나 특정 연구 조건에 바로 방법을 대응시키면 각 family의 일반적인 한계와 현재 구현상의 부족을 혼동하게 된다. 따라서 이 문서는 두 질문을 순서대로 다룬다.
 
-> Approximate geometry만 주어진 상황에서 실제 접촉 상태를 feedback으로 보정하며, task에 적합한 접촉을 형성하고 Rotation과 Push를 연속적으로 수행하려면 어떤 학습·제어 framework가 적합한가?
+> **첫째, heuristic/control, planning, RL, IL, VLA와 hybrid method는 nonprehensile manipulation의 접촉 계획·실행·복구 문제를 어떻게 해결하며, task 자체의 어떤 어려움 때문에 한계를 갖는가?**
+>
+> **둘째, 이러한 일반적 trade-off를 고려할 때 현재의 approximate-geometry, contact-feedback, low-level sequential manipulation에는 어떤 framework를 우선할 것인가?**
 
 Research Trend는 이 질문에 곧바로 `RL이 가장 우월하다`고 답하지 않는다. 대신 다음 순서로 판단한다.
 
 1. Heuristic/control, optimization/planning, RL, IL과 VLA가 무엇을 해결해 왔는지 확인한다.
 2. Contact feedback과 online correction은 특정 family만의 기능이 아니라는 점을 확인한다.
-3. 각 family를 현재 data·model·interaction 조건에 적용할 때 추가로 필요한 것을 비교한다.
-4. 그 결과로 RL을 **조건부 baseline choice**로 선택하고, 이 선택을 기각할 조건도 함께 정의한다.
+3. 각 family의 한계를 현재 연구 설정이 아니라 nonprehensile manipulation의 공통 난제에서 도출한다.
+4. 그 trade-off를 현재 data·model·interaction 조건에 대입해 RL을 **조건부 baseline choice**로 선택하고, 이 선택을 기각할 조건도 함께 정의한다.
 
 ### 1.1 Method 분류 기준
 
@@ -61,19 +63,26 @@ Hybrid column에는 두 방식이 최종 action generation에 모두 필요한 �
 
 ---
 
-## 3. Method별로 해결된 부분과 남는 문제
+## 3. Nonprehensile manipulation에서 방법별 강점과 구조적 한계
 
-| Method | 이미 해결한 부분 | 현재 연구 조건에서 추가로 필요한 부분 | 본 연구에서의 위치 |
+여기서 `한계`는 현재 연구가 특정 sensor나 geometry representation을 사용하기 때문에 생기는 구현상 부족을 뜻하지 않는다. Nonprehensile manipulation이 공통으로 갖는 다음 어려움에 대해 각 방법이 부담해야 하는 model·data·interaction·computation의 경계를 뜻한다.
+
+1. 물체가 grasp로 구속되지 않아 접촉 위치와 마찰에 따라 motion outcome이 크게 달라진다.
+2. Stick, slip, pivot, separation과 re-contact가 이어지는 hybrid contact-mode transition을 다뤄야 한다.
+3. 작은 state·geometry·dynamics 오차가 장기 trajectory에서 누적되므로 closed-loop correction과 recovery가 필요하다.
+4. Robot·object·environment contact를 이용하면서도 collision, toppling과 excessive force를 제한해야 한다.
+
+| Method | Nonprehensile manipulation에서의 핵심 강점 | Task 자체를 해결할 때의 구조적 한계 | 한계가 두드러지는 조건 |
 | --- | --- | --- | --- |
-| Heuristic / Control | 단순한 동작을 낮은 계산 비용으로 실행하며, 알려진 contact condition에서 예측 가능한 feedback behavior를 구성할 수 있음 | Approximate OBB 때문에 nominal contact가 달라지고 contact migration·slip·separation 조합이 증가하면 rule과 recovery case가 빠르게 늘어남 | Scripted minimum baseline, reset behavior, low-level controller |
-| Optimization / Planning | Geometry, collision, force와 contact-mode constraint를 명시할 수 있고 data-efficient하며 failure 원인을 해석하기 쉬움 | Geometry·friction·contact state가 부정확하면 최적화 문제의 전제 자체가 틀릴 수 있으며, dexterous wrist–finger contact를 online으로 반복 추정·재계획해야 함 | Safety constraint, model-based baseline, demonstration/reference source |
-| Generative / Planning | Object geometry와 task direction에 맞는 다양한 pre-contact candidate를 생성하고 feasibility로 선택할 수 있음 | 선택한 initial configuration이 실제 접촉 오차나 Rotation→Push 중의 contact change에 적응하는지는 별도 feedback mechanism이 필요함 | Task-conditioned contact-formation baseline |
-| RL | Simulation에서 perturbation과 recovery를 반복 경험하고, contact feedback과 delayed task outcome을 하나의 return으로 최적화할 수 있음 | Reward·reset·randomization에 민감하고 많은 interaction이 필요하며, simulator contact와 real sensor 사이의 gap이 남음 | 현재 low-level policy의 primary framework |
-| IL | Demonstration에 포함된 자연스러운 multimodal trajectory와 high-dimensional action distribution을 안정적으로 학습할 수 있음 | Geometry error, 잘못된 초기 contact, slip·contact loss와 recovery를 학습하려면 해당 사례가 demonstration에 포함되어야 하며 tactile/F/T wrist–finger data 수집 비용이 큼 | 동일 observation/action 조건의 learning baseline, 향후 pretraining 후보 |
-| VLA | Language instruction, semantic prior와 cross-task transfer를 제공하며, 최신 연구는 force/tactile도 action generation에 통합함 | Contact-level correction을 위해서는 해당 sensor가 포함된 task data와 architecture가 필요하며, 고정된 low-level task에서 large generalist model의 추가 이득은 별도 검증이 필요함 | 상위 task/goal interface와 contact-aware generalist reference |
-| Hybrid | Model의 constraint, demonstration의 안정성과 interaction learning의 recovery 능력을 결합할 수 있음 | 구성요소별 기여와 data·compute·sensor budget을 통제하지 않으면 공정한 비교가 어려움 | RL 단독안 이후 검토할 경쟁 방법 |
+| Heuristic / Control | 설계된 contact regime에서는 낮은 latency로 해석 가능한 feedback behavior를 제공하며, force·motion limit을 명시하기 쉽다. | 가능한 contact mode와 recovery를 사람이 rule·state transition·threshold로 표현해야 한다. Shape, friction과 접촉 순서가 다양해질수록 rule interaction과 예외 case가 조합적으로 증가한다. | Unseen object, contact migration, 반복되는 slip–separation–re-contact, clutter interaction |
+| Optimization / Planning | Geometry, collision, friction cone, force와 contact-mode constraint를 하나의 명시적 문제로 구성하고 물리적 feasibility를 직접 다룰 수 있다. | Contact dynamics는 non-smooth·hybrid하며 다중 접촉에서는 mode 수와 비선형성이 증가한다. Model·state가 부정확하면 계산된 trajectory의 feasibility가 약해지고, online replanning은 계산 시간과 수렴성 제약을 받는다. | Multi-contact dexterous manipulation, uncertain friction/contact point, fast disturbance |
+| Generative / Planning | 다봉적인 contact pose·trajectory 후보를 생성하여 하나의 nominal solution에 고정되는 문제를 줄이고, geometry와 task 조건에 따른 다양한 초기 해를 제안할 수 있다. | 생성된 후보의 기하학적 plausibility가 실제 동역학적 실행 가능성이나 disturbance recovery를 보장하지 않는다. Feasibility scorer, planner와 feedback controller의 품질에 최종 성능이 의존한다. | Unseen geometry, sparse feasible contact set, 접촉 후 예상 밖의 mode transition |
+| RL | Contact mode를 모두 명시하지 않고 interaction outcome으로 closed-loop strategy와 recovery를 학습할 수 있으며, 긴 horizon의 최종 task outcome을 최적화할 수 있다. | Sample complexity, reward specification과 temporal credit assignment 부담이 크다. Unsafe exploration, simulator exploitation과 Sim-to-Real gap이 생길 수 있고 constraint 만족과 unseen-condition generalization을 자동으로 보장하지 않는다. | High-dimensional wrist–finger action, sparse success, safety-critical real deployment |
+| IL | Expert가 사용하는 smooth contact transition과 고차원 multimodal action을 직접 학습하며, reward를 완전히 설계하지 않고도 복잡한 skill distribution을 표현할 수 있다. | Policy가 방문할 상태의 coverage가 demonstration support에 제한되며 작은 실행 오차가 covariate shift로 누적될 수 있다. 실패·복구와 희귀 contact transition을 포함한 demonstration은 수집하기 어렵다. | Disturbance recovery, unseen initial contact, long horizon, synchronized tactile/F/T demonstration |
+| VLA | 대규모 vision–language prior를 이용해 object·instruction·task 수준의 generalization과 skill selection을 제공할 수 있다. ForceVLA와 Tactile-VLA는 force/tactile grounding도 가능한 방향임을 보여준다. | Semantic task 이해가 접촉의 동역학적 feasibility를 보장하지 않는다. High-rate·low-latency contact correction, embodiment/action-space 차이와 force/tactile data scarcity는 별도의 architecture·data·controller를 요구한다. | 정밀 force regulation, 빠른 stick–slip 변화, embodiment-specific dexterous control |
+| Hybrid | Model의 constraint, demonstration의 prior와 interaction learning의 recovery를 역할별로 결합해 단일 family의 약점을 보완할 수 있다. | Module 간 state·time-scale·objective mismatch와 error propagation이 생길 수 있다. Pipeline 복잡도와 계산량이 증가하고, 성능 향상의 원인을 특정 구성요소에 귀속하기 어렵다. | Planner–policy 전환, slow–fast controller 결합, 복수 sensor·objective 통합 |
 
-이 표의 한계는 `어떤 family도 문제를 해결하지 못한다`는 뜻이 아니다. 각 방법이 현재 task에 필요한 기능을 제공하려면 **어떤 추가 model, data 또는 feedback mechanism이 필요한가**를 구분한 것이다.
+이 표는 어느 family도 nonprehensile manipulation을 해결할 수 없다는 주장이 아니다. 오히려 각각이 **어떤 자원을 사용해 접촉 불확실성을 처리하고 어디에 해결 부담을 남기는지**를 분리한다. 최신 흐름이 hybridization으로 이동하는 이유도 한 family가 절대적으로 우월해서가 아니라, 명시적 constraint·demonstration prior·interaction-based recovery가 서로 다른 문제를 해결하기 때문이다.
 
 ---
 
@@ -81,13 +90,15 @@ Hybrid column에는 두 방식이 최종 action generation에 모두 필요한 �
 
 ### 4.1 연구 조건과 방법 선택의 연결
 
-| 현재 조건 | 다른 방법만 사용할 때 추가로 필요한 것 | RL을 우선할 수 있는 이유 | 반드시 검증할 위험 |
+3절의 일반적 비교만으로 RL이 선택되는 것은 아니다. 아래 표는 그 trade-off를 현재 연구의 model·data·interaction 조건에 대입한 결과다.
+
+| 현재 연구 조건 | RL을 우선할 수 있는 이유 | RL만으로 해결되지 않는 사항 | 필요한 검증 |
 | --- | --- | --- | --- |
-| Approximate OBB와 실제 접촉 표면 사이에 오차가 있음 | Planning/control에는 정확한 contact state 추정과 online replanning이 필요하고, IL에는 다양한 geometry-error demonstration이 필요 | Geometry·dynamics perturbation 아래에서 접촉 실패와 recovery를 simulation interaction으로 생성 가능 | 학습 perturbation이 실제 perception·geometry error를 대표하는가? |
-| Approach→Rotation→Push의 초기 행동이 최종 성공에 영향을 줌 | 단계별 독립 rule이나 demonstration만으로는 final continuation objective를 별도로 설계해야 함 | Full episode return과 phase-gated shaping으로 연속 결과를 직접 최적화 가능 | Shared return만으로 downstream-aware contact formation이 생기는가? |
-| Tactile·wrist F/T에 따라 wrist와 fingers를 계속 조정해야 할 가능성이 있음 | Fixed contact pose에는 별도 online correction module이 필요함 | Multimodal feedback에서 continuous EEF–finger action을 joint policy로 학습 가능 | Fixed-hand 또는 wrist-only policy보다 실제 이득이 있는가? |
-| Real tactile/F/T demonstration을 대규모로 수집하기 어려움 | IL/VLA는 실패·복구와 sensor variation을 포함한 data collection이 필요함 | Privileged simulator information을 reward/critic에만 사용하고 actor는 deployable observation으로 학습 가능 | Contact model과 sensor representation의 Sim-to-Real gap을 넘는가? |
-| Shelf 및 주변 구조물 접촉을 제한해야 함 | Pure trial-and-error에는 safety mechanism이 부족함 | Collision cost·termination과 constrained exploration을 학습에 포함할 수 있음 | Reward hacking 없이 constraint violation이 실제로 감소하는가? |
+| Approximate OBB와 실제 접촉 표면 사이에 오차가 있음 | Geometry·dynamics perturbation 아래의 실패와 recovery를 simulation interaction으로 반복 생성할 수 있음 | 학습된 perturbation 범위 밖의 perception·geometry error까지 자동으로 보완하지는 않음 | Geometry-error level별 success와 tactile/F/T ablation |
+| Approach→Rotation→Push의 초기 행동이 최종 성공에 영향을 줌 | Full-episode return과 phase-gated shaping으로 앞선 action과 최종 outcome을 함께 최적화할 수 있음 | 긴 horizon의 credit assignment가 downstream-ready contact formation을 실제로 만들지는 미확인 | Rotation success와 Rotation-to-Push success를 분리한 continuation evaluation |
+| Tactile·wrist F/T에 따라 wrist와 fingers를 조정해야 할 가능성이 있음 | Multimodal feedback에서 EEF–finger action을 하나의 closed-loop policy로 학습할 수 있음 | Policy가 sensor를 무시하거나 spurious simulation correlation에 의존할 수 있음 | Vision/proprioception-only, tactile-only addition, F/T-only addition과 combined ablation |
+| Real tactile/F/T demonstration을 대규모로 수집하기 어려움 | Privileged simulator information을 reward·critic에만 사용하고 actor는 deployable observation으로 많은 interaction을 학습할 수 있음 | Simulator contact와 실제 sensor response 사이의 gap은 RL이 자동으로 제거하지 않음 | Sensor corruption·dynamics randomization과 real transfer 평가 |
+| Shelf 및 주변 구조물 접촉을 제한해야 함 | Collision cost·termination 또는 constrained RL을 rollout에 포함할 수 있음 | Penalty 기반 학습은 hard safety guarantee가 아니며 unsafe exploration과 reward hacking 가능성이 남음 | 독립 safety metric, violation rate와 hardware safety supervisor |
 
 ### 4.2 선택 결론
 
