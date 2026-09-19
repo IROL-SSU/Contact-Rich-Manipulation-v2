@@ -42,7 +42,7 @@ Intro는 아래 네 문서를 하나의 논증으로 읽는다. 각 문서는 �
 | ---: | --- | --- | --- |
 | 1 | [Research Motivation](./research_motivation.md) | 실제 manipulation 수요에서 nonprehensile task와 approximate-geometry contact uncertainty로 문제를 좁힌다. | 이 조건에는 어떤 method family가 적합한가? |
 | 2 | [Research Trend](./research_trend.md) | Heuristic/control/planning, RL, IL, VLA와 Hybrid의 발전·trade-off를 비교하고 현재 조건에서 RL을 primary baseline으로 선택한다. | 가까운 system이 이미 무엇을 해결했고 무엇이 남았는가? |
-| 3 | [Previous Works](./previous_works.md) | Environment–Agent–System 기준으로 closest work를 비교해 두 candidate question과 transition-evaluation requirement를 도출한다. | 어떤 비교와 결과가 candidate를 지지하거나 기각하는가? |
+| 3 | [Previous Works](./previous_works.md) | Geometry representation, contact feedback·configuration, action generation과 manipulation organization의 method concept로 closest work를 비교해 두 candidate question을 도출한다. | 우리 method의 핵심 조합은 기존 접근과 개념적으로 어디가 다른가? |
 | 4 | [Candidate Contributions](./contributions.md) | C1·C2를 matched comparison, metric, 지지 조건과 기각 조건이 있는 testable claim으로 바꾼다. | Method와 Experiments가 실제로 candidate를 지지하는가? |
 
 전체 흐름은 다음과 같다.
@@ -52,7 +52,7 @@ Application need
   → Nonprehensile manipulation
   → Contact uncertainty under approximate geometry
   → Conditional method selection
-  → Closest-system comparison
+  → Method-concept comparison
   → Testable hypotheses and candidate contributions
   → Matched experiments and ablations
   → Evidence-supported contributions
@@ -153,7 +153,7 @@ Rotation success는 subsequent Push feasibility의 충분조건이 아니다. Co
 4. **Current instance:** Shelf blocker를 통한 접근 공간 확보
 5. **Research Trend:** Heuristic/control/planning, RL, IL, VLA와 Hybrid의 발전
 6. **Conditional method choice:** 현재 model·data·interaction 조건에서 RL을 우선하는 이유와 반증 조건
-7. **Closest Previous Works:** Environment–Agent–System 비교와 기존 연구가 이미 해결한 범위
+7. **Closest Previous Works:** Representation–feedback–adaptation–action generation–execution organization 비교와 기존 연구가 이미 해결한 범위
 8. **Research questions:** Rotation utility, transition quality, sensing complementarity와 online adaptation
 9. **Candidate Contributions:** C1·C2와 각각의 matched experiment 및 기각 조건
 10. **Method/Experiments transition:** Factorized transition, robustness와 safety evaluation

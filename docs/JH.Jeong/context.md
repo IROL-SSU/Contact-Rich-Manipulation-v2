@@ -127,10 +127,10 @@ Marker 또는 tracker가 제공하는 기본 정보는 object pose다. Geometry�
 
 | Geometry level | Definition | Example | Intended use |
 | --- | --- | --- | --- |
-| No geometry | Pose 외에 shape·dimension 정보를 actor에 주지 않음 | Object origin pose only | Geometry contribution의 하한 ablation |
-| Approximate geometry | 실제 접촉 표면과 오차가 있을 수 있는 명시적 저차원 형상 | Estimated OBB, noisy dimensions | 현재 주 연구 조건 |
-| Implicit visual representation | 명시적 mesh 대신 image/point-cloud feature에 형상을 암묵적으로 포함 | RGB/depth encoder, point-cloud embedding | 비교 또는 후속 확장 |
-| Exact geometry | Known CAD/mesh 또는 정확한 dimensions가 object pose와 일관되게 정합됨 | Registered mesh, calibrated dimensions | Oracle/upper-bound baseline |
+| No shape representation | Pose 외에 shape·dimension 정보를 actor에 주지 않음 | Object origin pose only | Geometry contribution의 하한 ablation |
+| Implicit visual | RGB·depth·RGB-D image를 구조화된 형상으로 변환하지 않고 직접 encode | RGB/depth image encoder | 비교 또는 후속 확장 |
+| Estimated explicit geometry | 실제 접촉 표면과 오차가 있을 수 있는 구조화 형상 | Partial point cloud, BPS, estimated OBB | 현재 주 연구 조건 |
+| Exact model | Known CAD/mesh 또는 정확한 dimensions가 object pose와 일관되게 정합됨 | Registered mesh, calibrated dimensions | Oracle/upper-bound baseline |
 
 - `[Fixed]` Simulation collision geometry가 정확하더라도 actor가 exact geometry를 관측하지 않으면 actor의 geometry condition은 approximate다.
 - `[Baseline]` Approximate geometry의 첫 표현으로 episode-consistent OBB를 사용한다.
@@ -313,6 +313,8 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 - `[Candidate]` S1: 1–N개의 passive surrounding objects를 추가하고 contact는 forbidden collision로 처리하는 robustness test.
 - `[Open]` S2: Surrounding-object contact를 허용하거나 이용하는 multi-object contact manipulation. 채택하면 observation과 research scope가 크게 바뀐다.
 
+현재 판단에서 blocker–shelf support contact는 pushing·pivoting을 성립시키는 필수 dynamics이며 항상 허용한다. 반면 robot/blocker–pillar와 blocker–surrounding-object contact는 Stage 1에서 조작 resource가 아니라 safety/robustness 조건이다. 따라서 external-contact exploitation은 현재 H1–H4나 C1·C2의 핵심 축이 아니며, S2를 채택할 때만 별도 research question과 method 요소로 승격한다.
+
 사용자는 S0만을 논문의 주 조건으로 둘지, S1을 필수 evaluation으로 둘지 우선 결정해야 한다.
 
 ### 7.2 OD-2 — Geometry Information and Perturbation
@@ -462,7 +464,7 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 | Layer | Question | Inclusion | Output |
 | --- | --- | --- | --- |
 | **Research Trend** | 2021년 이후 heuristic/planning, RL, IL와 VLA가 contact가 수반되는 manipulation을 어떻게 확장했으며, nonprehensile manipulation 자체에서 어떤 구조적 trade-off를 가진 뒤 왜 현재 문제에 RL을 우선하는가? | Direct nonprehensile work와 method 변화의 중요한 adjacent contact-rich IL/VLA | Timeline, NPM 공통 난제에 대한 family별 강점·한계, 조건부 RL 선택 근거 |
-| **Closest Previous Works** | 우리와 유사한 environment·sensing·action·task 조건에서 무엇이 이미 해결되었고 어떤 교차점을 검증해야 하는가? | Nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 연구 | Environment–Agent–System 비교표와 candidate contribution |
+| **Closest Previous Works** | 우리와 유사한 system이 어떤 method concept를 사용하며 Ours의 조합은 어디에 위치하는가? | Nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 연구 | Representation–feedback–adaptation–action generation–execution organization 비교와 candidate question |
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
@@ -505,32 +507,23 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 
 ### 10.3 Main comparison table의 column
 
-각 column은 하나의 질문만 답한다. Environment, Agent와 System은 동일한 row 순서를 유지하되 별도 표로 작성한다. `Tactile`, `Wrist F/T`, `Vision`을 각각 presence column으로 늘어놓지 않고 raw physical sensor 기준의 `Physical Sensor Input` 한 column에 기록한다. Processed geometry, task goal과 language instruction은 이 column에서 제외한다. 아래 label의 상세 의미와 판정 경계는 [`Intro/previous_works.md`](./Intro/previous_works.md#2-comparison-codebook)의 codebook을 따른다.
+Main table은 구현 요소 inventory가 아니라 **method concept의 차이**를 설명한다. 독립 column은 “무엇을 표현하는가, 접촉 정보를 어떻게 이용하는가, 접촉 구성을 언제 바꾸는가, action을 어떤 원리로 만드는가, manipulation을 어떤 단위로 조직하는가”의 다섯 질문으로 제한한다. 상세 판정 경계는 [`Intro/previous_works.md`](./Intro/previous_works.md#2-comparison-codebook)의 codebook을 따른다.
 
-| Group | Column | Single question | Allowed coding |
-| --- | --- | --- | --- |
-| Environment | Evaluation Setting | 실제로 어떤 공간·접촉 구조에서 평가했는가? | Open tabletop / Cluttered tabletop / Fixture-constrained / Multiple settings / Open tabletop + fixture / Shelf |
-| Environment | Surrounding-Contact Role | Tool–target 이외의 접촉을 어떻게 취급하는가? | Target contact only / Avoid surrounding contact / Use surrounding contact / Environmental contact required / Depends on task / Undecided |
-| Environment | Geometry Available at Deployment | 어떤 geometry 표현과 정확도 수준이 주어지는가? | No geometry input / Image features (implicit geometry) / Observed point cloud / Observed point cloud → BPS / Approximate OBB / Exact known model |
-| Agent | Contact Tool | 무엇으로 target/environment와 접촉하는가? | Rigid end effector / Tactile pusher / Parallel gripper / Adaptive gripper / Grasped object/tool / Dexterous hand / Mixed tools |
-| Agent | Physical Sensor Input | 어떤 physical sensor stream을 deployment에서 이용하는가? | Vision → tactile/contact flag → wrist/TCP F/T → proprioception 순으로 기록; source가 확인되지 않으면 NR |
-| Agent | Commanded Action | Learned module 또는 controller가 무엇을 명령하는가? | EEF/TCP motion / gripper width / finger joints / contact force 등의 실제 command |
-| Agent | Configuration Adaptation | Task-conditioned tool/contact configuration을 언제 변경하는가? | Not applicable / Fixed after setup / Task-conditioned initial only / Online gripper adjustment / Online wrist–finger adjustment |
-| System | Action-Generation Method | 행동을 생성하는 주된 방법론은 무엇인가? | Rule/feedback control / Optimization/planning / Generative pose/trajectory planning / Reinforcement learning / Imitation learning / Vision-language-action / Hybrid |
+| Method concept | Single question | Allowed coding |
+| --- | --- | --- |
+| Geometry Representation | 실행 중 object/environment 형상을 어떤 형태로 사용하는가? | No shape representation / Implicit visual / Estimated explicit geometry / Exact model |
+| Contact Feedback | 실제 접촉 정보가 action loop에서 어떤 역할을 하는가? | None / State estimation / Closed-loop correction / Estimation + correction |
+| Contact Configuration | 손·도구와 물체의 접촉 구성을 언제 바꾸는가? | Fixed / Initial selection / Online adaptation |
+| Action Generation | 실행 action을 만드는 주된 원리는 무엇인가? | Model/control-based / Learning-based / Hybrid |
+| Manipulation Organization | 접촉 형성과 manipulation skill을 어떤 단위로 조직하는가? | Single-skill / Contact formation + execution / Multi-skill or multi-stage |
 
-`Comparison Role`은 별도 column으로 두지 않는다. Direct same-task baseline과 adjacent contact-aware comparator의 구분은 표 앞의 inclusion 설명과 paper-level evidence에서 관리한다.
+Sensor, tool과 action은 삭제되는 것이 아니라 concept의 근거 tag로 통합한다. 예를 들어 `Closed-loop correction (tactile + wrist F/T)`는 feedback의 역할과 modality를, `Online adaptation (dexterous wrist + finger)`는 adaptation timing과 physical authority를 한 cell에서 보여준다. RL·IL·VLA는 `Learning-based`의 subtype으로 괄호에 남기고, model/control과 함께 최종 action을 결정할 때만 `Hybrid`로 판정한다.
 
-`Geometry Available at Deployment`는 열 수를 줄이기 위해 representation과 fidelity를 한 셀에 기록하되 두 개념 자체는 구분한다. Point cloud는 자동으로 exact geometry를 의미하지 않으며, estimated OBB는 `Approximate OBB`로 기록한다.
+`Implicit visual`은 RGB만 뜻하지 않는다. RGB·depth·RGB-D를 영상 형태로 직접 encode하고 구조화된 geometry를 만들지 않는 경우다. Point cloud·BPS·estimated OBB는 `Estimated explicit geometry`로 묶고 subtype을 괄호에 남긴다.
 
-`Evaluation Setting`과 `Surrounding-Contact Role`은 합치지 않는다. 전자는 공간 구성, 후자는 contact의 허용·회피·활용 방식을 묻기 때문에 fixture나 shelf라는 동일 환경에서도 서로 다른 값을 가질 수 있다.
+`Evaluation Setting`과 `External-Contact Policy`는 method concept가 아니라 context metadata다. 현재 task에서 blocker–shelf support와 hand–blocker contact는 기본 조건이지만, pillar·wall·주변 물체를 의도적으로 bracing/pivot resource로 사용하지는 않는다. 따라서 주변 접촉은 core column에서 제외하고, S2에서 deliberate exploitation을 method scope로 채택할 때만 독립 축으로 승격한다.
 
-`Physical Sensor Input`은 raw physical sensor family만 기록한다. Point cloud·BPS·OBB·estimated pose는 `Geometry Available at Deployment`로, task direction·goal·language instruction은 conditioning information으로 분리한다. Binary/dense tactile, history 길이와 encoder 같은 가공 방식은 paper-level evidence 또는 method 문서에서 관리하고, privileged reward·critic information은 포함하지 않는다.
-
-System은 `Action-Generation Method` 한 column으로 제한한다. 이전의 `Evaluated Task`, `Training/Planning Source`, `Contact-Stage Coverage`, `Closed-Loop Correction`, `Reported Endpoint`는 유용하지만 Environment–Agent–System 사이의 경계가 모호해지므로 main classification table에서 제거하고 paper-level evidence에 보존한다.
-
-`Robustness`, `Context awareness`, `Generalizable`, `Controllability`처럼 논문마다 의미가 달라지는 포괄적 column은 사용하지 않는다. 대신 실제 perturbation, held-out split과 evaluation condition을 별도 evidence table에 기록한다.
-
-`Subsequent-Action Transition`은 현재 main table column으로 넣지 않는다. 논문이 실제로 terminal-state feasibility, skill chaining 또는 continuation success를 학습·평가하는 경우에만 별도 transition-analysis table에서 비교한다.
+Geometry perturbation, held-out split, reported endpoint와 transition metric은 실험 설계·결과 수준이므로 main comparison에 넣지 않는다. Training/planning source, data budget, network size, controller 세부 구조도 paper-level evidence와 fair-comparison rule에서 관리한다. `Robustness`, `Context awareness`, `Generalizable`, `Controllability`처럼 논문마다 의미가 달라지는 포괄적 column은 사용하지 않는다.
 
 ### 10.4 Evidence and inclusion rules
 
@@ -696,7 +689,7 @@ System은 `Action-Generation Method` 한 column으로 제한한다. 이전의 `E
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
-| 2026-09-19 | Comparison codebook이 column별 허용값만 나열하고 `Implicit visual`, `Exploit`, `Fixed`처럼 해석이 필요한 축약 label을 사용 | 허용값마다 직관적 의미와 포함·제외 기준을 정의하고, `Image features (implicit geometry)`, `Use surrounding contact`, `Fixed after setup`처럼 판정 의미가 드러나는 label로 canonical matrix를 통일 | Vision sensor와 geometry representation, 환경 형태와 contact 역할, initial configuration과 online adaptation의 혼동을 줄이기 위해 | 10.3, `Intro/previous_works.md` |
+| 2026-09-19 | Previous Works 표가 sensor·tool·action과 evaluation level을 각각 독립 column으로 나열해 method의 핵심 concept가 흐려짐 | Main comparison을 world representation, contact feedback, contact configuration, action generation, execution organization의 다섯 concept로 재구성; modality·embodiment·action은 괄호 근거로 통합하고 evaluation·endpoint는 제외; 평가 환경과 주변 접촉은 context metadata로 유지 | Ours가 기존 연구와 다른 지점을 구현 부품 수가 아니라 `approximate explicit geometry + closed-loop contact correction + online wrist–finger adaptation + multi-stage execution`의 method 구조로 설명하기 위해 | 7.1, 10.3, `Intro/previous_works.md` |
 | 2026-09-18 | Research Trend의 method별 한계를 approximate OBB, 현재 sensor와 sequential task에 필요한 추가 요소로 직접 설명 | NPM 공통 난제인 underconstrained motion, hybrid contact-mode transition, model/data coverage, closed-loop recovery와 safety를 기준으로 family별 구조적 한계를 먼저 비교하고 현재 조건의 RL 선택은 별도 절로 분리 | Method 자체의 한계와 현재 구현 조건에서 부족한 부분을 혼동하지 않고 공정한 trend comparison을 만들기 위해 | 10.1, `Intro/research_trend.md` |
 | 2026-09-18 | Rotation success와 Rotation-to-Push success의 factorized evaluation을 C3 contribution 후보로 분류하고 unified shared policy도 C4 후보로 병기 | 활성 contribution 후보는 C1·C2만 유지; factorized analysis는 공통 evaluation protocol로, shared policy는 method baseline으로 재분류 | 평가 설계와 algorithmic/scientific contribution을 혼동하지 않기 위해 | 7.3, 8–9, 11, `Intro/README.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
 | 2026-09-18 | Motivation, Trend, Previous Works와 Contributions가 각자의 역할은 가졌지만 문서 전환 시 앞 단계의 결론과 다음 질문이 명시되지 않아 독립 보고서처럼 읽힘 | 각 문서가 `앞 단계의 결론 → 현재 질문 → 현재 출력 → 다음 질문`을 이어받도록 연결하고, 발표 구성 같은 meta 내용은 `Intro/README.md`에 집중 | 네 문서를 `문제 정의 → 조건부 method 선택 → research gap → testable candidate`의 단일 논증으로 읽히게 하기 위해 | 1.2, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
