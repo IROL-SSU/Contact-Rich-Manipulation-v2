@@ -6,64 +6,49 @@
 
 ---
 
-## 1. Application expansion
+## 1. 접근 공간 확보를 위한 nonprehensile manipulation
 
-Robot은 제조 설비를 넘어 home service, logistics와 retail shop으로 적용 범위를 넓히고 있다. 이 환경의 작업은 사전에 정확히 정렬된 한 종류의 물체를 반복해서 다루는 문제와 다르다. Robot은 크기와 형상이 다양한 물체를 제한된 공간에서 발견하고, 접근하고, 재배치해야 하며, 다른 물체나 환경 구조가 목표 동작을 방해할 수 있다.
+Robot의 적용 범위가 제조 설비에서 home service, logistics와 retail shop으로 넓어지면서, 제한된 공간에서 크기와 형상이 다양한 물체를 발견하고 재배치해야 하는 상황이 증가하고 있다. Target이 다른 물체에 가려져 있거나 hand의 접근 경로가 막혀 있다면, robot은 target을 곧바로 grasp하기 전에 주변 blocker를 옮겨 **시야, hand clearance 또는 조작 방향**을 확보해야 한다.
 
-따라서 manipulation은 보이는 target을 곧바로 grasp하는 동작만으로 끝나지 않는다. Target이 다른 물체에 가려져 있거나 hand의 접근 경로가 막혀 있다면, robot은 먼저 주변 물체를 옮겨 **시야, hand clearance 또는 조작 방향**을 확보해야 한다.
+Prehensile manipulation은 물체를 안정적으로 구속할 수 있지만 feasible grasp, 손가락 배치 공간과 lifting clearance를 요구한다. Blocker를 짧은 거리만 옮기면 되거나 물체 뒤쪽의 finger placement와 lifting이 어렵고, grasp 이전에 orientation 또는 접근 가능한 면을 바꿔야 하는 경우에는 pushing, sliding과 pivoting 같은 nonprehensile action이 더 직접적일 수 있다.
 
-## 2. Why nonprehensile manipulation?
+따라서 본 연구에서 `nonprehensile manipulation`은 grasping을 대체하는 보편적 해법이 아니라, target 접근을 위해 주변 물체를 재배치하는 **task category**다.
 
-Prehensile manipulation은 물체를 안정적으로 구속할 수 있지만 feasible grasp, 손가락 배치 공간과 lifting clearance를 요구한다. Full grasp가 어렵거나 불필요한 재배치에서는 pushing, pulling, sliding과 pivoting 같은 nonprehensile action이 더 직접적일 수 있다.
+## 2. Approximate geometry 아래의 contact uncertainty
 
-본 연구에서 `nonprehensile manipulation`은 task category다. 이는 grasping을 대체하는 보편적 해법이 아니라, 다음 상황을 보완하는 manipulation capability다.
+Nonprehensile action은 안정적인 grasp 없이 접촉으로 물체 운동을 만든다. 같은 nominal motion도 contact location, local geometry, friction, mass distribution과 `stick–slip–separation` 전이에 따라 다른 결과를 낳는다. 여기서 `contact-rich manipulation`은 별도의 task category가 아니라 이러한 불확실성을 다루는 **interaction/control challenge**다.
 
-- Target에 접근하기 전에 blocker를 짧은 거리만 재배치하면 되는 경우
-- 물체 뒤쪽으로 손가락을 배치할 공간이 부족한 경우
-- Stable grasp나 lifting이 주변 구조물과의 충돌 위험을 높이는 경우
-- Grasp를 형성하기 전에 물체 orientation이나 접근 가능한 면을 바꿔야 하는 경우
+Vision과 approximate geometry는 object pose, 접근 관계와 nominal contact face 같은 전역 정보를 제공하지만, occlusion, tracking error와 shape approximation 때문에 실제 contact onset, local surface mismatch와 force transmission까지 정확히 알려주지는 못한다. 각 정보원의 역할과 한계는 다음처럼 구분한다.
 
-## 3. Why is contact the central challenge?
-
-Nonprehensile action은 안정적인 grasp 없이 접촉을 통해 물체 운동을 만든다. 따라서 같은 nominal motion이라도 contact location, local geometry, friction, mass distribution과 `stick–slip–separation` 전이에 따라 결과가 달라진다.
-
-여기서 `contact-rich manipulation`은 별도의 task category가 아니라 nonprehensile manipulation을 어렵게 만드는 **interaction/control challenge**다.
-
-Vision과 coarse geometry는 object pose, 접근 방향과 nominal contact face 같은 전역 정보를 제공할 수 있다. 그러나 occlusion, tracking error와 shape approximation 때문에 실제 contact onset, local surface mismatch와 force transmission까지 정확히 알려주지는 못한다.
-
-| Information source | 주된 역할 | 단독으로 알기 어려운 정보 |
+| Information source | 주된 역할 | 남는 불확실성 |
 | --- | --- | --- |
 | Vision / approximate geometry | 전역 task, object pose, 접근 관계, nominal contact face | 실제 contact onset, local mismatch, slip, 전달 force |
 | Binary tactile | Sensor region별 contact onset, loss와 migration | Contact force의 연속 크기와 전체 wrench |
 | Wrist F/T | Hand–environment system의 net force/torque와 load 변화 | 개별 contact 위치와 sensor별 force 분포 |
 | Proprioception | Arm/hand configuration과 command 결과 | 외부 contact state와 hidden physical properties |
 
-## 4. Broad problem에서 현재 연구 대상으로 좁히기
+따라서 vision과 geometry는 nominal access를 정하고, tactile과 wrist F/T는 실행 중 드러나는 contact state와 geometry mismatch를 보완한다. 어느 한 modality가 다른 정보를 완전히 대체한다고 가정하지 않는다.
 
-본 연구는 위 broader problem 가운데 다음 instance를 다룬다.
+## 3. 현재 연구 대상과 범위
 
-- 선반 안의 target object에 접근하기 위해 앞쪽 blocker를 이동한다.
-- Blocker 선택과 전역 작업 순서는 상위 module이 제공한다.
-- Low-level policy는 `Approach / Contact Formation → Rotation / Pivoting → Push / Translation`을 수행한다.
-- Rotation은 항상 필요한 고정 동작이 아니다. Direct push가 불안정하거나 desired push direction에 부적합한 contact/object orientation일 때 preparatory action으로 사용한다.
-- Shelf와 비표적 물체의 접촉은 기본적으로 피하되, 주변 물체의 존재와 randomization 범위는 아직 open decision이다.
+현재 다루는 작업은 선반 안의 target object에 접근하기 위해 앞쪽 blocker를 이동하는 것이다. 상위 module은 blocker와 task goal을 정하고, Stage 1 low-level policy는 안정적인 grasp나 lifting 없이 다음 과정을 수행한다.
+
+```text
+Approach / Contact Formation → Rotation / Pivoting → Push / Translation
+```
+
+Approach는 후속 조작에 사용할 contact state를 형성하고, Rotation은 direct push가 불안정하거나 현재 orientation이 desired push direction에 부적합할 때만 preparatory action으로 사용하며, Push는 blocker를 목표 방향과 거리로 이동한다. 세 항목은 sub-objective이지 독립 policy나 강제된 hard sequence가 아니므로 초기 상태가 적합하면 Rotation은 작거나 생략될 수 있다.
+
+Target retrieval, multi-blocker ordering과 perception algorithm 자체는 이 low-level policy의 직접 범위가 아니다. Blocker–shelf support contact는 pushing·pivoting에 필요한 dynamics로 허용하지만 pillar와 비표적 물체의 접촉은 기본적으로 피한다. 주변 movable object를 main condition 또는 robustness condition에 포함할지는 [`context.md`](../context.md)의 open decision으로 남긴다.
 
 핵심 질문은 단순히 접촉하는 방법이 아니다.
 
-> **Approximate geometry만 주어진 조건에서 contact feedback을 이용해 실제 geometry/contact mismatch를 보완하고, 이후 Rotation과 Push에 유효한 hand/contact state 및 wrist–finger motion을 형성·조정할 수 있는가?**
+> **지속적인 vision에서 얻은 approximate geometry와 contact feedback을 함께 사용해 실제 geometry/contact mismatch를 보완하고, 이후 Rotation과 Push에 유효한 hand/contact state 및 wrist–finger motion을 형성·조정할 수 있는가?**
 
-## 5. Method 선택을 검토해야 하는 이유
+## 4. 방법 선정을 위한 질문
 
-이제 문제는 정의되었지만 해결 방법은 아직 정해지지 않았다. Conventional approach를 하나의 약한 방법으로 묶어 배제해서는 안 된다.
+이 문제 정의만으로 특정 방법이 자동으로 선택되지는 않는다. Heuristic/control, optimization/planning, generative/planning, RL, IL, VLA와 hybrid는 서로 다른 model·data·interaction 조건을 필요로 하므로, 어느 하나를 약한 대안으로 전제하지 않고 현재 조건에 맞는 방법을 비교해야 한다.
 
-- **Task-specific heuristic**은 계산이 빠르고 구현 의도가 명확하지만, object shape·friction·contact sequence가 바뀔 때 규칙과 threshold를 다시 설계해야 할 수 있다.
-- **Model-based planning/control**은 physical constraint를 명시하고 failure 원인을 해석하기 좋지만, geometry·friction·contact-mode model의 정확도에 민감하며 contact sequence와 clutter가 늘수록 search와 modeling 비용이 커질 수 있다.
-- 두 접근 모두 잘 정의된 model과 범위에서는 강력한 baseline이며 safety layer 또는 demonstration generator로 활용할 수 있다.
+> **Heuristic/control, planning, RL, IL와 VLA는 contact-feedback manipulation을 어떻게 확장해 왔으며, 현재의 model·data·interaction 조건에서는 어떤 방법을 우선해야 하는가?**
 
-[Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)처럼 physics simulation과 search를 결합한 방법과 [Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135)처럼 contact mode를 명시적으로 최적화한 방법은 conventional method의 강점을 보여준다. 문제는 이러한 방법이 무효라는 것이 아니라, **approximate geometry 아래에서 다양한 contact outcome과 recovery를 모두 사전에 열거하고 모델링하기 어렵다**는 점이다.
-
-Learning-based method도 자동으로 해답이 되는 것은 아니다. RL은 reward·simulation transfer 문제를, IL은 demonstration coverage 문제를, VLA는 data·compute budget과 low-level contact precision 문제를 각각 가진다. 따라서 Motivation 단계의 결론은 특정 method의 선택이 아니라 다음 질문이다.
-
-> **Heuristic/control, planning, RL, IL와 VLA는 contact-feedback manipulation을 어떻게 확장해 왔으며, 현재의 model·data·interaction 조건에서는 어떤 framework를 우선해야 하는가?**
-
-이 질문은 다음 문서인 [Research Trend](./research_trend.md)에서 다룬다. Method가 선택된 뒤에야 [Previous Works](./previous_works.md)에서 가까운 system과 남은 research gap을 비교한다.
+이 질문은 [Research Trend](./research_trend.md)에서 다룬다. 방법을 조건부로 선택한 뒤 [Previous Works](./previous_works.md)에서 Environment의 Scene·Workspace, Robot Agent의 Sensing·Object Geometry·Manipulation과 System Method를 비교하고 남은 research gap을 판정한다.

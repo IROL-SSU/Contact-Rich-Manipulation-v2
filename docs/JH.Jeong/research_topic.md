@@ -174,9 +174,9 @@ Rotation terminal state에서는 face-alignment success와 subsequent Push succe
 | Phase transition | 앞 단계의 종료 상태가 다음 단계를 가능하게 하는가 | $F_R$, $F_{R\rightarrow P}$, immediate-push success, aggregate contact loss |
 | Contact efficiency | 전체 접촉을 유지하면서 필요한 만큼만 재구성하는가 | Contact-loss event, contact switch, first-contact 이후 hand joint travel |
 | Generalization | 관측·물성이 달라져도 성능을 유지하는가 | Held-out geometry·friction·mass success와 seen–unseen gap |
-| System utility | Blocker 조작이 target 접근에 실제 도움이 되는가 | Visibility·reachability·clearance와 target retrieval success |
+| Target 접근 효과 | Blocker 조작이 target 접근에 실제 도움이 되는가 | Visibility·reachability·clearance와 target retrieval success |
 
-현재 1단계의 primary 평가는 앞의 세 수준이며, system utility는 2단계 확장에서 본격적으로 다룬다.
+현재 1단계의 primary 평가는 앞의 세 수준이며, target 접근 효과는 2단계 확장에서 본격적으로 다룬다.
 
 ---
 
