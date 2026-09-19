@@ -28,28 +28,120 @@ IL·VLA 논문이라도 semantic generalization만 다루고 nonprehensile/conta
 
 ## 2. Comparison codebook
 
+Codebook은 저자가 사용한 표현을 그대로 옮기는 용도가 아니라, 서로 다른 논문을 같은 질문으로 판정하기 위한 규칙이다. Main table에는 아래의 짧은 label을 쓰고, 이 절에서 각 label의 의미와 제외 조건을 고정한다. `NR`은 논문에서 확인되지 않았다는 뜻이고, `Undecided`는 **우리 system에서 아직 결정하지 않은 항목**에만 사용한다.
+
 ### 2.1 Environment
 
-| Column | 판정 질문 | 허용값 | 경계 |
-| --- | --- | --- | --- |
-| Evaluation environment | 실제 실험에서 어떤 공간·접촉 구조를 평가하는가? | `Open tabletop` / `Cluttered tabletop` / `Fixture-based` / `Multiple environments` / `Open + fixture` / `Shelf` | 논문이 주장하는 일반성이 아니라 실제 평가 장면으로 판정 |
-| Non-target/environment contact | Tool–target 이외의 물체·환경 접촉을 어떻게 취급하는가? | `Target only` / `Avoid` / `Exploit` / `Required` / `Task-dependent` / `Open` | Environment의 형태와 접촉의 역할은 독립적이다. 같은 fixture 환경에서도 접촉을 회피하거나 이용할 수 있으므로 두 column을 합치지 않는다. |
-| Geometry information | Deployment system에 어떤 geometry 표현과 정확도 수준이 주어지는가? | `None` / `Implicit visual (not explicit)` / `Point cloud (observed)` / `Point cloud/BPS (observed)` / `OBB (approximate)` / `Known model (exact)` | 한 셀을 `representation (fidelity)`로 기록한다. Point cloud라고 자동으로 exact가 아니며, known CAD/dimensions가 pose와 정합된 경우만 `exact`다. Marker pose는 geometry 자체가 아니다. |
+#### Evaluation setting — 어디에서 평가했는가?
+
+논문이 주장하는 일반성이 아니라 실제 experiment와 deployment evaluation에 등장한 공간·접촉 구조로 판정한다.
+
+| 허용값 | 직관적 의미 | 판정 기준 |
+| --- | --- | --- |
+| `Open tabletop` | 주변 구조물이 거의 없는 일반 테이블 | Target과 support plane 이외의 fixture·clutter가 평가의 핵심 조건이 아님 |
+| `Cluttered tabletop` | 다른 물체가 함께 있는 테이블 | 주변 물체가 접근, 경로 또는 충돌 가능성에 영향을 줌 |
+| `Fixture-constrained` | 고정 구조물이 접촉과 motion을 제한하는 환경 | Hole, peg, slot, board, wall과 같은 fixture가 task를 구성함 |
+| `Multiple settings` | 구조적으로 다른 둘 이상의 환경 | 단순 object 교체가 아니라 tabletop·fixture 등 평가 setting 자체가 달라짐 |
+| `Open tabletop + fixture` | Open condition과 fixture condition을 모두 평가 | 한 논문에서 두 조건을 명시적으로 분리해 평가함 |
+| `Shelf` | Shelf deck·pillar·경계가 있는 선반 환경 | 선반 구조가 workspace와 safety constraint를 결정함 |
+
+#### Surrounding-contact role — Target 이외의 접촉을 어떻게 다루는가?
+
+정상적인 object–support-plane 접촉은 이 column에서 세지 않는다. Tool–target 접촉 이외의 robot/object–fixture 또는 주변 물체 접촉이 task에서 어떤 역할을 하는지를 기록한다.
+
+| 허용값 | 직관적 의미 | 판정 기준 |
+| --- | --- | --- |
+| `Target contact only` | Target과의 접촉만 평가 | 별도 주변 물체·fixture 접촉이 task에 없거나 사용되지 않음 |
+| `Avoid surrounding contact` | 주변 접촉을 실패·비용으로 취급 | Collision penalty, constraint 또는 termination으로 회피함 |
+| `Use surrounding contact` | 주변 접촉을 조작에 활용 | Wall, fixture 또는 다른 물체의 반력을 의도적으로 이용함 |
+| `Environmental contact required` | 환경 접촉 없이는 task가 성립하지 않음 | Insertion, wiping, constrained sliding처럼 fixture contact가 필수임 |
+| `Depends on task` | 같은 system에서도 task별 역할이 다름 | 일부 task에서는 회피하고 다른 task에서는 이용함 |
+| `Undecided` | 우리 system에서 아직 미결 | 주변 물체의 존재·허용 여부가 확정되지 않은 경우에만 사용 |
+
+Evaluation setting과 surrounding-contact role은 독립적으로 판정한다. 예를 들어 fixture 환경에서도 fixture 접촉을 회피할 수 있고, open tabletop에서도 주변 물체를 이용할 수 있다.
+
+#### Geometry available at deployment — 실행 시 어떤 형상 표현을 받는가?
+
+Geometry는 `표현 방식 + 정확도 수준`으로 기록한다. 이 column은 raw sensor 종류가 아니라 deployment system이 action을 결정할 때 이용할 수 있는 **형상 표현**을 나타낸다.
+
+| 허용값 | 직관적 의미 | 포함 조건과 제외 조건 |
+| --- | --- | --- |
+| `No geometry input` | 명시적·암묵적 형상 입력이 없음 | Pose, tactile 또는 proprioception만 사용하며 visual shape feature도 사용하지 않음 |
+| `Image features (implicit geometry)` | 영상 feature 안에 형상이 암묵적으로 포함됨 | RGB 또는 depth/RGB-D image를 encoder에 직접 입력하지만 point cloud·OBB·mesh 같은 구조화된 형상은 만들지 않음 |
+| `Observed point cloud` | 관측으로 얻은 3D 점 집합을 사용 | RGB-D·depth sensor 등으로 얻은 partial/noisy point cloud를 사용하며 exact CAD로 간주하지 않음 |
+| `Observed point cloud → BPS` | 관측 point cloud를 BPS로 변환 | Point cloud를 Basis Point Set distance 등 고정 길이 표현으로 가공함 |
+| `Approximate OBB` | 거친 box 형상과 pose를 사용 | 추정된 center, orientation과 extent를 사용하며 실제 local surface/contact geometry는 알지 못함 |
+| `Exact known model` | 정확한 object/fixture model을 알고 사용 | Known CAD, mesh 또는 정확한 dimension이 pose와 정합되어 planning/control에 사용됨 |
+
+`Image features (implicit geometry)`는 단순히 vision을 썼다는 뜻이 아니다. 영상을 통해 추정한 OBB를 policy에 주면 `Approximate OBB`, 영상으로 만든 point cloud를 주면 `Observed point cloud`로 기록한다. 반대로 RGB-D를 사용해도 depth image를 image encoder에 직접 넣고 구조화된 geometry를 만들지 않으면 `Image features (implicit geometry)`다. Marker나 tracker가 제공한 pose만으로는 object shape를 알 수 없으므로 pose 자체는 geometry로 세지 않는다.
 
 ### 2.2 Agent
 
-| Column | 판정 질문 | 기록 규칙 | 경계 |
-| --- | --- | --- | --- |
-| Tool | 실제로 target 또는 environment와 접촉하는 robot-side mechanism은 무엇인가? | `Rigid EEF`, `Tactile pusher`, `Parallel/adaptive gripper`, `Grasped object/tool`, `Dexterous hand`, `Mixed` | Robot 전체나 controller가 아니라 물체에 접촉을 전달하는 장치로 판정 |
-| Input modality | Deployment 시 이용하는 물리적 sensor stream은 무엇인가? | `Vision (RGB/depth/RGB-D) → tactile → wrist/TCP F/T → proprioception` 순으로 기록하고, source를 확인할 수 없으면 `NR` | Point cloud·BPS·OBB·estimated pose는 `Geometry information`, task direction·goal·language instruction은 conditioning 정보이므로 이 column에서 제외한다. Tactile encoding과 history 같은 가공 방식도 main table에서는 제외한다. |
-| Action output | Learned module 또는 controller가 무엇을 명령하는가? | EEF/TCP motion, gripper width, finger joints, contact force 등 실제 command를 기록 | 초기 pose 생성과 접촉 중 반복 command를 구분 |
-| Tool-configuration update | Task에 맞춘 tool/contact configuration을 언제 변경하는가? | `N/A` / `Fixed` / `Task-conditioned initial` / `Online—gripper` / `Online—wrist/fingers` | Configuration은 접촉을 형성하는 wrist pose와 articulated tool DOF를 뜻한다. 단순 trajectory tracking과 접촉 configuration의 적응을 구분한다. |
+#### Contact tool — 무엇으로 물체에 접촉하는가?
+
+| 허용값 | 직관적 의미 | 판정 기준 |
+| --- | --- | --- |
+| `Rigid end effector` | 관절이 없는 단단한 tip·rod·plate | Robot 전체가 아니라 실제 contact interface가 rigid한 경우 |
+| `Tactile pusher` | Tactile sensor가 부착된 pushing tool | Tool 자체가 contact sensing surface 역할을 함 |
+| `Parallel gripper` | 두 jaw의 개폐를 주로 사용하는 gripper | Gripper width를 명령하지만 개별 finger joint를 독립 제어하지 않음 |
+| `Adaptive gripper` | 접촉에 맞춰 finger가 수동·능동 적응하는 gripper | Dexterous-hand 수준의 독립 finger command와 구분 |
+| `Grasped object/tool` | Robot이 쥔 물체나 도구로 접촉 | Gripper가 아니라 grasped item이 실제 target/environment에 힘을 전달함 |
+| `Dexterous hand` | 여러 finger joint를 갖는 다지 hand | Finger configuration을 접촉 형성이나 online adaptation에 사용할 수 있음 |
+| `Mixed tools` | 둘 이상의 contact tool을 비교·사용 | 동일 논문에서 tool 종류가 평가 조건에 따라 달라짐 |
+
+#### Physical sensor input — 실행 중 어떤 물리 sensor stream을 받는가?
+
+여러 입력은 `Vision → tactile/contact state → wrist/TCP F/T → proprioception` 순으로 기록한다. 가공된 geometry, task goal과 language instruction은 여기서 제외한다.
+
+| 표기 | 의미 | 경계 |
+| --- | --- | --- |
+| `Vision` | Camera가 제공하는 raw 또는 minimally processed image stream | 확인되면 `Vision (RGB)`, `Vision (depth)`, `Vision (RGB-D)`처럼 세부 종류를 병기하고, point cloud·OBB·estimated pose는 geometry column에 기록 |
+| `Tactile` | 별도 tactile array·image·taxel stream | Wrist force만 사용하면 tactile로 세지 않음 |
+| `Contact flag/state` | Contact 여부나 discrete contact state | Tactile spatial pattern이나 6-axis wrench와 구분 |
+| `Wrist/TCP F/T` | End-effector의 force/torque 또는 wrench | Reward-only privileged force는 deployment input으로 세지 않음 |
+| `Proprioception` | Joint position·velocity, gripper width 등 robot 내부 상태 | Command나 task goal은 포함하지 않음 |
+| `NR` | Raw sensor source를 논문에서 확인할 수 없음 | Preprocessed geometry만 명시된 경우 설명을 괄호에 덧붙임 |
+
+#### Commanded action — system이 실제로 무엇을 명령하는가?
+
+| 반복 표기 | 의미 |
+| --- | --- |
+| `EEF/TCP motion` | End-effector의 pose, delta pose, velocity 또는 trajectory command |
+| `Object motion` | Grasped object/tool의 목표 motion을 직접 최적화·명령 |
+| `Gripper width` | Gripper opening/closing command |
+| `Finger joints` | 개별 또는 actuated finger joint command |
+| `Contact force` | Target force 또는 force-control reference |
+| `Initial wrist pose/configuration` | 접촉 전 initial wrist pose나 finger configuration만 생성 |
+
+초기 pose/configuration 생성과 contact 중 반복 command를 구분해 기록한다. 논문 고유 action이 위 표에 맞지 않으면 의미를 보존하는 짧은 표현을 추가한다.
+
+#### Configuration adaptation — contact configuration을 언제 바꾸는가?
+
+Configuration은 접촉을 형성하는 wrist pose와 articulated tool DOF를 뜻한다. 단순 EEF trajectory tracking은 configuration adaptation으로 세지 않는다.
+
+| 허용값 | 직관적 의미 | 판정 기준 |
+| --- | --- | --- |
+| `Not applicable` | 별도 tool/contact configuration이 없음 | Rigid EEF motion만 제어하는 경우 |
+| `Fixed after setup` | 시작 후 configuration을 고정 | Grasp나 finger posture를 정한 뒤 online으로 바꾸지 않음 |
+| `Task-conditioned initial only` | Goal에 맞춰 initial configuration만 선택 | Contact 전 wrist/finger pose를 생성하지만 이후에는 고정 |
+| `Online gripper adjustment` | 실행 중 gripper opening/closure를 수정 | Feedback에 따라 gripper width나 closure command를 갱신 |
+| `Online wrist–finger adjustment` | 실행 중 wrist와 finger configuration을 함께 수정 | Contact feedback이나 task state에 따라 wrist pose와 finger joints를 반복 갱신 |
 
 ### 2.3 System
 
-| Column | 판정 질문 | 허용값 | 경계 |
-| --- | --- | --- | --- |
-| Method | 행동을 생성하는 주된 방법론은 무엇인가? | `Heuristic/Control` / `Optimization` / `Generative/Planning` / `RL` / `IL` / `VLA` / `Hybrid` | Encoder 종류나 sensor 유무가 아니라 action generation과 학습·계획 방식으로 판정한다. 복수 방식이 실제 행동 생성에 함께 관여할 때만 `Hybrid`로 기록한다. |
+#### Action-generation method — 행동을 만드는 주된 방법은 무엇인가?
+
+| 허용값 | 직관적 의미 | 판정 기준 |
+| --- | --- | --- |
+| `Rule/feedback control` | 사람이 정의한 rule, primitive 또는 feedback law | Learned policy나 online optimizer가 주된 action generator가 아님 |
+| `Optimization/planning` | Model·constraint·search로 action을 계산 | Trajectory optimization, MPC, contact-mode planning 등을 포함 |
+| `Generative pose/trajectory planning` | 생성 model이 pose·trajectory 후보를 만들고 planner가 선택·실행 | Demonstration action을 직접 모방하는 IL과 구분 |
+| `Reinforcement learning (RL)` | Environment return으로 policy/value를 학습 | Online deployment action을 learned RL policy가 생성 |
+| `Imitation learning (IL)` | Demonstration action을 주 supervision으로 학습 | Behavior cloning, diffusion/flow policy 등을 포함 |
+| `Vision-language-action (VLA)` | Vision-language representation과 action generation을 결합 | Semantic instruction만 처리하고 별도 controller가 전부 실행하면 역할을 구분해 기록 |
+| `Hybrid` | 둘 이상의 방식이 action generation에 필수적으로 관여 | `Optimization + RL`, `VLA + control`처럼 실제 결합 요소를 괄호에 명시 |
+
+Encoder 종류나 sensor 유무는 method family를 결정하지 않는다. 복수 component가 있어도 하나가 perception이나 initialization에만 쓰이면 자동으로 `Hybrid`로 분류하지 않는다.
 
 `Evaluated task`, `contact-stage coverage`, `closed-loop correction`, `reported endpoint`는 중요한 근거이지만 Environment–Agent–System의 단일 범주로 깔끔하게 귀속되지 않는다. 따라서 main classification table에 억지로 넣지 않고 Section 4의 paper-level evidence에서 논문별로 검증한다. `Robustness`, `Context awareness`, `Generalizable`, `Controllability`처럼 논문마다 의미가 달라지는 포괄적 표현도 column으로 사용하지 않는다.
 
@@ -61,58 +153,58 @@ Environment, Agent와 System은 서로 다른 질문에 답하므로 같은 row 
 
 ### 3.1 Environment
 
-| ID | Work | Evaluation environment | Non-target/environment contact | Geometry information |
+| ID | Work | Evaluation setting | Surrounding-contact role | Geometry available at deployment |
 | --- | --- | --- | --- | --- |
-| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Open tabletop | Target only | None |
-| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | Cluttered tabletop | Avoid | Implicit visual (not explicit) |
-| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | Open tabletop | Target only | Implicit visual (not explicit) |
-| [B92](https://doi.org/10.15607/RSS.2024.XX.135) | Tactile-Driven Contact Mode Control | Fixture-based | Exploit | Known model (exact) |
-| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | Multiple environments | Exploit | Point cloud (observed) |
-| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Open tabletop | Target only | Point cloud/BPS (observed)⁶ |
-| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | Open tabletop | Target only | Point cloud (observed)³ |
-| [B81](https://doi.org/10.1109/LRA.2026.3655262) | Optimization-Guided Non-Prehensile RL | Open + fixture | Task-dependent | Implicit visual (not explicit) |
-| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | Multiple fixture-based tasks | Required | Implicit visual (not explicit)⁴ |
-| [B48](https://doi.org/10.48550/arXiv.2507.09160) | Tactile-VLA | Multiple fixture-based tasks | Required | Implicit visual (not explicit)⁵ |
-| — | **Ours** | Shelf | Avoid / Open¹ | OBB (approximate) |
+| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Open tabletop | Target contact only | No geometry input |
+| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | Cluttered tabletop | Avoid surrounding contact | Image features (implicit geometry) |
+| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | Open tabletop | Target contact only | Image features (implicit geometry) |
+| [B92](https://doi.org/10.15607/RSS.2024.XX.135) | Tactile-Driven Contact Mode Control | Fixture-constrained | Use surrounding contact | Exact known model |
+| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | Multiple settings | Use surrounding contact | Observed point cloud |
+| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Open tabletop | Target contact only | Observed point cloud → BPS⁶ |
+| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | Open tabletop | Target contact only | Observed point cloud³ |
+| [B81](https://doi.org/10.1109/LRA.2026.3655262) | Optimization-Guided Non-Prehensile RL | Open tabletop + fixture | Depends on task | Image features (implicit geometry) |
+| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | Multiple settings | Environmental contact required | Image features (implicit geometry)⁴ |
+| [B48](https://doi.org/10.48550/arXiv.2507.09160) | Tactile-VLA | Multiple settings | Environmental contact required | Image features (implicit geometry)⁵ |
+| — | **Ours** | Shelf | Avoid surrounding contact¹ | Approximate OBB |
 
 ### 3.2 Agent
 
-| ID | Work | Tool | Input modality | Action output | Tool-configuration update |
+| ID | Work | Contact tool | Physical sensor input | Commanded action | Configuration adaptation |
 | --- | --- | --- | --- | --- | --- |
-| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Tactile pusher | Tactile + proprioception | EEF motion | N/A |
-| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | Rigid EEF | Vision + contact sensing + proprioception | EEF motion | N/A |
-| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | Rigid EEF | Vision + wrist F/T + proprioception² | EEF motion | N/A |
-| [B92](https://doi.org/10.15607/RSS.2024.XX.135) | Tactile-Driven Contact Mode Control | Grasped object/tool | Tactile + optional wrist F/T + proprioception | EEF/object motion | Fixed |
-| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | Parallel gripper | Vision + proprioception | EEF motion | Fixed |
-| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Dexterous hand | NR (preprocessed geometry only)⁶ | Initial wrist pose + finger joints; then EEF translation | Task-conditioned initial⁶ |
-| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | Dexterous hand | Vision + tactile + proprioception | EEF motion + finger joints | Online—wrist/fingers³ |
-| [B81](https://doi.org/10.1109/LRA.2026.3655262) | Optimization-Guided Non-Prehensile RL | Rigid EEF | Vision + contact sensing + wrist F/T + proprioception | EEF motion | N/A |
-| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | Adaptive gripper / grasped tool | Vision (RGB) + wrist/TCP F/T + proprioception | TCP pose + gripper-width action chunk | Online—gripper⁴ |
-| [B48](https://doi.org/10.48550/arXiv.2507.09160) | Tactile-VLA | Parallel gripper | Vision (RGB) + tactile + proprioception | Target pose + target force + gripper width | Online—gripper⁵ |
-| — | **Ours** | Dexterous hand | Vision + tactile + wrist F/T + proprioception | EEF delta pose + finger joints | Online—wrist/fingers |
+| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Tactile pusher | Tactile + proprioception | EEF motion | Not applicable |
+| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | Rigid end effector | Vision + contact flag + proprioception | EEF motion | Not applicable |
+| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | Rigid end effector | Vision + wrist F/T + proprioception² | EEF motion | Not applicable |
+| [B92](https://doi.org/10.15607/RSS.2024.XX.135) | Tactile-Driven Contact Mode Control | Grasped object/tool | Tactile + optional wrist F/T + proprioception | EEF/object motion | Fixed after setup |
+| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | Parallel gripper | Vision + proprioception | EEF motion | Fixed after setup |
+| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Dexterous hand | NR (preprocessed geometry only)⁶ | Initial wrist pose + finger joints; then EEF translation | Task-conditioned initial only⁶ |
+| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | Dexterous hand | Vision + tactile + proprioception | EEF motion + finger joints | Online wrist–finger adjustment³ |
+| [B81](https://doi.org/10.1109/LRA.2026.3655262) | Optimization-Guided Non-Prehensile RL | Rigid end effector | Vision + contact state + wrist F/T + proprioception | EEF motion | Not applicable |
+| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | Mixed tools (adaptive gripper / grasped tool) | Vision (RGB) + wrist/TCP F/T + proprioception | TCP pose + gripper-width action chunk | Online gripper adjustment⁴ |
+| [B48](https://doi.org/10.48550/arXiv.2507.09160) | Tactile-VLA | Parallel gripper | Vision (RGB) + tactile + proprioception | Target pose + target force + gripper width | Online gripper adjustment⁵ |
+| — | **Ours** | Dexterous hand | Vision + tactile + wrist F/T + proprioception | EEF delta pose + finger joints | Online wrist–finger adjustment |
 
 ### 3.3 System
 
-| ID | Work | Method |
+| ID | Work | Action-generation method |
 | --- | --- | --- |
-| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Heuristic/Control |
-| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | RL |
-| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | RL |
+| [B37](https://doi.org/10.1109/TRO.2021.3104471) | Goal-Driven Robotic Pushing | Rule/feedback control |
+| [B84](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal-Oriented Pushing in Clutter | Reinforcement learning (RL) |
+| [B12](https://doi.org/10.48550/arXiv.2412.13157) | Visuotactile Estimation under Occlusions | Reinforcement learning (RL) |
 | [B92](https://doi.org/10.15607/RSS.2024.XX.135) | Tactile-Driven Contact Mode Control | Hybrid (Optimization + Control) |
-| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | RL |
-| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Generative/Planning |
-| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | IL |
+| [B90](https://doi.org/10.15607/RSS.2025.XXI.154) | HAMNET | Reinforcement learning (RL) |
+| [B01](https://doi.org/10.48550/arXiv.2509.18455) | GD2P | Generative pose/trajectory planning |
+| [B22](https://openreview.net/forum?id=dT3ZciXvNX) | DexMove | Imitation learning (IL) |
 | [B81](https://doi.org/10.1109/LRA.2026.3655262) | Optimization-Guided Non-Prehensile RL | Hybrid (Optimization + RL) |
-| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | VLA |
+| [B46](https://doi.org/10.52202/085713-3124) | ForceVLA | Vision-language-action (VLA) |
 | [B48](https://doi.org/10.48550/arXiv.2507.09160) | Tactile-VLA | Hybrid (VLA + Control) |
-| — | **Ours** | RL |
+| — | **Ours** | Reinforcement learning (RL) |
 
 1. `[Open]` Shelf와 비표적 물체의 contact는 피한다. 주변 물체를 항상 둘지, 위치·수를 randomize할지, single-object와 multi-object를 분리할지는 아직 결정되지 않았다.
-2. `[Evidence]` B12가 `tactile`이라고 부르는 입력은 별도 tactile array가 아니라 end-effector force measurement다. 따라서 `Input modality`에는 별도 tactile을 쓰지 않고 `wrist F/T`로 기록한다. History 길이는 main table이 아니라 evidence에서 관리한다.
-3. `[Evidence]` DexMove는 initial hand contact pose를 object point cloud와 target object pose에 조건화한다. 따라서 `Geometry information = Point cloud (observed)`로 분류한다.
+2. `[Evidence]` B12가 `tactile`이라고 부르는 입력은 별도 tactile array가 아니라 end-effector force measurement다. 따라서 `Physical sensor input`에는 별도 tactile을 쓰지 않고 `wrist F/T`로 기록한다. History 길이는 main table이 아니라 evidence에서 관리한다.
+3. `[Evidence]` DexMove는 initial hand contact pose를 object point cloud와 target object pose에 조건화한다. 따라서 `Geometry available at deployment = Observed point cloud`로 분류한다.
 4. `[Evidence]` ForceVLA는 별도 tactile array 없이 real-time 6-axis end-effector wrench, RGB vision과 proprioception으로 TCP pose와 gripper-width action chunk를 생성한다. Insertion·pumping·wiping·peeling을 포함하므로 contact-aware VLA의 강한 정식 게재 비교군이지만, shelf NPM의 same-task baseline은 아니다.
 5. `[Evidence]` Tactile-VLA는 dual high-resolution tactile의 normal/shear history로 target position과 contact force를 예측하고 hybrid position–force controller 및 선택적 CoT replanning을 사용한다. 현재 확인 가능한 출판 상태는 arXiv 2025이므로 preprint adjacent comparator로 구분한다.
-6. `[Evidence]` GD2P는 object point cloud를 BPS로 표현하고 push/pull direction에 조건화된 wrist pose와 finger configuration을 생성한다. Point cloud/BPS와 direction은 각각 processed geometry와 task conditioning이므로 raw-sensor 기준의 `Input modality`에서는 제외한다. 접촉 이후에는 선택한 pose를 유지한 채 정해진 방향으로 이동하므로 `Task-conditioned initial`이며 online contact-feedback policy는 아니다.
+6. `[Evidence]` GD2P는 object point cloud를 BPS로 표현하고 push/pull direction에 조건화된 wrist pose와 finger configuration을 생성한다. Point cloud/BPS와 direction은 각각 processed geometry와 task conditioning이므로 raw-sensor 기준의 `Physical sensor input`에서는 제외한다. 접촉 이후에는 선택한 pose를 유지한 채 정해진 방향으로 이동하므로 `Task-conditioned initial only`이며 online contact-feedback policy는 아니다.
 
 ---
 
@@ -175,10 +267,10 @@ Supported·unsupported statement를 구분하면 두 개의 candidate claim과 �
 표를 발표용 최종본으로 바꾸기 전에 다음을 수행한다.
 
 1. B37, B84, B12, B92, B90, B22와 B81의 full text에서 각 categorical value의 근거 문장·figure·section을 기록한다.
-2. `Geometry information`의 representation과 fidelity 표기가 deployment input과 일치하는지 다시 검증한다.
-3. 각 `Input modality`가 실제 physical sensor stream인지, processed geometry·goal·privileged information인지 구분한다.
+2. `Geometry available at deployment`의 representation과 fidelity 표기가 실제 deployment input과 일치하는지 다시 검증한다.
+3. 각 `Physical sensor input`이 실제 sensor stream인지, processed geometry·goal·privileged information인지 구분한다.
 4. Wrist F/T가 actor/control input인지, reward·estimation·evaluation에서만 사용되는지 구분한다.
-5. Surrounding-object 조건을 `Target only / Avoid / Exploit / Required / Task-dependent / Open` 중 하나로 일관되게 판정한다.
+5. Surrounding-object 조건을 `Target contact only / Avoid surrounding contact / Use surrounding contact / Environmental contact required / Depends on task / Undecided` 중 하나로 일관되게 판정한다.
 6. 발표 표에는 검증이 끝난 row만 남기고 불확실한 cell은 `NR`로 표시한다.
 
 GD2P, ForceVLA와 Tactile-VLA의 geometry/input, action, controller와 task는 2026-09-18 원문에서 확인했다. Tactile-VLA는 제출·발표 시점에 정식 게재 여부를 다시 확인하며, 확인 전까지 `preprint adjacent comparator`로 유지한다.

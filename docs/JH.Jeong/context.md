@@ -8,7 +8,7 @@
 >
 > **문서 역할:** 연구 범위, 가설, 임시 baseline과 미결 사항을 분리하고 이후 판단의 기준을 제공한다.
 >
-> **최종 갱신:** 2026-09-18
+> **최종 갱신:** 2026-09-19
 
 ---
 
@@ -505,28 +505,28 @@ Previous Works의 주 구조는 method family의 단순 나열이 아니라 다�
 
 ### 10.3 Main comparison table의 column
 
-각 column은 하나의 질문만 답한다. Environment, Agent와 System은 동일한 row 순서를 유지하되 별도 표로 작성한다. `Tactile`, `Wrist F/T`, `Vision`을 각각 presence column으로 늘어놓지 않고 raw physical sensor 기준의 `Input Modality` 한 column에 기록한다. Processed geometry, task goal과 language instruction은 이 column에서 제외한다.
+각 column은 하나의 질문만 답한다. Environment, Agent와 System은 동일한 row 순서를 유지하되 별도 표로 작성한다. `Tactile`, `Wrist F/T`, `Vision`을 각각 presence column으로 늘어놓지 않고 raw physical sensor 기준의 `Physical Sensor Input` 한 column에 기록한다. Processed geometry, task goal과 language instruction은 이 column에서 제외한다. 아래 label의 상세 의미와 판정 경계는 [`Intro/previous_works.md`](./Intro/previous_works.md#2-comparison-codebook)의 codebook을 따른다.
 
 | Group | Column | Single question | Allowed coding |
 | --- | --- | --- | --- |
-| Environment | Evaluation Environment | 실제로 어떤 공간·접촉 구조에서 평가했는가? | Open tabletop / Cluttered tabletop / Fixture-based / Multiple environments / Open + fixture / Shelf |
-| Environment | Non-target/Environment Contact | Tool–target 이외의 접촉을 어떻게 취급하는가? | Target only / Avoid / Exploit / Required / Task-dependent / Open |
-| Environment | Geometry Information | 어떤 geometry 표현과 정확도 수준이 주어지는가? | None / Implicit visual (not explicit) / Point cloud (observed) / Point cloud-BPS (observed) / OBB (approximate) / Known model (exact) |
-| Agent | Tool | 무엇으로 target/environment와 접촉하는가? | Rigid EEF / Tactile pusher / Parallel-adaptive gripper / Grasped object-tool / Dexterous hand / Mixed |
-| Agent | Input Modality | 어떤 physical sensor stream을 deployment에서 이용하는가? | Vision (RGB/depth/RGB-D) → tactile → wrist/TCP F/T → proprioception 순으로 기록; source가 확인되지 않으면 NR |
-| Agent | Action Output | Learned module 또는 controller가 무엇을 명령하는가? | EEF/TCP motion / gripper width / finger joints / target force 등의 실제 command |
-| Agent | Tool-Configuration Update | Task-conditioned tool/contact configuration을 언제 변경하는가? | N/A / Fixed / Task-conditioned initial / Online—gripper / Online—wrist-fingers |
-| System | Method | 행동을 생성하는 주된 방법론은 무엇인가? | Heuristic-Control / Optimization / Generative-Planning / RL / IL / VLA / Hybrid |
+| Environment | Evaluation Setting | 실제로 어떤 공간·접촉 구조에서 평가했는가? | Open tabletop / Cluttered tabletop / Fixture-constrained / Multiple settings / Open tabletop + fixture / Shelf |
+| Environment | Surrounding-Contact Role | Tool–target 이외의 접촉을 어떻게 취급하는가? | Target contact only / Avoid surrounding contact / Use surrounding contact / Environmental contact required / Depends on task / Undecided |
+| Environment | Geometry Available at Deployment | 어떤 geometry 표현과 정확도 수준이 주어지는가? | No geometry input / Image features (implicit geometry) / Observed point cloud / Observed point cloud → BPS / Approximate OBB / Exact known model |
+| Agent | Contact Tool | 무엇으로 target/environment와 접촉하는가? | Rigid end effector / Tactile pusher / Parallel gripper / Adaptive gripper / Grasped object/tool / Dexterous hand / Mixed tools |
+| Agent | Physical Sensor Input | 어떤 physical sensor stream을 deployment에서 이용하는가? | Vision → tactile/contact flag → wrist/TCP F/T → proprioception 순으로 기록; source가 확인되지 않으면 NR |
+| Agent | Commanded Action | Learned module 또는 controller가 무엇을 명령하는가? | EEF/TCP motion / gripper width / finger joints / contact force 등의 실제 command |
+| Agent | Configuration Adaptation | Task-conditioned tool/contact configuration을 언제 변경하는가? | Not applicable / Fixed after setup / Task-conditioned initial only / Online gripper adjustment / Online wrist–finger adjustment |
+| System | Action-Generation Method | 행동을 생성하는 주된 방법론은 무엇인가? | Rule/feedback control / Optimization/planning / Generative pose/trajectory planning / Reinforcement learning / Imitation learning / Vision-language-action / Hybrid |
 
 `Comparison Role`은 별도 column으로 두지 않는다. Direct same-task baseline과 adjacent contact-aware comparator의 구분은 표 앞의 inclusion 설명과 paper-level evidence에서 관리한다.
 
-`Geometry Information`은 열 수를 줄이기 위해 representation과 fidelity를 `표현 (정확도)` 형식의 한 셀로 기록한다. 두 개념 자체는 구분한다. Point cloud는 자동으로 exact geometry를 의미하지 않으며, OBB는 `OBB (approximate)`로 기록한다.
+`Geometry Available at Deployment`는 열 수를 줄이기 위해 representation과 fidelity를 한 셀에 기록하되 두 개념 자체는 구분한다. Point cloud는 자동으로 exact geometry를 의미하지 않으며, estimated OBB는 `Approximate OBB`로 기록한다.
 
-`Evaluation Environment`와 `Non-target/Environment Contact`는 합치지 않는다. 전자는 공간 구성, 후자는 contact의 허용·회피·활용 방식을 묻기 때문에 fixture나 shelf라는 동일 환경에서도 서로 다른 값을 가질 수 있다.
+`Evaluation Setting`과 `Surrounding-Contact Role`은 합치지 않는다. 전자는 공간 구성, 후자는 contact의 허용·회피·활용 방식을 묻기 때문에 fixture나 shelf라는 동일 환경에서도 서로 다른 값을 가질 수 있다.
 
-`Input Modality`는 raw physical sensor family만 기록한다. Point cloud·BPS·OBB·estimated pose는 `Geometry Information`으로, task direction·goal·language instruction은 conditioning information으로 분리한다. Binary/dense tactile, history 길이와 encoder 같은 가공 방식은 paper-level evidence 또는 method 문서에서 관리하고, privileged reward·critic information은 포함하지 않는다.
+`Physical Sensor Input`은 raw physical sensor family만 기록한다. Point cloud·BPS·OBB·estimated pose는 `Geometry Available at Deployment`로, task direction·goal·language instruction은 conditioning information으로 분리한다. Binary/dense tactile, history 길이와 encoder 같은 가공 방식은 paper-level evidence 또는 method 문서에서 관리하고, privileged reward·critic information은 포함하지 않는다.
 
-System은 `Method` 한 column으로 제한한다. 이전의 `Evaluated Task`, `Training/Planning Source`, `Contact-Stage Coverage`, `Closed-Loop Correction`, `Reported Endpoint`는 유용하지만 Environment–Agent–System 사이의 경계가 모호해지므로 main classification table에서 제거하고 paper-level evidence에 보존한다.
+System은 `Action-Generation Method` 한 column으로 제한한다. 이전의 `Evaluated Task`, `Training/Planning Source`, `Contact-Stage Coverage`, `Closed-Loop Correction`, `Reported Endpoint`는 유용하지만 Environment–Agent–System 사이의 경계가 모호해지므로 main classification table에서 제거하고 paper-level evidence에 보존한다.
 
 `Robustness`, `Context awareness`, `Generalizable`, `Controllability`처럼 논문마다 의미가 달라지는 포괄적 column은 사용하지 않는다. 대신 실제 perturbation, held-out split과 evaluation condition을 별도 evidence table에 기록한다.
 
@@ -696,6 +696,7 @@ System은 `Method` 한 column으로 제한한다. 이전의 `Evaluated Task`, `T
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-19 | Comparison codebook이 column별 허용값만 나열하고 `Implicit visual`, `Exploit`, `Fixed`처럼 해석이 필요한 축약 label을 사용 | 허용값마다 직관적 의미와 포함·제외 기준을 정의하고, `Image features (implicit geometry)`, `Use surrounding contact`, `Fixed after setup`처럼 판정 의미가 드러나는 label로 canonical matrix를 통일 | Vision sensor와 geometry representation, 환경 형태와 contact 역할, initial configuration과 online adaptation의 혼동을 줄이기 위해 | 10.3, `Intro/previous_works.md` |
 | 2026-09-18 | Research Trend의 method별 한계를 approximate OBB, 현재 sensor와 sequential task에 필요한 추가 요소로 직접 설명 | NPM 공통 난제인 underconstrained motion, hybrid contact-mode transition, model/data coverage, closed-loop recovery와 safety를 기준으로 family별 구조적 한계를 먼저 비교하고 현재 조건의 RL 선택은 별도 절로 분리 | Method 자체의 한계와 현재 구현 조건에서 부족한 부분을 혼동하지 않고 공정한 trend comparison을 만들기 위해 | 10.1, `Intro/research_trend.md` |
 | 2026-09-18 | Rotation success와 Rotation-to-Push success의 factorized evaluation을 C3 contribution 후보로 분류하고 unified shared policy도 C4 후보로 병기 | 활성 contribution 후보는 C1·C2만 유지; factorized analysis는 공통 evaluation protocol로, shared policy는 method baseline으로 재분류 | 평가 설계와 algorithmic/scientific contribution을 혼동하지 않기 위해 | 7.3, 8–9, 11, `Intro/README.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
 | 2026-09-18 | Motivation, Trend, Previous Works와 Contributions가 각자의 역할은 가졌지만 문서 전환 시 앞 단계의 결론과 다음 질문이 명시되지 않아 독립 보고서처럼 읽힘 | 각 문서가 `앞 단계의 결론 → 현재 질문 → 현재 출력 → 다음 질문`을 이어받도록 연결하고, 발표 구성 같은 meta 내용은 `Intro/README.md`에 집중 | 네 문서를 `문제 정의 → 조건부 method 선택 → research gap → testable candidate`의 단일 논증으로 읽히게 하기 위해 | 1.2, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
