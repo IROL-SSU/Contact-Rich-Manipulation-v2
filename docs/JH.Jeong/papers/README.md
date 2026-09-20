@@ -51,7 +51,7 @@
 
 ## 3. ID와 근거 수준
 
-- `B01–B98`는 상세 검토 대상으로 승격한 핵심 corpus의 고정 ID다. 새 논문은 검토 후 `B99`부터 부여한다.
+- `B01–B99`는 상세 검토 대상으로 승격한 핵심 corpus의 고정 ID다. 새 논문은 검토 후 `B100`부터 부여한다.
 - `ICRAyy-NNN`, `IROSyy-NNN`은 conference screening ID이며 핵심 B-ID와 구분한다.
 - 목록에 포함됐다는 사실은 baseline 채택, 방법 재현 또는 논문 claim의 검증을 의미하지 않는다.
 - `screening`은 초록 수준, `core_papers`는 서지 확인, `topic_groups`와 `reward_formulation`은 연구 질문에 연결한 분석이라는 근거 수준 차이가 있다.

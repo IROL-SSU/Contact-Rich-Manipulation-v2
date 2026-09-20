@@ -41,14 +41,18 @@
 | [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) | Single | Open | Vision+Contact | None | Translation | Learning |
 | [B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) | Single | Open | Contact | Exact | Combined | Non-learning |
 | [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) | Single | Mixed | Vision | Estimated | Combined | Learning |
-| [B46 · ForceVLA](https://doi.org/10.52202/085713-3124) | Single | Mixed | Vision+Contact | None | Combined | Learning |
 | [B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Single | Mixed | Vision+Contact | None | Combined | Hybrid |
 | [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Single | Open | Vision | Estimated | Translation | Hybrid |
 | [B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) | Single | Open | Vision+Contact | Estimated | Combined | Learning |
 | [B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) | Single | Mixed | Vision+Contact | Estimated | Combined | Hybrid |
+| [B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) | Cluttered | Mixed | Vision+Contact | None | Combined | Hybrid |
 | **Ours** | **Single** | **Constrained** | **Vision+Contact** | **Estimated** | **Combined** | **Learning** |
 
-B01의 raw sensing source와 geometry 정확도, B22의 manipulation 범위, B46·B48의 전체 task suite 범위는 full text에서 우선 재확인한다. 표의 값은 현재 파악한 범위에서 가장 가까운 공통 분류다.
+B01의 raw sensing source와 geometry 정확도, B22의 manipulation 범위, B48의 전체 task suite 범위는 full text에서 우선 재확인한다. 표의 값은 현재 파악한 범위에서 가장 가까운 공통 분류다.
+
+B99의 `Cluttered`는 five-task suite 중 Retrieve Plate가 movable foam-ball clutter를 포함한다는 paper-level 판정이며, 다른 task는 대부분 single-target이다. `Hybrid`는 learned VLA가 end-effector pose뿐 아니라 force target과 subtask transition을 출력하고, hybrid force–position controller가 이를 실행하는 구성을 반영한다.
+
+B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사용한 별도 논문이다. 다만 공통 저자, ForceVLA의 한계를 출발점으로 한 문제 설정과 직접 baseline 비교를 근거로 **같은 계보의 method successor**로 판정해 이 비교 집합에서는 B46을 대체했다. B46은 [Paper Index](../papers/core_papers.md)의 선행 계보 항목으로 유지한다.
 
 ### Ours를 읽는 기준
 
@@ -70,8 +74,8 @@ B01의 raw sensing source와 geometry 정확도, B22의 manipulation 범위, B46
 | **2022** | [B37 · Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) `[Tactile feedback control / Non-learning; online 2021]`<br>[B84 · Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) `[RL / Learning]` | Translation에서 tactile feedback law로 접촉 오차를 직접 보정하는 방식과, goal progress·contact 유지·collision avoidance를 interaction return으로 학습하는 방식이 병렬적으로 나타났다. |
 | **2023** | [B85 · Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) `[Geometry-conditioned RL / Learning]` | RL의 범위가 translation에서 environment-contact pivoting으로 확장되고, depth-derived object feature와 state/action projection으로 unseen-object transfer를 다뤘다. |
 | **2024** | [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) `[Visuotactile estimation + RL / Learning; CoRL 2024, PMLR 2025]`<br>[B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) `[Tactile object/contact-state estimation + prescribed-mode optimization/control / Non-learning]` | Contact uncertainty를 estimator와 controller의 결합 문제로 명시했다. 한쪽은 occlusion 아래 state uncertainty를 learned policy에 전달하고, 다른 쪽은 tactile로 grasped-object pose와 extrinsic contact location을 추정해 주어진 contact mode 안에서 optimization과 feedback control을 수행한다. |
-| **2025** | [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) `[Modular RL / Learning]`<br>[B46 · ForceVLA](https://doi.org/10.52202/085713-3124) `[Force-aware VLA / Learning; Adjacent]`<br>[B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) `[Tactile VLA + position–force control / Hybrid; Adjacent]` | Learning은 object·environment geometry를 활용하는 modular policy와 pretrained VLA로 확장됐다. 동시에 force/tactile modality와 embodiment-specific local control의 결합이 필요함을 보여준다. |
-| **2026** | [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) `[Generative hand-pose model + simulation/planning / Hybrid]`<br>[B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) `[Tactile flow-based IL / Learning]`<br>[B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) `[Optimization demonstrations + RL / Hybrid]` | 하나의 family가 전체 문제를 대체하기보다 역할이 분화됐다. 생성·optimization은 initial configuration과 feasible prior를 제공하고, IL/RL policy는 contact 이후의 closed-loop execution과 adaptation을 담당한다. |
+| **2025** | [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) `[Modular RL / Learning]`<br>[B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) `[Tactile VLA + position–force control / Hybrid; Adjacent]` | Learning은 object·environment geometry를 활용하는 modular policy와 tactile-conditioned VLA로 확장됐다. 동시에 learned action generation과 embodiment-specific position–force control의 결합이 필요함을 보여준다. |
+| **2026** | [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) `[Generative hand-pose model + simulation/planning / Hybrid]`<br>[B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) `[Tactile flow-based IL / Learning]`<br>[B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) `[Optimization demonstrations + RL / Hybrid]`<br>[B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) `[Force-aware VLA + hybrid force–position control / Hybrid; Adjacent]` | 역할 분화가 더 명시적이 됐다. 생성·optimization은 initial configuration과 feasible prior를, IL/RL은 closed-loop execution을 담당한다. ForceVLA2는 force를 입력 cue로만 쓰는 수준에서 나아가 force target과 control mode를 action으로 생성해 active hybrid force–position regulation에 연결한다. |
 
 이 timeline은 `model-based method가 learning으로 대체됐다`는 흐름을 뜻하지 않는다. Contact feedback과 online correction은 non-learning control, RL, IL와 VLA 모두에서 나타나며, 최근 변화는 각 family가 initial configuration, state estimation, feasibility와 feedback execution의 역할을 나누는 방향에 가깝다.
 
@@ -85,7 +89,7 @@ B01의 raw sensing source와 geometry 정확도, B22의 manipulation 범위, B46
 - B85는 Ours와 `Manipulation`을 제외한 다섯 column이 같다. Wall-assisted pivoting과 unseen-object transfer를 보여주지만 reorientation만 다루며, 후속 translation과 online finger adaptation은 포함하지 않는다.
 - B81은 estimated geometry와 vision·contact feedback을 사용해 translation과 reorientation을 모두 다루지만, optimization과 RL을 결합한 `Hybrid`이며 workspace 범위도 다르다.
 - B92는 open planar workspace에서 translation과 reorientation을 모두 다루지만, known object geometry, prescribed contact mode와 non-learning optimization/control을 사용한다.
-- B46과 B48은 vision과 contact sensing을 learning method에 결합할 수 있음을 보여주지만, 여러 contact-rich task를 다루는 인접 연구다.
+- B99와 B48은 vision·contact-conditioned VLA를 hybrid force–position control과 결합할 수 있음을 보여주지만, 여러 contact-rich task를 다루는 인접 연구다. 특히 B99는 force target과 subtask transition까지 action output에 포함한다.
 
 이 차이는 연구 질문을 좁히는 근거이지 novelty의 증거는 아니다. 특히 `Vision+Contact`, `Estimated` geometry 또는 `Combined` manipulation이라는 조합만으로 contribution을 주장하지 않는다.
 

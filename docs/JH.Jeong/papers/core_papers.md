@@ -2,7 +2,7 @@
 
 > [Paper Index](./README.md) · [Intro](../Intro/README.md) · [Previous Works 비교](../Intro/previous_works.md) · [목적별 그룹](./topic_groups.md) · [우선 독해](./reading_guide.md) · [Conference Screening](./screening/README.md)
 
-[B01](https://doi.org/10.48550/arXiv.2509.18455)–[B98](https://doi.org/10.1109/ICRA48506.2021.9561734)의 서지정보와 공식 자료를 ID 순서로 정리한다. 이 페이지는 **논문을 순서대로 설명하는 본문이 아니라 서지정보의 단일 기준표**다.
+[B01](https://doi.org/10.48550/arXiv.2509.18455)–[B99](https://doi.org/10.48550/arXiv.2603.15169)의 서지정보와 공식 자료를 ID 순서로 정리한다. 이 페이지는 **논문을 순서대로 설명하는 본문이 아니라 서지정보의 단일 기준표**다.
 
 - 연구 질문별 해석과 baseline 역할이 필요하면 [목적별 논문 그룹](./topic_groups.md)으로 이동한다.
 - 실제로 읽을 순서가 필요하면 [우선 독해 가이드](./reading_guide.md)로 이동한다.
@@ -110,5 +110,6 @@
 | [B96](https://doi.org/10.1109/ICRA48506.2021.9561221) | [Manipulation Planning Among Movable Obstacles Using Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221) | ICRA 2021 | Physics-based simulation; adaptive motion primitives; multi-heuristic search | [Publication DOI](https://doi.org/10.1109/ICRA48506.2021.9561221) | [CMU](https://publications.ri.cmu.edu/manipulation-planning-among-movable-obstacles-using-physics-based-adaptive-motion-primitives), [Paper](https://arxiv.org/abs/2102.04324) |
 | [B97](https://doi.org/10.1109/ICRA48506.2021.9562061) | [Dexterous Manoeuvre through Touch in a Cluttered Scene](https://doi.org/10.1109/ICRA48506.2021.9562061) | ICRA 2021; screening [ICRA21-003](https://doi.org/10.1109/ICRA48506.2021.9562061) | Tactile representation; RL; clutter interaction | [Publication DOI](https://doi.org/10.1109/ICRA48506.2021.9562061) | [Author publication](https://yan-wu.com/publications/), [IEEE](https://ieeexplore.ieee.org/document/9562061/) |
 | [B98](https://doi.org/10.1109/ICRA48506.2021.9561734) | [Learning Multimodal Contact-Rich Skills from Demonstrations Without Reward Engineering](https://doi.org/10.1109/ICRA48506.2021.9561734) | ICRA 2021; screening [ICRA21-072](https://doi.org/10.1109/ICRA48506.2021.9561734) | Multimodal LfD/RL hybrid; demonstration-derived reward; real contact-rich skills | [Publication DOI](https://doi.org/10.1109/ICRA48506.2021.9561734) | [IEEE](https://ieeexplore.ieee.org/document/9561734/), [Paper](https://arxiv.org/abs/2103.01296) |
+| [B99](https://doi.org/10.48550/arXiv.2603.15169) | [ForceVLA2: Unleashing Hybrid Force-Position Control with Force Awareness for Contact-Rich Manipulation](https://doi.org/10.48550/arXiv.2603.15169) | CVPR 2026 | Force prompts; direct force pathway; Cross-Scale MoE; hybrid force–position control | [arXiv DOI](https://doi.org/10.48550/arXiv.2603.15169) | [CVF](https://openaccess.thecvf.com/content/CVPR2026/html/Li_ForceVLA2_Unleashing_Hybrid_Force-Position_Control_with_Force_Awareness_for_Contact-Rich_CVPR_2026_paper.html), [Project](https://sites.google.com/view/force-vla2/home), [Paper](https://arxiv.org/abs/2603.15169) |
 
 ---
