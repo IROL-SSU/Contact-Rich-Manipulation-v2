@@ -32,8 +32,8 @@
 | 순서 | 문서 | 다루는 내용 | 결론 또는 남는 질문 |
 | ---: | --- | --- | --- |
 | 1 | [Research Motivation](./research_motivation.md) | 실제 manipulation 수요에서 nonprehensile task와 approximate-geometry contact uncertainty로 연구 문제를 좁힌다. | 여러 방법을 비교해야 하는 조건 |
-| 2 | [Research Trend](./research_trend.md) | Heuristic/control/planning, RL, IL, VLA와 hybrid의 장점과 한계를 비교한다. | 현재 조건에서 RL을 우선하는 조건부 `[Baseline]` 판단 |
-| 3 | [Previous Works](./previous_works.md) | 가까운 연구를 `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method`의 공통 값으로 비교한다. | Ours와 가까운 조건 및 남은 C1·C2 검증 질문 |
+| 2 | [Research Trend](./research_trend.md) | Explicit model/control, demonstration·pretrained prior와 interaction-return RL이 해결한 범위와 남긴 부담을 비교한다. | Nonprehensile manipulation과 현재 자원 조건에서 RL을 우선하는 조건부 `[Baseline]` 판단 |
+| 3 | [Previous Works](./previous_works.md) | B85를 포함한 가까운 연구 11편의 2022–2026 timeline과 `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method` 비교표를 정리한다. | Ours와 가까운 조건 및 남은 C1·C2 검증 질문 |
 | 4 | [Candidate Contributions](./contributions.md) | C1·C2의 비교 조건과 지지·기각 조건을 정리한다. | Method와 Experiments가 검증할 대상 |
 
 Introduction은 최종 contribution을 미리 확정하지 않는다. 문헌 근거와 matched experiment가 지지한 candidate만 이후 contribution으로 승격한다.

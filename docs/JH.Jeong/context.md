@@ -467,12 +467,12 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 
 | 구분 | 질문 | 포함할 연구 | 정리할 내용 |
 | --- | --- | --- | --- |
-| **Research Trend** | 2021년 이후 heuristic/planning, RL, IL와 VLA가 contact가 수반되는 manipulation을 어떻게 확장했으며, 각 방법의 장점과 한계를 고려할 때 왜 현재 문제에 RL을 우선하는가? | Direct nonprehensile work와 method 변화의 중요한 adjacent contact-rich IL/VLA | 대표 연구, nonprehensile manipulation의 공통 난제에 대한 방법별 강점·한계, 조건부 RL 선택 근거 |
-| **Closest Previous Works** | 우리와 유사한 연구는 Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | Nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 연구 | `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method` 비교와 남은 검증 질문 |
+| **Research Trend** | Existing model/control, demonstration·pretrained prior와 interaction-return RL은 nonprehensile manipulation의 무엇을 해결했고 어떤 부담을 남겼으며, 왜 현재 자원 조건에는 RL이 더 합리적인가? | Direct nonprehensile work와 method 선택의 반례가 되는 adjacent contact-rich IL/VLA | 공통 decision burden, 기존 방법의 해결 범위·한계, 조건부 RL 선택과 기각 근거 |
+| **Closest Previous Works** | 우리와 유사한 연구는 시간적으로 어떤 method concept을 발전시켰으며, Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | B85를 포함해 nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 11편 | 비교 집합만의 2022–2026 timeline, `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method` 비교와 남은 검증 질문 |
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
-Research Trend는 대표 논문을 네 가지 방법론적 변화로 묶는다. Hybrid 연구는 `(Optimization + RL)`, `(VLA + Control)`처럼 실제 결합 요소를 함께 기록한다. 논문이 우리 task와 얼마나 가까운지는 Previous Works에서 판단한다. Trend의 설명 순서는 `대표 연구 → nonprehensile manipulation의 공통 난제에 대한 방법별 강점과 한계 → 현재 조건에 적용 → RL을 우선하는 이유와 반증 조건`으로 고정한다.
+Research Trend에는 연도별 timeline을 두지 않는다. 대신 method를 `Explicit model / feedback control`, `Demonstration / pretrained or generative prior`, `Interaction-return RL`의 세 mechanism으로 묶고, hybrid는 각 mechanism의 역할 분담으로 설명한다. 설명 순서는 `nonprehensile manipulation의 공통 decision burden → 기존 연구가 해결한 범위와 남긴 부담 → 범주 수준에서 RL이 합리적인 조건 → 현재 조건에 적용 → 반증 조건`으로 고정한다. 연도별 변화는 Previous Works 비교표의 11편만 사용한 timeline에서 다루며, 각 논문은 동일한 `B-ID`로 비교표와 연결한다.
 
 RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른다.
 
@@ -522,7 +522,11 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 | **Robot Agent** | **Manipulation** | `Translation` / `Reorientation` / `Combined` | 이동, 회전 또는 둘 모두를 다루는가? |
 | **System** | **Method** | `Non-learning` / `Learning` / `Hybrid` | Action 생성의 주된 방식이 비학습, 학습 또는 두 방식의 결합인가? |
 
-`Object Geometry`는 robot agent가 실행 중 받는 명시적 shape 표현을 뜻한다. Pose나 RGB만 사용하면 `None`, OBB와 estimated point cloud는 `Estimated`, 정확한 CAD·mesh·dimension은 `Exact`로 판정한다. Simulator 또는 training 과정만 exact geometry를 사용해도 robot agent가 받지 않으면 `Exact`로 세지 않는다. Section 3.3의 `Implicit visual`은 실험 설계용 세부 구분이며, Previous Works 비교표에서는 명시적 shape가 아니므로 `None`으로 통합한다. `Geometry Handling`은 입력 정보와 처리 능력을 혼동시키고, `Object Generalization`은 unseen object에 대한 평가 범위를 뜻하는 별도 기준이므로 이 column의 이름으로 사용하지 않는다.
+`Object Geometry`는 robot agent가 실행 중 받는 명시적 shape 표현을 뜻한다. Pose나 RGB만 사용하면 `None`, OBB·estimated point cloud·depth-derived shape/size feature처럼 sensor에서 추정한 표현은 `Estimated`, 정확한 CAD·mesh·dimension은 `Exact`로 판정한다. Simulator 또는 training 과정만 exact geometry를 사용해도 robot agent가 받지 않으면 `Exact`로 세지 않는다. Section 3.3의 `Implicit visual`은 실험 설계용 세부 구분이며, Previous Works 비교표에서는 명시적 shape가 아니므로 `None`으로 통합한다. `Geometry Handling`은 입력 정보와 처리 능력을 혼동시키고, `Object Generalization`은 unseen object에 대한 평가 범위를 뜻하는 별도 기준이므로 이 column의 이름으로 사용하지 않는다.
+
+`Manipulation=Combined`는 한 논문이 translation과 reorientation을 모두 포함한다는 paper-level coverage다. 두 동작을 하나의 sequential task로 연결했거나 동일한 episode objective로 최적화했다는 의미로 해석하지 않는다.
+
+`Translation`과 `Reorientation`은 goal pose의 좌표 수가 아니라 manipulation primitive를 기준으로 판정한다. Planar pushing이 orientation error까지 제어하더라도 별도의 pivot·rotation skill을 다루지 않으면 `Translation`이다.
 
 현재 Stage 1의 분류는 다음과 같다.
 
@@ -704,6 +708,9 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-20 | Research Trend가 broad 논문과 Previous Works 10편을 함께 넣은 2021–2026 timeline을 보유 | B85를 closest comparison에 추가해 11편으로 만들고, 이 11편만의 2022–2026 timeline을 Previous Works로 이동. Research Trend는 기존 방법의 해결 범위와 한계를 근거로 `왜 RL인가`를 설명 | Chronology와 closest-work 비교를 한 문서에 연결하고, Research Trend는 method-selection argument에 집중하기 위해 | 10.1, 10.3, 14.1, `Intro/README.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `papers/README.md`, `papers/reading_guide.md` |
+| 2026-09-20 | Previous Works 비교표 10편 중 B12와 B48이 Research Trend timeline에서 누락되고, 나머지 논문도 두 문서 간 식별자가 연결되지 않음 | B12와 B48을 해당 연도에 추가하고 Previous Works 10편 모두에 동일한 `B-ID`를 표시. Conference edition과 proceedings 연도가 다른 B12는 `CoRL 2024, PMLR 2025`를 함께 표기 | 가까운 비교 연구가 broader trend에서 차지하는 시간적·방법론적 위치를 빠짐없이 추적하기 위해 | 10.1, 14.1, `Intro/research_trend.md`, `Intro/previous_works.md` |
+| 2026-09-20 | Research Trend의 2021–2026 연도별 timeline을 네 개의 방법론적 변화 표로 대체하고, RL 선택 이유를 현재 task 조건 중심으로 압축 | 연도별 timeline을 복원하고 `nonprehensile manipulation의 구조적 난제 → 방법별 자원과 부담 → interaction outcome을 이용한 RL의 조건부 강점 → 현재 task 적용`으로 재구성. 각 주장에 planning/control, RL, IL/VLA와 hybrid의 직접 근거·반례를 연결 | 분야의 시간적 변화와 broad method-selection 논리를 함께 보여주고, tactile feedback·recovery가 RL만의 기능이라는 과장을 피하기 위해 | 10.1, 14.1, `Intro/research_trend.md` |
 | 2026-09-20 | Geometry 관련 column 이름으로 `Geometry Handling`과 `Object Generalization`을 검토 | Robot Agent가 실행 중 받는 명시적 형상 정보의 유무와 정확도를 나타내는 `Object Geometry = None / Estimated / Exact`로 확정 | 처리 능력과 unseen-object 일반화를 섞지 않고 하나의 기준에서 직관적으로 비교하기 위해 | 10.3–10.4, `Intro/previous_works.md`, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/contributions.md`, `papers/reading_guide.md` |
 | 2026-09-20 | Environment, Robot Agent와 System을 상세한 open-ended column 및 별도의 Task·Evaluation 표로 비교 | 비교표를 Environment의 `Scene·Workspace`, Robot Agent의 `Sensing·Object Geometry·Manipulation`, System의 `Method`로 제한하고 각 column은 2–3개의 공통 값만 사용. `Object Geometry`는 `None / Estimated / Exact`로 판정 | 논문마다 서로 다른 세부 설명을 나열하지 않고 한눈에 비교하며, blocker observability와 autonomy처럼 현재 구분력이 없는 항목을 제외하기 위해 | 10.1–10.4, 14.1, `Intro/` 전체, `papers/reading_guide.md` |
 | 2026-09-20 | Environment에 task·pose·shape·평가 변화를, System에 goal·단계·endpoint를 함께 넣어 세 구분의 의미가 넓어짐 | 당시 중간안에서는 Environment를 workspace·scene·environment contact, Robot Agent를 robot body·input modality·action, System을 method로 한정하고 Task와 Evaluation을 별도 표로 관리했다. 이 구성은 현재 바로 위 행의 여섯-column 비교표로 대체됐다. | 사용자가 Agent는 환경과 상호작용하는 robot agent이고 System은 method를 뜻한다고 명확히 했으므로, 서로 다른 종류의 정보를 같은 column group에 섞지 않기 위해 | 3.6–3.7, 10.1–10.4, 14.1, `research_topic.md`, `Intro/` 전체, `papers/reading_guide.md`, `papers/screening/task_and_retrieval.md` |

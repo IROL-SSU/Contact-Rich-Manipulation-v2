@@ -10,11 +10,11 @@
 
 ### Step 1. 상위 task category와 method trend를 먼저 구분한다
 
-먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)를 읽고, 2021년의 [Physics-Based Adaptive Motion Primitives](https://doi.org/10.1109/ICRA48506.2021.9561221)·[Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471)에서 2025–2026년의 [HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154)·[Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)·[ForceVLA](https://doi.org/10.52202/085713-3124)·[Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160)·[Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)로 이어지는 변화를 비교한다.
+먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)에서 explicit model/control, demonstration·pretrained prior와 interaction-return RL이 해결한 범위와 남긴 부담을 비교한다. 그다음 [`../Intro/previous_works.md#3-comparison-set-timeline`](../Intro/previous_works.md#3-comparison-set-timeline)에서 B85를 포함한 비교 대상 11편만의 2022–2026 변화를 확인한다.
 
 확인할 내용은 planning/control, RL, IL와 VLA가 서로 일방적으로 대체된 것이 아니라 physical model, demonstration prior, semantic prior와 interaction learning을 서로 다른 비율로 결합해 왔다는 점이다. RL 선택은 보편적 우위가 아니라 `명확한 low-level goal + 불확실한 contact outcome + 풍부한 simulation interaction + 제한된 real demonstration`이라는 현재 조건에서 정당화한다.
 
-그다음 [`../Intro/previous_works.md`](../Intro/previous_works.md)에서 `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
+같은 [`Previous Works`](../Intro/previous_works.md#2-비교표)에서 `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
 
 ### Step 2. Geometry uncertainty를 처리하는 대안을 비교한다
 
