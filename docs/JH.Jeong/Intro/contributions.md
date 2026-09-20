@@ -82,7 +82,7 @@ Rotation success는 subsequent Push feasibility의 충분조건이 아니다. �
 
 | 범주 | 현재 주장하지 않는 내용 |
 | --- | --- |
-| **Robot Agent 구성** | Tactile/F/T, multimodal sensing, wrist–finger action, phase-ID 제거 또는 특정 observation/action 차원을 사용한다는 사실 |
+| **Robot Agent 구성** | Tactile/F/T, multimodal sensing, wrist–finger action, `End-effector Reconfiguration=Online`, phase-ID 제거 또는 특정 observation/action 차원을 사용한다는 사실 |
 | **System 구성** | RL, task-conditioned formation, shared policy 또는 특정 network architecture를 사용한다는 사실 |
 | **일반적 우월성** | OBB가 mesh·point cloud·implicit visual보다 우월하다거나 RL이 planning·control·IL·VLA보다 보편적으로 우월하다는 주장 |
 | **조합·평가** | Approach–Rotation–Push 또는 기존 표에 없는 feature 조합 자체, Rotation과 Rotation-to-Push를 나누어 평가한다는 사실 자체, shared episodic return만으로 후속 단계를 고려하는 별도 학습 방법을 구현했다는 주장 |

@@ -468,7 +468,7 @@ Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는
 | 구분 | 질문 | 포함할 연구 | 정리할 내용 |
 | --- | --- | --- | --- |
 | **Research Trend** | Existing model/control, demonstration·pretrained prior와 interaction-return RL은 nonprehensile manipulation의 무엇을 해결했고 어떤 부담을 남겼으며, 왜 현재 자원 조건에는 RL이 더 합리적인가? | Direct nonprehensile work와 method 선택의 반례가 되는 adjacent contact-rich IL/VLA | 공통 decision burden, 기존 방법의 해결 범위·한계, 조건부 RL 선택과 기각 근거 |
-| **Closest Previous Works** | 우리와 유사한 연구는 시간적으로 어떤 method concept을 발전시켰으며, Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | B85를 포함해 nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 11편 | 비교 집합만의 2022–2026 timeline, `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method` 비교와 남은 검증 질문 |
+| **Closest Previous Works** | 우리와 유사한 연구는 시간적으로 어떤 method concept을 발전시켰으며, Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | B85를 포함해 nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 11편 | 비교 집합만의 2022–2026 timeline, `Scene·Workspace / Sensing·Object Geometry·End-effector Reconfiguration·Manipulation / Method` 비교와 남은 검증 질문 |
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
@@ -511,38 +511,43 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 
 ### 10.3 Environment–Robot Agent–System 비교 기준
 
-여기서 Agent는 AI agent가 아니라 **환경과 물리적으로 상호작용하는 robot agent**를 뜻한다. 비교표는 다음 여섯 column과 정해진 값만 사용한다. 상세한 판정과 논문별 표는 [`Intro/previous_works.md`](./Intro/previous_works.md#1-column-기준)를 따른다.
+여기서 Agent는 AI agent가 아니라 **환경과 물리적으로 상호작용하는 robot agent**를 뜻한다. 비교표는 다음 일곱 column과 정해진 값만 사용한다. 상세한 판정과 논문별 표는 [`Intro/previous_works.md`](./Intro/previous_works.md#1-column-기준)를 따른다.
 
 | 구분 | Column | 사용하는 값 | 판정 질문 |
 | --- | --- | --- | --- |
-| **Environment** | **Scene** | `Single` / `Cluttered` | Manipulation 대상 외의 movable object가 함께 있는가? |
+| **Environment** | **Scene** | `Uncluttered` / `Cluttered` | 주변 movable object가 manipulation에 영향을 주는 scene을 method가 명시적으로 다루는가? |
 | **Environment** | **Workspace** | `Open` / `Constrained` / `Mixed` | Shelf·wall·fixture와 같은 고정 구조물이 접근과 물체 운동을 제한하는가? |
 | **Robot Agent** | **Sensing** | `Vision` / `Contact` / `Vision+Contact` | 실행에 vision과 tactile·contact state·wrist F/T 중 무엇을 사용하는가? |
 | **Robot Agent** | **Object Geometry** | `None` / `Estimated` / `Exact` | Robot agent가 명시적인 물체 형상 표현을 어떤 정확도로 받는가? |
+| **Robot Agent** | **End-effector Reconfiguration** | `Fixed` / `Pre-contact` / `Online` | Wrist pose와 별개로 gripper aperture나 finger posture 같은 내부 contact-interface configuration을 언제 결정·갱신하는가? |
 | **Robot Agent** | **Manipulation** | `Translation` / `Reorientation` / `Combined` | 이동, 회전 또는 둘 모두를 다루는가? |
-| **System** | **Method** | `Non-learning` / `Learning` / `Hybrid` | Action 생성의 주된 방식이 비학습, 학습 또는 두 방식의 결합인가? |
+| **System** | **Method** | `Control` / `Optimization` / `Generative` / `RL` / `IL` / `VLA` | 배포 시 task-level action 또는 실행할 pose 후보를 만드는 주된 mechanism은 무엇인가? |
 
 `Object Geometry`는 robot agent가 실행 중 받는 명시적 shape 표현을 뜻한다. Pose나 RGB만 사용하면 `None`, OBB·estimated point cloud·depth-derived shape/size feature처럼 sensor에서 추정한 표현은 `Estimated`, 정확한 CAD·mesh·dimension은 `Exact`로 판정한다. Simulator 또는 training 과정만 exact geometry를 사용해도 robot agent가 받지 않으면 `Exact`로 세지 않는다. Section 3.3의 `Implicit visual`은 실험 설계용 세부 구분이며, Previous Works 비교표에서는 명시적 shape가 아니므로 `None`으로 통합한다. `Geometry Handling`은 입력 정보와 처리 능력을 혼동시키고, `Object Generalization`은 unseen object에 대한 평가 범위를 뜻하는 별도 기준이므로 이 column의 이름으로 사용하지 않는다.
+
+`End-effector Reconfiguration`은 physical tool family가 아니라 deployed method의 internal configuration authority를 기록한다. Method가 task·object에 맞춘 내부 configuration을 생성하지 않고 preset을 유지하면 `Fixed`, task·object에 맞춘 configuration을 접촉 전에 선택하고 각 contact episode에서는 유지하면 `Pre-contact`, 접촉 이후에도 gripper width나 finger joints를 갱신하면 `Online`이다. Wrist/EEF pose 변화, arm motion에 따른 contact-point 이동, target-force 변경과 passive compliance는 이 column에서 reconfiguration으로 세지 않는다. 따라서 preset을 유지하는 gripper와 rigid pusher는 action-authority 관점에서 모두 `Fixed`다. `Online`은 update capability를 뜻하며 그 효과가 검증됐다는 의미는 아니다.
 
 `Manipulation=Combined`는 한 논문이 translation과 reorientation을 모두 포함한다는 paper-level coverage다. 두 동작을 하나의 sequential task로 연결했거나 동일한 episode objective로 최적화했다는 의미로 해석하지 않는다.
 
 `Translation`과 `Reorientation`은 goal pose의 좌표 수가 아니라 manipulation primitive를 기준으로 판정한다. Planar pushing이 orientation error까지 제어하더라도 별도의 pivot·rotation skill을 다루지 않으면 `Translation`이다.
 
+`Method`는 모든 보조 module의 조합이 아니라 주된 action-generation family 하나를 기록한다. Designed feedback law는 `Control`, explicit objective와 constraint를 푸는 online solver는 `Optimization`, interaction return으로 최적화한 policy는 `RL`, demonstration trajectory를 직접 학습한 non-VLA policy는 `IL`, pose/action 후보를 생성한 뒤 simulation이나 planner로 선택·실행하는 learned model은 `Generative`, pretrained vision–language model 기반 action policy는 `VLA`로 판정한다. Optimization demonstration이나 low-level controller를 함께 사용한다는 이유만으로 별도의 `Hybrid` 값을 만들지 않는다.
+
 현재 Stage 1의 분류는 다음과 같다.
 
-| Work | Scene | Workspace | Sensing | Object Geometry | Manipulation | Method |
-| --- | --- | --- | --- | --- | --- | --- |
-| **Ours** | **Single** | **Constrained** | **Vision+Contact** | **Estimated** | **Combined** | **Learning** |
+| Work | Scene | Workspace | Sensing | Object Geometry | End-effector Reconfiguration | Manipulation | Method |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Ours** | **Uncluttered** | **Constrained** | **Vision+Contact** | **Estimated** | **Online** | **Combined** | **RL** |
 
-이 행은 현재 S0와 provisional RL policy를 기준으로 한다. `Single`은 manipulation 대상 blocker 외의 movable object가 없다는 뜻이며, `Constrained`는 shelf가 접근·회전·병진 공간을 제한한다는 뜻이다. Continuous vision으로 blocker pose와 OBB를 갱신하고 tactile·wrist F/T를 함께 사용하므로 `Vision+Contact`, exact mesh가 아닌 OBB를 사용하므로 `Estimated`, reorientation과 translation을 모두 다루므로 `Combined`로 분류한다. OD-1에서 S1을 채택하면 `Scene` 분류는 다시 검토한다.
+이 행은 현재 S0와 provisional RL policy를 기준으로 한다. `Uncluttered`는 manipulation 대상 blocker 외에 동작에 영향을 주는 movable object가 없다는 뜻이며, `Constrained`는 shelf가 접근·회전·병진 공간을 제한한다는 뜻이다. Continuous vision으로 blocker pose와 OBB를 갱신하고 tactile·wrist F/T를 함께 사용하므로 `Vision+Contact`, exact mesh가 아닌 OBB를 사용하므로 `Estimated`, 접촉 이후에도 wrist action과 함께 finger-joint configuration을 갱신하므로 `Online`, reorientation과 translation을 모두 다루므로 `Combined`, interaction return으로 policy를 최적화하므로 `RL`로 분류한다. `Online` reconfiguration의 추가 이득은 C2에서 검증할 대상이다. OD-1에서 S1을 채택하면 `Scene` 분류는 다시 검토한다.
 
 현재 Stage 1은 blocker pose와 geometry를 지속적으로 관측할 수 있다고 가정하므로 observability는 비교 column에서 제외한다. 현재 가까운 연구도 goal이 주어진 뒤에는 자율 실행하므로 autonomy도 제외한다. Human demonstration은 training source이지 manual execution이 아니다. Task와 Evaluation은 Sections 2–3과 9에서 연구 범위와 검증 설계로 관리하며, Previous Works 비교 column으로 추가하지 않는다.
 
-세부 observation·action, training source, controller와 논문 결과는 근거 문서에 보존하되 비교표의 새 column으로 늘리지 않는다. 직접 비교에서는 여섯 column이 같은지 먼저 확인하고, 조건이 다른 논문은 특정 요소의 근거나 인접 연구의 반례로 사용한다.
+세부 observation·action vector, training source, controller와 논문 결과는 근거 문서에 보존하고 비교표는 위 일곱 column으로 유지한다. 직접 비교에서는 일곱 column의 조건을 먼저 확인하고, `End-effector Reconfiguration` 자체를 비교할 때는 나머지 조건을 고정한다. 조건이 다른 논문은 특정 요소의 근거나 인접 연구의 반례로 사용한다.
 
 ### 10.4 문헌 확인과 포함 기준
 
-- Full text에서 `Scene`, `Workspace`, `Sensing`, `Object Geometry`, `Manipulation`, `Method`를 확인한 뒤 C1·C2와의 관계를 해석한다.
+- Full text에서 `Scene`, `Workspace`, `Sensing`, `Object Geometry`, `End-effector Reconfiguration`, `Manipulation`, `Method`를 확인한 뒤 C1·C2와의 관계를 해석한다.
 - 타 논문은 `확인 완료 / 추가 확인 필요 / 확인되지 않음`으로 기록하고, 우리 연구의 `[Fixed] / [Baseline] / [Open] / [Candidate]` 상태와 혼용하지 않는다.
 - 공식 출판 페이지와 full text를 먼저 확인한다.
 - DOI는 publisher metadata와 대조한다. DOI가 없으면 `No DOI—preprint` 또는 공식 proceedings URL로 표시한다.
@@ -617,7 +622,8 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 | Exact geometry | Pose와 정확히 정합된 CAD/mesh 또는 calibrated dimensions |
 | Vision/coarse-geometry information | Blocker pose, nominal shape, task goal과 접근 관계를 제공하는 전역 정보; 실제 contact state를 직접 보장하지 않음 |
 | Contact feedback | Tactile과 wrist F/T를 통해 실제 contact event/location 및 net wrench 변화를 관측하여 geometry·physics mismatch에 대응하는 실행 feedback |
-| Online adaptation | Contact 이후 sensory feedback에 따라 wrist 또는 finger action을 계속 변경하는 것 |
+| Online adaptation | Contact 이후 sensory feedback에 따라 wrist 또는 finger action을 계속 변경하는 넓은 개념 |
+| End-effector Reconfiguration=`Online` | Previous Works 비교표에서 contact 이후 gripper aperture 또는 finger posture 같은 내부 end-effector DOF를 갱신하는 경우; wrist-only correction은 포함하지 않음 |
 | Aggregate contact maintenance | 동일 contact set을 고정하지 않고 적어도 하나의 hand–object support contact를 선호하는 것 |
 | Transition evaluation | 앞 phase 종료 state에서 다음 phase rollout 성공을 별도로 측정하는 것 |
 | Explicit downstream learning | 다음 phase feasibility를 별도 value/reward/objective로 직접 최적화하는 것 |
@@ -708,14 +714,17 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-20 | Physical tool을 `Pusher / Gripper / Dexterous Hand`로 구분하는 별도 column을 검토 | Robot Agent에 `End-effector Reconfiguration = Fixed / Pre-contact / Online`을 추가. Wrist pose를 제외한 gripper aperture·finger posture를 deployed method가 언제 결정·갱신하는지 판정하며, fixed-configuration gripper와 rigid pusher는 모두 `Fixed`로 분류 | Hardware 이름보다 contact-interface의 internal action authority가 method concept과 C2의 initial selection–online adaptation 차이를 더 직접적으로 보여주며, `Gripper`와 `Dexterous Hand`의 용어 중첩도 피하기 위해 | 10.1, 10.3–10.4, 14.1, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md`, `papers/reading_guide.md` |
+| 2026-09-20 | Method를 `Non-learning / Learning / Hybrid`로 묶어 RL·IL·VLA와 action 생성 구조의 차이가 가려짐 | 배포 시 주된 action-generation family를 기준으로 `Control / Optimization / Generative / RL / IL / VLA`로 분류. 보조 estimator·demonstration·low-level controller는 별도 Method 값을 만들지 않음 | 논문의 method concept을 비교하면서도 `VLA+IL`, `RL+Optimization`처럼 중복 category가 늘어나는 것을 막기 위해 | 10.3, 14.1, `Intro/previous_works.md` |
+| 2026-09-20 | Scene을 `Single / Cluttered`로 분류해 target 수와 주변 clutter capability가 혼재 | Scene을 `Uncluttered / Cluttered`의 이진 capability로 변경. 주변 movable clutter를 명시적으로 다루는 method는 `Cluttered`, 그렇지 않으면 `Uncluttered`로 판정하며 `Mixed`는 두지 않음 | Cluttered capability가 uncluttered scene을 대체로 포함하고, 이 표는 평가 구성보다 method가 다루는 최대 scene complexity를 비교하기 위해 | 10.3, 14.1, `Intro/previous_works.md`, `Intro/research_trend.md` |
 | 2026-09-20 | Previous Works의 force-aware adjacent representative로 B46 ForceVLA를 사용 | ForceVLA를 직접 antecedent와 baseline으로 두고 force target·control-mode output까지 확장한 CVPR 2026 B99 ForceVLA2로 교체. B46은 연구 계보를 위해 core corpus에 유지 | 현재 force-aware VLA의 method concept이 passive force conditioning에서 active hybrid force–position regulation으로 발전한 범위를 반영하기 위해 | 10.2, 10.5, 11, 14.1, `Intro/previous_works.md`, `Intro/research_trend.md`, `papers/README.md`, `papers/core_papers.md`, `papers/topic_groups.md` |
 | 2026-09-20 | Research Trend가 broad 논문과 Previous Works 10편을 함께 넣은 2021–2026 timeline을 보유 | B85를 closest comparison에 추가해 11편으로 만들고, 이 11편만의 2022–2026 timeline을 Previous Works로 이동. Research Trend는 기존 방법의 해결 범위와 한계를 근거로 `왜 RL인가`를 설명 | Chronology와 closest-work 비교를 한 문서에 연결하고, Research Trend는 method-selection argument에 집중하기 위해 | 10.1, 10.3, 14.1, `Intro/README.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `papers/README.md`, `papers/reading_guide.md` |
 | 2026-09-20 | Previous Works 비교표 10편 중 B12와 B48이 Research Trend timeline에서 누락되고, 나머지 논문도 두 문서 간 식별자가 연결되지 않음 | B12와 B48을 해당 연도에 추가하고 Previous Works 10편 모두에 동일한 `B-ID`를 표시. Conference edition과 proceedings 연도가 다른 B12는 `CoRL 2024, PMLR 2025`를 함께 표기 | 가까운 비교 연구가 broader trend에서 차지하는 시간적·방법론적 위치를 빠짐없이 추적하기 위해 | 10.1, 14.1, `Intro/research_trend.md`, `Intro/previous_works.md` |
 | 2026-09-20 | Research Trend의 2021–2026 연도별 timeline을 네 개의 방법론적 변화 표로 대체하고, RL 선택 이유를 현재 task 조건 중심으로 압축 | 연도별 timeline을 복원하고 `nonprehensile manipulation의 구조적 난제 → 방법별 자원과 부담 → interaction outcome을 이용한 RL의 조건부 강점 → 현재 task 적용`으로 재구성. 각 주장에 planning/control, RL, IL/VLA와 hybrid의 직접 근거·반례를 연결 | 분야의 시간적 변화와 broad method-selection 논리를 함께 보여주고, tactile feedback·recovery가 RL만의 기능이라는 과장을 피하기 위해 | 10.1, 14.1, `Intro/research_trend.md` |
 | 2026-09-20 | Geometry 관련 column 이름으로 `Geometry Handling`과 `Object Generalization`을 검토 | Robot Agent가 실행 중 받는 명시적 형상 정보의 유무와 정확도를 나타내는 `Object Geometry = None / Estimated / Exact`로 확정 | 처리 능력과 unseen-object 일반화를 섞지 않고 하나의 기준에서 직관적으로 비교하기 위해 | 10.3–10.4, `Intro/previous_works.md`, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/contributions.md`, `papers/reading_guide.md` |
 | 2026-09-20 | Environment, Robot Agent와 System을 상세한 open-ended column 및 별도의 Task·Evaluation 표로 비교 | 비교표를 Environment의 `Scene·Workspace`, Robot Agent의 `Sensing·Object Geometry·Manipulation`, System의 `Method`로 제한하고 각 column은 2–3개의 공통 값만 사용. `Object Geometry`는 `None / Estimated / Exact`로 판정 | 논문마다 서로 다른 세부 설명을 나열하지 않고 한눈에 비교하며, blocker observability와 autonomy처럼 현재 구분력이 없는 항목을 제외하기 위해 | 10.1–10.4, 14.1, `Intro/` 전체, `papers/reading_guide.md` |
-| 2026-09-20 | Environment에 task·pose·shape·평가 변화를, System에 goal·단계·endpoint를 함께 넣어 세 구분의 의미가 넓어짐 | 당시 중간안에서는 Environment를 workspace·scene·environment contact, Robot Agent를 robot body·input modality·action, System을 method로 한정하고 Task와 Evaluation을 별도 표로 관리했다. 이 구성은 현재 바로 위 행의 여섯-column 비교표로 대체됐다. | 사용자가 Agent는 환경과 상호작용하는 robot agent이고 System은 method를 뜻한다고 명확히 했으므로, 서로 다른 종류의 정보를 같은 column group에 섞지 않기 위해 | 3.6–3.7, 10.1–10.4, 14.1, `research_topic.md`, `Intro/` 전체, `papers/reading_guide.md`, `papers/screening/task_and_retrieval.md` |
-| 2026-09-20 | Environment–Agent–System을 복원했지만 최종 비교를 geometry·feedback·configuration·action generation·stage organization의 다섯 항목으로 다시 축약해 pose와 shape, tactile과 wrist F/T, initial selection과 online action, stage responsibility와 endpoint가 합쳐졌고, policy 시작 위치와 상위 planner의 경계도 드러나지 않음 | 당시 중간안에서는 Environment에 task·시작 상태·pose·shape·평가 변화까지, Agent에 contact interface·실행 입력·action을, System에 goal·단계·feedback·action/controller를 기록했다. 이 분류는 이후의 중간안을 거쳐 현재 가장 위 행의 여섯-column 비교표로 대체됐다. | 비교 기준이 method 설명에 종속되면서 이전에 합의한 문제 조건, agent capability와 결과 수준이 사라지는 문제를 바로잡기 위해 | 7.4, 10.1–10.4, 14.1, `Intro/README.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
+| 2026-09-20 | Environment에 task·pose·shape·평가 변화를, System에 goal·단계·endpoint를 함께 넣어 세 구분의 의미가 넓어짐 | 당시 중간안에서는 Environment를 workspace·scene·environment contact, Robot Agent를 robot body·input modality·action, System을 method로 한정하고 Task와 Evaluation을 별도 표로 관리했다. 이 구성은 이후 당시 여섯-column 비교표로 대체됐다. | 사용자가 Agent는 환경과 물리적으로 상호작용하는 robot agent이고 System은 method를 뜻한다고 명확히 했으므로, 서로 다른 종류의 정보를 같은 column group에 섞지 않기 위해 | 3.6–3.7, 10.1–10.4, 14.1, `research_topic.md`, `Intro/` 전체, `papers/reading_guide.md`, `papers/screening/task_and_retrieval.md` |
+| 2026-09-20 | Environment–Agent–System을 복원했지만 최종 비교를 geometry·feedback·configuration·action generation·stage organization의 다섯 항목으로 다시 축약해 pose와 shape, tactile과 wrist F/T, initial selection과 online action, stage responsibility와 endpoint가 합쳐졌고, policy 시작 위치와 상위 planner의 경계도 드러나지 않음 | 당시 중간안에서는 Environment에 task·시작 상태·pose·shape·평가 변화까지, Agent에 contact interface·실행 입력·action을, System에 goal·단계·feedback·action/controller를 기록했다. 이 분류는 이후의 중간안을 거쳐 당시 여섯-column 비교표로 대체됐다. | 비교 기준이 method 설명에 종속되면서 이전에 합의한 문제 조건, agent capability와 결과 수준이 사라지는 문제를 바로잡기 위해 | 7.4, 10.1–10.4, 14.1, `Intro/README.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |
 | 2026-09-20 | GD2P를 preprint로 표시한 문서와 ICRA 2026으로 표시한 논문 목록이 함께 존재 | [공식 project page](https://geodex2p.github.io/)를 기준으로 ICRA 2026 게재로 통일 | 문서 간 publication-status 충돌을 제거하기 위해 | 10.5, 14.1, `Intro/research_trend.md`, `Intro/previous_works.md`, `papers/core_papers.md` |
 | 2026-09-20 | Intro 구조를 설명하는 별도 표현과 임의의 약자가 늘고, 합의되지 않은 C1→C2 검증 순서가 문서에 포함됨 | Environment–Agent–System은 줄이지 않고 그대로 쓰며, 문서의 질문과 결론을 평이한 문장으로 정리하고 C1·C2의 검증 순서는 미정으로 유지 | 연구 내용보다 문서 관리 표현이 앞서는 문제를 막고 실제 결정 상태를 정확히 보존하기 위해 | 10.1–10.5, 14.1, `Intro/` 전체 |
 | 2026-09-19 | Intro 문서마다 연구 정의, 방법 비교, C1·C2, 평가와 작업 목록을 반복해 한 수정이 여러 파일에 중복 반영됨 | `README`는 문서 구성, `research_motivation`은 문제 정의, `research_trend`는 조건부 방법 선택, `previous_works`는 선행연구 비교와 남은 질문, `contributions`는 C1·C2의 검증 조건을 다루도록 정리하고 반복 내용을 줄임. Environment–Agent–System은 약자로 줄이지 않고 문서 구조는 일반 문장으로 설명 | 잦은 수정으로 문서가 서로 달라지는 문제를 줄이고 Introduction을 `문제 → 방법 선택 → 근거 → 검증할 주장`의 흐름으로 읽히게 하기 위해 | 14.1, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/previous_works.md`, `Intro/contributions.md` |

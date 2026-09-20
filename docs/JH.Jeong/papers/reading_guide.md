@@ -14,7 +14,7 @@
 
 확인할 내용은 planning/control, RL, IL와 VLA가 서로 일방적으로 대체된 것이 아니라 physical model, demonstration prior, semantic prior와 interaction learning을 서로 다른 비율로 결합해 왔다는 점이다. RL 선택은 보편적 우위가 아니라 `명확한 low-level goal + 불확실한 contact outcome + 풍부한 simulation interaction + 제한된 real demonstration`이라는 현재 조건에서 정당화한다.
 
-같은 [`Previous Works`](../Intro/previous_works.md#2-비교표)에서 `Scene·Workspace / Sensing·Object Geometry·Manipulation / Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
+같은 [`Previous Works`](../Intro/previous_works.md#2-비교표)에서 `Scene·Workspace / Sensing·Object Geometry·End-effector Reconfiguration·Manipulation / Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
 
 ### Step 2. Geometry uncertainty를 처리하는 대안을 비교한다
 
@@ -106,7 +106,7 @@ Reward 검토 결과는 `term 이름`이 아니라 다음 형식으로 남긴다
 1. 논문이 실제로 해결한 task와 environment
 2. Object·scene·robot·sensor 조건
 3. Observation과 전처리
-4. Action과 controller
+4. Action, controller와 end-effector configuration update timing
 5. Reward·loss·training data
 6. Contact representation과 phase transition
 7. Generalization과 real validation

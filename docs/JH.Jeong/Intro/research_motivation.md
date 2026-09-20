@@ -51,4 +51,4 @@ Target retrieval, multi-blocker ordering과 perception algorithm 자체는 이 l
 
 > **Heuristic/control, planning, RL, IL와 VLA는 contact-feedback manipulation을 어떻게 확장해 왔으며, 현재의 model·data·interaction 조건에서는 어떤 방법을 우선해야 하는가?**
 
-이 질문은 [Research Trend](./research_trend.md)에서 다룬다. 방법을 조건부로 선택한 뒤 [Previous Works](./previous_works.md)에서 Environment의 Scene·Workspace, Robot Agent의 Sensing·Object Geometry·Manipulation과 System Method를 비교하고 남은 research gap을 판정한다.
+이 질문은 [Research Trend](./research_trend.md)에서 다룬다. 방법을 조건부로 선택한 뒤 [Previous Works](./previous_works.md)에서 Environment의 Scene·Workspace, Robot Agent의 Sensing·Object Geometry·End-effector Reconfiguration·Manipulation과 System Method를 비교하고 남은 research gap을 판정한다.
