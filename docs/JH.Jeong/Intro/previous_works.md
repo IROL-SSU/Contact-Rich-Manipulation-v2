@@ -10,27 +10,34 @@
 
 ## 1. Column 기준
 
-비교표에는 Environment, Robot Agent와 System에 해당하는 다음 일곱 column만 사용한다. 논문마다 서로 다른 설명을 넣기보다 각 column의 정해진 값 중 하나로 분류한다.
+비교표에는 Environment, Robot Agent와 System에 해당하는 다음 여덟 column만 사용한다. 논문마다 서로 다른 설명을 넣기보다 각 column의 정해진 값 중 하나로 분류한다.
 
 | 구분 | Column | 사용하는 값 | 판정 기준 |
 | --- | --- | --- | --- |
-| **Environment** | **Scene** | `Uncluttered` / `Cluttered` | 주변 movable object가 manipulation에 영향을 주는 scene을 method가 명시적으로 다루면 `Cluttered`, 그렇지 않으면 `Uncluttered` |
-| **Environment** | **Workspace** | `Open` / `Constrained` / `Mixed` | 주변 구조물이 동작을 제한하지 않으면 `Open`, shelf·wall·fixture가 제한하면 `Constrained`, 두 조건을 모두 다루면 `Mixed` |
-| **Robot Agent** | **Sensing** | `Vision` / `Contact` / `Vision+Contact` | `Contact`는 tactile, contact state와 wrist F/T를 포함한다. 대부분 공통인 proprioception은 분류에서 생략한다. |
-| **Robot Agent** | **Object Geometry** | `None` / `Estimated` / `Exact` | 명시적 shape 표현이 없으면 `None`, OBB·estimated point cloud·depth-derived shape/size feature처럼 sensor에서 추정한 표현이면 `Estimated`, 정확한 CAD·mesh·dimension이면 `Exact` |
-| **Robot Agent** | **End-effector Reconfiguration** | `Fixed` / `Pre-contact` / `Online` | Wrist pose와 별개로 gripper aperture나 finger posture 같은 내부 contact-interface configuration을 언제 결정·갱신하는가? |
-| **Robot Agent** | **Manipulation** | `Translation` / `Reorientation` / `Combined` | Push·pull만 다루면 `Translation`, rotation·pivot이 중심이면 `Reorientation`, 둘을 모두 다루면 `Combined` |
-| **System** | **Method** | `Control` / `Optimization` / `Generative` / `RL` / `IL` / `VLA` | 배포 시 task-level action 또는 실행할 pose 후보를 만드는 주된 mechanism은 무엇인가? |
+| **Environment** | **물체 형상 (Object Configuration)** | `Structured` / `Unstructured` | 조작 대상 물체가 고정·정형 형상군에 한정되는가, 다양한 비정형 형상을 다루는가? |
+| **Environment** | **주변 물체 (Surrounding Objects)** | `Absent` / `Present` | 조작 대상 외의 movable object가 함께 존재해 접근·시야·이동 경로 또는 접촉에 영향을 주는가? |
+| **Robot Agent** | **감각 입력 (Sensory Input)** | `Vision` / `Contact` / `Vision+Contact` | 실행에 vision과 tactile·contact state·wrist F/T 중 무엇을 사용하는가? |
+| **Robot Agent** | **도구 (Tool)** | `Pusher` / `Gripper` / `Dexterous Hand` | 물체와 직접 접촉하는 물리적 도구는 무엇인가? |
+| **Robot Agent** | **접촉 구성 (Contact Configuration)** | `Constant` / `Pre-contact` / `Online` | 도구의 aperture·finger posture 같은 내부 구성을 언제 결정·갱신하는가? |
+| **Robot Agent** | **물체 조작 (Object Manipulation)** | `Translation` / `Reorientation` / `Combined` | 대상 물체의 이동, 회전 또는 둘 모두를 다루는가? |
+| **System** | **물체 형상 정보 (Object Geometry)** | `None` / `Estimated` / `Exact` | 방법이 명시적 물체 형상을 어떤 정확도로 사용하는가? |
+| **System** | **방법 (Method)** | `Planning/Control` / `RL` / `IL` / `VLA` | 배포 시 task-level action을 정하는 주된 방법은 무엇인가? |
 
-`Object Geometry`는 robot agent가 실행 중 받는 **명시적 형상 정보**를 기준으로 한다. RGB나 pose만 사용해 명시적인 shape를 입력하지 않는 경우는 `None`이며, simulator가 exact geometry를 갖더라도 robot agent에 주어지지 않으면 `Exact`로 분류하지 않는다.
+`Object Configuration`은 물체의 pose나 배치가 아니라 **조작 대상의 물리적 형상 범위**다. 고정 물체나 box·cylinder·정해진 polygon처럼 제한된 형상군이면 `Structured`, 서로 다른 일상 물체와 irregular shape까지 명시적으로 다루면 `Unstructured`다. 이는 형상 범위의 분류이며 unseen-object generalization이 검증됐다는 뜻은 아니다.
 
-`End-effector Reconfiguration`은 physical tool의 종류가 아니라 deployed method가 **내부 contact-interface configuration을 언제 능동적으로 결정·갱신하는지**를 나타낸다. Method가 task·object에 맞춘 내부 configuration을 생성하지 않고 preset을 유지하면 `Fixed`, task·object에 맞춰 접촉 전에 configuration을 선택한 뒤 각 contact episode에서는 유지하면 `Pre-contact`, 접촉 이후에도 gripper width나 finger joints를 갱신하면 `Online`이다. Wrist/EEF pose 변화, arm motion에 따른 contact-point 이동, target-force 변경과 passive compliance는 reconfiguration으로 세지 않는다. 따라서 닫힌 gripper의 preset을 유지하며 미는 방식과 rigid pusher는 이 column에서 모두 `Fixed`다. `Online`은 action authority를 뜻하며 feedback adaptation의 효과가 검증됐다는 의미는 아니다.
+`Surrounding Objects=Present`는 조작 대상이 아닌 movable object가 같은 장면에 있고 manipulation에 실제 제약을 줄 때만 사용한다. Table·shelf·wall 같은 지지면과 고정 구조물, gripper가 쥔 task-essential tool, 여러 물체를 한 번에 하나씩 따로 시험한 경우는 세지 않는다. `Mixed`는 두지 않으며, 두 조건을 모두 보고한 논문은 주변 물체가 있는 최대 deployed capability를 기준으로 `Present`로 표시한다.
 
-`Manipulation=Combined`는 한 논문이 translation과 reorientation을 모두 포함한다는 **paper-level coverage**를 뜻한다. 두 동작을 하나의 sequential task로 연결하거나 동일한 episode objective로 최적화했다는 뜻은 아니다.
+`Sensory Input`은 외부 환경을 읽는 감각 channel만 기록한다. Scene camera의 RGB·depth·RGB-D는 `Vision`, optical tactile image를 포함한 tactile·binary contact·wrist F/T는 `Contact`에 포함하고, 대부분 공통인 proprioception과 goal·geometry representation은 생략한다.
 
-`Translation`과 `Reorientation`은 goal pose의 좌표 수가 아니라 논문이 다루는 manipulation primitive를 기준으로 판정한다. 예를 들어 planar pushing이 orientation error까지 제어하더라도 별도의 pivot·rotation skill을 다루지 않으면 `Translation`이다.
+`Tool`은 실제 접촉 장치를 나타낸다. 능동 내부 자유도가 없는 접촉 tip은 `Pusher`, 주로 하나의 aperture로 연동되는 fingers는 `Gripper`, 여러 finger joint를 독립적으로 구동하면 `Dexterous Hand`다. 닫힌 gripper를 pusher처럼 사용해도 물리적 도구는 `Gripper`이며, 내부 자유도를 실제로 활용하는지는 `Contact Configuration`에서 별도로 읽는다.
 
-`Method`는 논문에 포함된 모든 module을 나열하지 않고 **주된 action-generation family** 하나를 기록한다. Designed feedback law가 action을 직접 정하면 `Control`, explicit objective와 constraint를 푸는 online solver가 motion을 정하면 `Optimization`, interaction return으로 policy를 최적화하면 `RL`, non-VLA policy가 demonstration trajectory를 직접 학습하면 `IL`, learned model이 pose/action 후보를 생성하고 simulation이나 planner가 선택·실행하면 `Generative`, pretrained vision–language model 기반 action policy이면 `VLA`다. 따라서 optimization demonstration으로 RL을 유도한 B81은 `RL`, demonstration과 low-level controller를 함께 사용하는 B48·B99는 `VLA`로 분류하며, 보조 module 때문에 별도의 `Hybrid` 값을 만들지 않는다.
+`Contact Configuration`은 deployed method가 내부 contact configuration을 갱신하는 **시점과 권한**을 나타낸다. Task·object와 무관하게 같은 구성을 실행 내내 유지하면 `Constant`, 첫 manipulation contact 전에 task·object별 구성을 선택한 뒤 실행 중 유지하면 `Pre-contact`, autonomous execution 중 다시 갱신할 수 있으면 `Online`이다. `Online`에는 feedback 기반 연속 조정과 일시적 contact separation 뒤의 retry·re-contact·re-grasp가 모두 포함된다. Wrist/EEF pose, arm motion으로 인한 contact-point 이동, force target 변경과 passive compliance는 포함하지 않는다. 판정 단위는 learned action vector 하나가 아니라 autonomous deployment stack 전체이며, update trigger나 command source가 보고되지 않으면 근거 주석으로 남긴다.
+
+`Object Manipulation`은 robot motion이 아니라 **대상 물체의 운동**을 분류한다. Push·pull·slide만 다루면 `Translation`, pivot·rotation이 중심이면 `Reorientation`, 둘을 모두 보고하면 `Combined`다. Planar pushing 중 작은 yaw error를 보정하는 것만으로는 `Reorientation`으로 세지 않으며, `Combined`도 두 동작을 하나의 episode objective로 연결했다는 뜻은 아니다.
+
+`Object Geometry`는 System이 실행에 사용하는 **명시적 형상 표현의 정확도**다. RGB·depth 영상을 구조화된 형상으로 만들지 않고 직접 encode하면 `None`, sensor로 추정한 OBB·point cloud·shape feature는 `Estimated`, 등록된 CAD·mesh 또는 알려진 정확한 dimension은 `Exact`다. Simulator나 training에서만 exact geometry를 사용하고 deployed system이 쓰지 않으면 `Exact`로 세지 않는다.
+
+`Method`는 보조 module을 나열하지 않고 deployed task-level decision을 맡는 family 하나를 기록한다. Scripted heuristic, 명시적 controller·optimizer·planner 또는 generative proposal을 simulation/planning으로 선택하는 stack은 `Planning/Control`, interaction return으로 policy를 최적화하면 `RL`, non-VLA policy가 demonstration trajectory를 직접 학습하면 `IL`, pretrained vision–language backbone 기반 action policy이면 `VLA`다. 따라서 B01의 diffusion proposal+simulation/planning은 `Planning/Control`, optimization demonstration으로 policy를 유도한 B81은 `RL`, low-level controller를 함께 쓰는 B48·B99는 `VLA`다.
 
 현재 Stage 1은 manipulation 대상 blocker의 pose와 geometry를 지속적으로 관측할 수 있다고 가정하므로 observability는 비교 column으로 두지 않는다. 현재 가까운 연구도 주어진 goal 이후에는 자율 실행하므로 autonomy 역시 비교 column에서 제외한다. Human demonstration은 training source이지 실행 중 manual control을 뜻하지 않는다.
 
@@ -38,36 +45,37 @@
 
 ## 2. 비교표
 
-| Work | Scene | Workspace | Sensing | Object Geometry | End-effector Reconfiguration | Manipulation | Method |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| [B37 · Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) | Uncluttered | Open | Contact | None | Fixed | Translation | Control |
-| [B84 · Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) | Cluttered | Open | Vision+Contact | None | Fixed | Translation | RL |
-| [B85 · Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) | Uncluttered | Constrained | Vision+Contact | Estimated | Fixed | Reorientation | RL |
-| [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) | Uncluttered | Open | Vision+Contact | None | Fixed | Translation | RL |
-| [B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) | Uncluttered | Open | Contact | Exact | Fixed | Combined | Optimization |
-| [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) | Uncluttered | Mixed | Vision | Estimated | Fixed | Combined | RL |
-| [B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Uncluttered | Mixed | Vision+Contact | None | Online | Combined | VLA |
-| [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Uncluttered | Open | Vision | Estimated | Pre-contact | Translation | Generative |
-| [B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) | Uncluttered | Open | Vision+Contact | Estimated | Online | Combined | IL |
-| [B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) | Uncluttered | Mixed | Vision+Contact | Estimated | Fixed | Combined | RL |
-| [B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) | Cluttered | Mixed | Vision+Contact | None | Fixed | Combined | VLA |
-| **Ours** | **Uncluttered** | **Constrained** | **Vision+Contact** | **Estimated** | **Online** | **Combined** | **RL** |
+| Work | Object Configuration | Surrounding Objects | Sensory Input | Tool | Contact Configuration | Object Manipulation | Object Geometry | Method |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [B37 · Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) | Unstructured | Absent | Contact | Pusher | Constant | Translation | None | Planning/Control |
+| [B84 · Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) | Unstructured | Present | Vision+Contact | Gripper | Constant | Translation | Exact | RL |
+| [B85 · Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) | Unstructured | Absent | Vision+Contact | Gripper | Constant | Reorientation | Estimated | RL |
+| [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) | Structured | Absent | Vision+Contact | Pusher | Constant | Translation | None | RL |
+| [B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) | Structured | Absent | Contact | Gripper | Constant | Combined | Exact | Planning/Control |
+| [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) | Unstructured | Absent | Vision | Gripper | Constant | Combined | Exact | RL |
+| [B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Unstructured | Absent | Vision+Contact | Gripper | Online | Translation | None | VLA |
+| [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Unstructured | Present | Vision | Dexterous Hand | Pre-contact | Translation | Estimated | Planning/Control |
+| [B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) | Unstructured | Present | Vision+Contact | Dexterous Hand | Online | Combined | Estimated | IL |
+| [B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) | Unstructured | Absent | Vision+Contact | Pusher | Constant | Combined | Estimated | RL |
+| [B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) | Unstructured | Present | Vision+Contact | Gripper | Online | Combined | None | VLA |
+| **Ours** | **Unstructured** | **Present** | **Vision+Contact** | **Dexterous Hand** | **Online** | **Combined** | **Estimated** | **RL** |
 
-B01의 raw sensing source와 geometry 정확도, B22의 manipulation 범위, B48의 전체 task suite 범위는 full text에서 우선 재확인한다. 표의 값은 현재 파악한 범위에서 가장 가까운 공통 분류다.
+B84는 system-level path planner가 알려진 target diameter를 사용하므로 `Object Geometry=Exact`, B90은 등록 mesh에서 sampling한 object point cloud를 사용하므로 `Exact`로 판정했다. 반면 B37은 tactile image만 사용하고 B48·B99는 scene RGB·depth를 구조화된 형상으로 만들지 않고 직접 encode하므로 `None`이다. B22의 `Present`는 object sorting·desktop tidying까지 포함한 reported task-suite capability를 기준으로 하며, 모든 rollout에서 주변 물체가 방해물이라는 뜻은 아니다. B48은 gripper motion이 아니라 대상 물체 운동만 판정하면 별도 reorientation task가 확인되지 않아 `Translation`이다.
 
-B99의 `Cluttered`는 five-task suite 중 Retrieve Plate가 movable foam-ball clutter를 포함한다는 capability-level 판정이며, 다른 task는 대부분 주변 movable clutter가 없는 scene이다. Method는 end-effector pose뿐 아니라 force target과 subtask transition을 생성하는 주된 action architecture를 기준으로 `VLA`로 분류한다. Hybrid force–position controller는 그 출력을 실행하는 핵심 layer지만 별도의 Method 값으로 세지 않는다. AG-95 adaptive gripper를 장착했지만 보고된 learned action에는 gripper-width나 finger-joint command가 확인되지 않으므로 `End-effector Reconfiguration=Fixed`로 판정한다. 후속 원문에서 내부 configuration command가 확인되면 이 cell을 다시 검토한다.
+B99의 `Present`는 five-task suite 중 Retrieve Plate가 movable foam-ball clutter를 포함하기 때문이다. Method는 force target과 subtask transition을 만드는 주된 action architecture를 기준으로 `VLA`다. Retrieve Plate에서 autonomous retry/re-grasp가 보고되므로 deployed-system capability는 `Contact Configuration=Online`으로 판정한다. 다만 formal learned action에는 gripper-aperture command가 없으므로, 해당 command가 VLA·subtask script·별도 controller 중 어디에서 생성되는지는 `미보고`로 남긴다.
 
 B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사용한 별도 논문이다. 다만 공통 저자, ForceVLA의 한계를 출발점으로 한 문제 설정과 직접 baseline 비교를 근거로 **같은 계보의 method successor**로 판정해 이 비교 집합에서는 B46을 대체했다. B46은 [Paper Index](../papers/core_papers.md)의 선행 계보 항목으로 유지한다.
 
 ### Ours를 읽는 기준
 
-- `Uncluttered`: 현재 S0에는 manipulation 대상 blocker 외에 동작에 영향을 주는 movable object가 없다.
-- `Constrained`: shelf가 접근·회전·병진 공간을 제한한다.
-- `Vision+Contact`: continuous vision-derived pose와 OBB, tactile, wrist F/T를 함께 사용한다.
-- `Estimated`: robot agent는 exact mesh가 아니라 estimated OBB를 받는다.
-- `Online`: policy가 접촉 이후에도 wrist action과 함께 finger-joint configuration을 갱신한다. 그 추가 이득은 C2에서 검증할 대상이다.
-- `Combined`: 필요한 reorientation/pivoting과 이후 translation을 모두 다룬다.
-- `RL`: Stage 1 policy는 interaction return으로 최적화한다. Scripted heuristic은 효과를 비교하기 위한 별도 baseline이다.
+- `Unstructured`: intended shelf task는 다양한 blocker 형상을 대상으로 한다. 단, 정확한 train/test object 범위와 non-box-like generalization은 아직 OD-10에서 확정할 사항이다.
+- `Present`: 실제 shelf setting에는 target 외의 movable object가 있다. 주변 물체를 제거한 S0는 핵심 가설을 분리하기 위한 `Absent` ablation이다.
+- `Vision+Contact`: continuous vision-derived pose·OBB와 tactile·wrist F/T를 함께 사용한다.
+- `Dexterous Hand`: RH56E2의 여러 finger joint를 독립적으로 구동한다.
+- `Online`: 실행 중 feedback에 따라 finger-joint configuration을 계속 갱신한다. Wrist motion은 이 판정에 포함하지 않으며, online finger update의 추가 이득은 C2에서 검증한다.
+- `Combined`: preparatory reorientation/pivoting과 이후 translation을 모두 다룬다.
+- `Estimated`: System은 exact mesh가 아니라 perception-derived OBB를 사용한다.
+- `RL`: Stage 1 policy는 interaction return으로 최적화한다. Scripted heuristic은 별도 baseline이다.
 
 ---
 
@@ -77,13 +85,13 @@ B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사�
 
 | 연도 | 비교 연구와 method concept | 비교 집합에서 읽히는 변화 |
 | --- | --- | --- |
-| **2022** | [B37 · Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) `[Tactile feedback control; online 2021]`<br>[B84 · Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) `[RL]` | Translation에서 tactile feedback law로 접촉 오차를 직접 보정하는 방식과, goal progress·contact 유지·collision avoidance를 interaction return으로 학습하는 방식이 병렬적으로 나타났다. |
+| **2022** | [B37 · Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) `[Planning/Control: tactile feedback; online 2021]`<br>[B84 · Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) `[RL]` | Translation에서 tactile feedback law로 접촉 오차를 직접 보정하는 방식과, goal progress·contact 유지·collision avoidance를 interaction return으로 학습하는 방식이 병렬적으로 나타났다. |
 | **2023** | [B85 · Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) `[Geometry-conditioned RL]` | RL의 범위가 translation에서 environment-contact pivoting으로 확장되고, depth-derived object feature와 state/action projection으로 unseen-object transfer를 다뤘다. |
-| **2024** | [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) `[Visuotactile estimation + RL; CoRL 2024, PMLR 2025]`<br>[B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) `[Tactile object/contact-state estimation + prescribed-mode optimization/control]` | Contact uncertainty를 estimator와 controller의 결합 문제로 명시했다. 한쪽은 occlusion 아래 state uncertainty를 learned policy에 전달하고, 다른 쪽은 tactile로 grasped-object pose와 extrinsic contact location을 추정해 주어진 contact mode 안에서 optimization과 feedback control을 수행한다. |
+| **2024** | [B12 · Visuotactile Estimation under Occlusions](https://doi.org/10.48550/arXiv.2412.13157) `[Visuotactile estimation + RL; CoRL 2024, PMLR 2025]`<br>[B92 · Tactile-Driven Contact Mode Control](https://doi.org/10.15607/RSS.2024.XX.135) `[Planning/Control: prescribed-mode optimization + feedback]` | Contact uncertainty를 estimator와 controller의 결합 문제로 명시했다. 한쪽은 occlusion 아래 state uncertainty를 learned policy에 전달하고, 다른 쪽은 tactile로 grasped-object pose와 extrinsic contact location을 추정해 주어진 contact mode 안에서 optimization과 feedback control을 수행한다. |
 | **2025** | [B90 · HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154) `[Modular RL]`<br>[B48 · Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) `[Tactile VLA + position–force control; Adjacent]` | Learning은 object·environment geometry를 활용하는 modular policy와 tactile-conditioned VLA로 확장됐다. 동시에 learned action generation과 embodiment-specific position–force control의 결합이 필요함을 보여준다. |
-| **2026** | [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) `[Generative hand-pose model + simulation/planning]`<br>[B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) `[Tactile flow-based IL]`<br>[B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) `[Optimization demonstrations + RL]`<br>[B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) `[Force-aware VLA + hybrid force–position control; Adjacent]` | 역할 분화가 더 명시적이 됐다. 생성·optimization은 initial configuration과 feasible prior를, IL/RL은 closed-loop execution을 담당한다. ForceVLA2는 force를 입력 cue로만 쓰는 수준에서 나아가 force target과 control mode를 action으로 생성해 active hybrid force–position regulation에 연결한다. |
+| **2026** | [B01 · GD2P](https://doi.org/10.48550/arXiv.2509.18455) `[Planning/Control: generative proposal + simulation/planning]`<br>[B22 · DexMove](https://openreview.net/forum?id=dT3ZciXvNX) `[Tactile flow-based IL]`<br>[B81 · Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262) `[Optimization demonstrations + RL]`<br>[B99 · ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) `[Force-aware VLA + hybrid force–position control; Adjacent]` | 역할 분화가 더 명시적이 됐다. Planning/Control의 generative·optimization module은 initial configuration과 feasible prior를 제공하고, IL/RL/VLA stack은 closed-loop execution으로 확장된다. ForceVLA2는 force target과 control mode를 action으로 생성해 active hybrid force–position regulation에 연결한다. |
 
-이 timeline은 `model-based method가 learning으로 대체됐다`는 흐름을 뜻하지 않는다. Contact feedback과 online correction은 non-learning control, RL, IL와 VLA 모두에서 나타나며, 최근 변화는 각 family가 initial configuration, state estimation, feasibility와 feedback execution의 역할을 나누는 방향에 가깝다.
+이 timeline은 `Planning/Control이 learning으로 대체됐다`는 흐름을 뜻하지 않는다. Contact feedback과 online correction은 `Planning/Control`, `RL`, `IL`, `VLA` 모두에서 나타나며, 최근 변화는 각 family가 initial configuration, state estimation, feasibility와 feedback execution의 역할을 나누는 방향에 가깝다.
 
 ---
 
@@ -91,11 +99,12 @@ B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사�
 
 현재 표에서 Ours와 모든 column이 같은 연구는 없다.
 
-- B01과 B22는 `Estimated` object geometry를 사용하는 가까운 비교 연구다. B01은 task-conditioned configuration을 접촉 전에 선택하는 `Pre-contact`, B22는 tactile wrist–finger configuration을 조작 중 갱신하는 `Online`에 해당한다.
-- B85는 Ours와 Scene, Workspace, Sensing, Object Geometry와 Method가 같지만 `Manipulation`과 `End-effector Reconfiguration`이 다르다. Wall-assisted pivoting과 unseen-object transfer를 보여주지만 reorientation만 다루며, 후속 translation과 online finger adaptation은 포함하지 않는다.
-- B81은 estimated geometry와 vision·contact feedback을 사용해 translation과 reorientation을 모두 다루지만, optimization-generated demonstration으로 유도한 `RL`이며 workspace 범위도 다르다.
-- B92는 open planar workspace에서 translation과 reorientation을 모두 다루지만, known object geometry와 prescribed contact mode를 가정한 `Optimization` method를 사용한다.
-- B99와 B48은 vision·contact-conditioned VLA를 hybrid force–position control과 결합할 수 있음을 보여주지만, 여러 contact-rich task를 다루는 인접 연구다. B48의 `Online`은 gripper width를 통한 internal grasp-force 조절이고, Ours의 multi-finger contact-interface reconfiguration과 동일한 action authority를 뜻하지 않는다. B99는 force target과 subtask transition까지 action output에 포함하지만 보고된 gripper configuration command가 없어 `Fixed`다.
+- B22는 Ours와 동일하게 `Unstructured`, `Present`, `Vision+Contact`, `Dexterous Hand`, `Online`, `Combined`, `Estimated`에 해당하지만 주된 method가 `IL`이다. 가장 가까운 구성이라도 Ours의 RL 선택이나 C1·C2를 자동으로 정당화하지는 않는다.
+- B01은 `Dexterous Hand`와 `Estimated` geometry를 사용하지만, task-conditioned hand pose를 실행 전에 고르는 `Pre-contact`이며 generative proposal을 simulation/planning으로 선택하는 `Planning/Control`이다.
+- B85는 estimated geometry와 vision·contact feedback을 사용하는 `RL`이지만 `Gripper+Constant`로 wall-assisted reorientation만 다룬다. 후속 translation과 online finger adaptation은 포함하지 않는다.
+- B81은 estimated geometry와 vision·contact feedback으로 translation과 reorientation을 모두 다루지만 `Pusher+Constant`이며, 주변 movable object가 없는 조건에서 optimization-generated demonstration으로 RL을 유도한다.
+- B92는 known geometry와 prescribed contact mode를 사용하는 `Planning/Control`이며, `Gripper+Constant`로 translation과 reorientation을 다룬다.
+- B48·B99는 `Gripper+Online`과 vision·contact-conditioned VLA의 강한 인접 반례다. B48의 `Online`은 gripper-width force regulation이고, B99의 `Online`은 reported retry/re-grasp capability다. 둘 다 Ours의 continuous multi-joint dexterous-hand update와 같은 action authority를 뜻하지 않는다.
 
 이 차이는 연구 질문을 좁히는 근거이지 novelty의 증거는 아니다. 특히 `Vision+Contact`, `Estimated` geometry 또는 `Combined` manipulation이라는 조합만으로 contribution을 주장하지 않는다.
 
@@ -106,6 +115,6 @@ B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사�
 1. **C1:** Estimated geometry에 오차가 있을 때 contact feedback이 Rotation-to-Push와 final-task 성능 저하를 줄이는가?
 2. **C2:** Task-conditioned pre-contact formation 이후 contact 중 online wrist–finger adaptation이 추가 이득을 주는가?
 
-직접 수치 비교에서는 같은 Scene, Workspace, Sensing과 Object Geometry 조건을 우선 맞춘다. End-effector Reconfiguration 자체가 비교 요인인 C2에서는 hardware·task·controller를 고정한 채 `Fixed / Pre-contact / Online`만 바꾸는 matched ablation을 사용한다. 조건이 다른 논문은 특정 요소의 근거나 인접 연구의 반례로 사용하고, 원 논문의 success rate를 Ours와 그대로 대조하지 않는다.
+직접 수치 비교에서는 `Object Configuration`, `Surrounding Objects`, `Sensory Input`, `Tool`과 `Object Geometry` 조건을 우선 맞춘다. `Contact Configuration`이 비교 요인인 C2에서는 같은 tool·task·controller에서 `Constant / Pre-contact / Online`만 바꾸는 matched ablation을 사용한다. 조건이 다른 논문은 특정 요소의 근거나 인접 연구의 반례로 사용하고, 원 논문의 success rate를 Ours와 그대로 대조하지 않는다.
 
 각 cell은 full text에서 확인한다. 현재 근거가 부족한 분류는 후속 원문 검토에서 수정하며, 세부 observation·action·training source와 결과는 [Paper Index](../papers/README.md)와 각 독서 문서에 남긴다.
