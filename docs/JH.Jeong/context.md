@@ -8,7 +8,7 @@
 >
 > **문서 역할:** 연구 범위, 가설, 임시 baseline과 미결 사항을 분리하고 이후 판단의 기준을 제공한다.
 >
-> **최종 갱신:** 2026-09-21
+> **최종 갱신:** 2026-09-24
 
 ---
 
@@ -206,27 +206,31 @@ H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasi
 ### 6.1 먼저 구현할 학습 방법
 
 - `[Baseline]` 현재 low-level execution policy는 RL로 먼저 구현한다.
-- `[Baseline]` RL 선택은 다른 방법보다 본질적으로 우월하다는 주장이 아니라, **정확한 contact model보다 simulation interaction을 얻기 쉽고, real tactile/F/T demonstration coverage는 제한되며, contact feedback에 따른 recovery와 full-episode outcome을 함께 최적화해야 한다**는 현재 문제 조건에 따른 선택이다.
+- `[Baseline]` RL 선택은 다른 방법보다 본질적으로 우월하다는 주장이 아니다. 현재는 **정확한 contact model·mode·switching rule과 포괄적인 recovery demonstration보다 task outcome·safety constraint와 randomized simulation interaction·reset을 더 쉽게 구성할 수 있다**는 자원 조건에 따른 선택이다.
 - `[Rejected]` RL 사용 자체를 contribution 또는 novelty로 주장하는 방식.
-- `[Open]` RL 선택의 실험적 타당성은 geometry perturbation과 contact disturbance 조건에서 heuristic/model-based 또는 IL baseline보다 유의한 이득이 있는지, 그리고 Sim-to-Real 성능이 유지되는지로 판단한다.
+- `[Open]` RL 선택의 실험적 타당성은 geometry perturbation과 contact disturbance 조건에서 matched Conventional 또는 IL/VLA baseline보다 유의한 이득이 있는지, 그리고 Sim-to-Real 성능이 유지되는지로 판단한다.
+
+Planning과 control은 Conventional methods, IL/VLA와 RL 모두에 필요한 기능이며 RL·IL·VLA와 병렬인 broad method family가 아니다. Research Trend에서는 **task-level decision rule의 주된 source**로 방법을 구분한다. `Conventional methods`는 사람이 설계한 model·mode·constraint·rule·planner를, `IL/VLA`는 demonstration 또는 pretrained action prior를, `RL`은 interaction에서 얻은 task return·constraint를 주된 decision source로 사용한다. 여러 source가 역할을 나누면 별도 `Hybrid` family를 만들기보다 composition으로 기록한다.
 
 | Alternative family | 우리 조건에서 단독 적용할 때 남는 문제 | 본 연구에서 유지할 역할 | Status |
 | --- | --- | --- | --- |
 | Heuristic / motion primitive | Approximate geometry로 nominal contact가 달라지고 contact migration·slip·separation의 조합이 증가하면 예외 규칙이 확장됨 | 초기 action prior, reset behavior, 해석 가능한 최소 비교군 | `[Baseline]` |
-| Model-based planning / optimization / control | 정확한 geometry·friction·contact mode 또는 신뢰할 수 있는 online state estimate가 필요하며, wrist–finger contact sequence의 반복 재계획 비용이 발생함 | OSC/Differential IK, safety constraint, optimization-guided baseline | `[Baseline]` |
-| IL | Geometry perturbation, 잘못된 접촉과 failure recovery를 포함하는 tactile/F/T demonstration coverage의 수집 비용이 크며, imitation objective가 final Rotation-to-Push success를 직접 최적화하지는 않음 | 동일 observation/action을 사용하는 강한 learning baseline과 향후 pretraining | `[Candidate]` |
+| Explicit-model planning / optimization | 명시적 contact model·mode에 의존하는 경우 geometry·friction 또는 신뢰할 수 있는 online state estimate가 필요하며, wrist–finger contact sequence를 반복 탐색하면 online solve 부담이 증가함 | OSC/Differential IK, feedback control, safety constraint, optimization-guided baseline | `[Baseline]` |
+| IL | Offline behavior cloning에서는 rollout error가 expert distribution 밖의 state를 만들 수 있으므로 geometry perturbation, contact loss와 recovery를 포괄하는 data·teacher 또는 interactive aggregation이 필요함 | 동일 observation/action을 사용하는 reactive/generative learning baseline과 향후 pretraining | `[Candidate]` |
 | VLA | Semantic task prior에는 강하지만 contact-level correction에는 tactile/F/T가 포함된 data와 architecture가 별도로 필요하고, 현재 task의 고정된 semantics에서는 generalist 규모의 직접 이득이 불명확함 | 상위 task command와 goal-generation interface | `[Candidate]` |
 
-이 한계들은 각 family가 contact-rich manipulation을 해결할 수 없다는 뜻이 아니다. Reactive IL과 force-aware VLA는 명시적 반례이며, 최신 흐름은 model·demonstration·RL을 결합하는 hybridization에 가깝다. 따라서 Research Trend는 family의 우열이 아니라 **현재 정보·data·interaction budget에서 RL을 먼저 구현하는 조건부 이유**를 설명한다.
+이 한계들은 각 family가 contact-rich manipulation을 해결할 수 없다는 뜻이 아니다. [Diffusion Policy](https://doi.org/10.15607/RSS.2023.XIX.026)는 generative IL이 multimodal action distribution을 표현할 수 있음을, [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)는 IL도 high-frequency tactile feedback에 반응할 수 있음을 보여준다. [DAgger](https://proceedings.mlr.press/v15/ross11a.html)는 learner-induced state에 expert label을 추가해 offline behavior cloning의 distribution shift를 줄이는 방법을 제시한다. Force-aware VLA도 contact-level feedback의 반례이며, 최신 흐름은 model·demonstration·RL이 역할을 나누는 composition에 가깝다. 따라서 Research Trend는 family의 우열이 아니라 **현재 정보·data·interaction budget에서 RL을 먼저 구현하는 조건부 이유**를 설명한다.
 
 Nonprehensile manipulation 범주에서 RL의 상대적 강점은 다음 네 조건으로 정리한다.
 
-1. 하나의 정답 contact trajectory가 없는 상황에서 expert action을 그대로 모방하기보다 task outcome으로 여러 contact choice와 motion을 비교할 수 있다.
-2. Simulation과 automatic reset이 가능하면 slip, contact loss, geometry·friction error, disturbance와 recovery를 training distribution에 반복적으로 포함할 수 있다.
+1. Action의 비유일성만으로 RL이 정당화되지는 않는다. 다만 policy rollout의 모든 state에 corrective expert action을 붙이기보다 outcome evaluator를 구성하기 쉬운 경우, 여러 contact choice와 recovery 결과를 task return으로 비교할 수 있다.
+2. Simulation은 IL/VLA의 demonstration 생성에도 사용할 수 있다. Reliable simulation teacher는 부족하지만 failure interaction을 안전하게 생성·reset하고 outcome으로 평가할 수 있을 때 RL의 상대적 이유가 생긴다.
 3. Pre-contact formation, reorientation과 translation을 episode return으로 연결해 초기 contact decision이 후속 object outcome에 미친 영향을 최적화할 수 있다. 다만 실제 credit 전달 여부는 H2와 transition evaluation으로 검증한다.
-4. 반복되는 task family에서는 offline interaction 비용을 먼저 지불하고, 배포 시 반복되는 contact decision을 빠른 closed-loop policy inference로 amortize할 수 있다.
+4. Policy inference를 통한 amortization은 IL/VLA에도 해당한다. 반복되는 task family에서 빠른 policy 실행이 필요하고 recovery demonstration보다 simulation interaction을 더 많이 확보할 수 있을 때 RL 학습 비용을 회수할 수 있다.
 
-이 논리는 **정확한 model·contact-mode schedule과 충분한 recovery demonstration보다 randomized interaction과 task-level success metric을 더 신뢰성 있게 확보할 수 있을 때** 강해진다. 반대로 신뢰할 수 있는 model과 작은 mode 집합이 있거나, 충분한 expert/recovery data가 있거나, one-off·OOD goal을 즉시 풀어야 하면 planning·control 또는 IL이 더 적합할 수 있다. RL은 geometry representation, low-level controller와 safety supervisor를 대체하지 않으며, 좁은 feasible-contact region에서 exploration이 병목이면 planning·optimization·demonstration prior를 결합한 structured RL을 비교한다.
+> `Specification coverage 부담 증가` + `policy-induced recovery data 부담 증가`만으로는 RL이 결론이 되지 않는다. 여기에 `measurable outcome` + `safe·affordable interaction/reset` + `representative simulation`이 있을 때 interaction-return RL이 조건부로 합리적이다.
+
+RL은 그 대신 interaction volume, reward·credit assignment, exploration safety, simulator contact fidelity와 Sim-to-Real 부담을 진다. Randomization 설정만으로 recovery coverage가 확보됐다고 보지 않으며, policy-induced failure·recovery state의 방문과 실제 복구 outcome을 별도로 확인한다. 신뢰할 수 있는 model과 작은 mode 집합이 있거나, 충분한 expert/recovery data나 simulation teacher가 있거나, one-off·OOD goal을 즉시 풀어야 하면 conventional method 또는 IL/VLA가 더 적합할 수 있다. RL은 geometry representation, low-level controller와 safety supervisor를 대체하지 않으며, 좁은 feasible-contact region에서 exploration이 병목이면 planning·optimization·demonstration prior를 결합한 structured RL을 비교한다. 또한 RL 선택은 auxiliary fixed-structure contact나 movable-object contact를 manipulation resource로 사용한다는 결정에 의존하지 않으며, 해당 contact의 적극적 활용은 Section 7.1의 `[Open]`을 따른다.
 
 ### 6.2 Policy organization
 
@@ -483,20 +487,23 @@ C2의 결합 효과를 최종 판정하려면 E2와 E4를 `contact-formation obj
 
 | 구분 | 질문 | 포함할 연구 | 정리할 내용 |
 | --- | --- | --- | --- |
-| **Research Trend** | Existing model/control, demonstration·pretrained prior와 interaction-return RL은 nonprehensile manipulation의 무엇을 해결했고 어떤 부담을 남겼으며, 왜 현재 자원 조건에는 RL이 더 합리적인가? | Direct nonprehensile work와 method 선택의 반례가 되는 adjacent contact-rich IL/VLA | 공통 decision burden, 기존 방법의 해결 범위·한계, 조건부 RL 선택과 기각 근거 |
+| **Research Trend** | Designed model·rule, demonstration·action prior와 interaction return은 nonprehensile manipulation의 decision knowledge를 어떻게 제공하며, 어떤 조건에서 RL이 더 합리적인가? | Direct nonprehensile work와 method 선택의 반례가 되는 adjacent contact-rich IL/VLA | 공통 decision burden, 각 supervision source의 해결 범위·resource burden, 조건부 RL 선택과 기각 근거 |
 | **Closest Previous Works** | 우리와 유사한 연구는 시간적으로 어떤 method concept을 발전시켰으며, Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | B85를 포함해 nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 11편 | 비교 집합만의 2022–2026 timeline, `Object Configuration·Surrounding Objects / Sensory Input·Tool·Contact Configuration·Object Manipulation / Object Geometry·Method` 비교와 남은 검증 질문 |
 
 `Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
 
-Research Trend에는 연도별 timeline을 두지 않는다. 대신 method를 `Explicit model / feedback control`, `Demonstration / pretrained or generative prior`, `Interaction-return RL`의 세 mechanism으로 묶고, hybrid는 각 mechanism의 역할 분담으로 설명한다. 설명 순서는 `nonprehensile manipulation의 공통 decision burden → 기존 연구가 해결한 범위와 남긴 부담 → 범주 수준에서 RL이 합리적인 조건 → 현재 조건에 적용 → 반증 조건`으로 고정한다. 연도별 변화는 Previous Works 비교표의 11편만 사용한 timeline에서 다루며, 각 논문은 동일한 `B-ID`로 비교표와 연결한다.
+Research Trend에는 연도별 timeline을 두지 않는다. Planning과 control은 모든 family에 필요한 기능으로 보고, method는 task-level decision knowledge의 source에 따라 `Conventional methods`, `IL/VLA`, `RL`로 묶는다. Composition은 별도 family가 아니라 model·demonstration·interaction return이 맡는 역할을 표시한다. 설명 순서는 `nonprehensile manipulation의 공통 decision burden → 기존 연구가 해결한 범위와 남긴 resource burden → RL 전환이 성립하는 추가 전제 → 현재 조건에 적용 → 반증 조건`으로 고정한다. 연도별 변화는 Previous Works 비교표의 11편만 사용한 timeline에서 다루며, 각 논문은 동일한 `B-ID`로 비교표와 연결한다.
+
+Research Trend의 `Conventional methods`는 Previous Works 표의 compact value인 `Planning/Control`에 대응한다. Trend에서는 supervision burden을 함께 논의하기 위해 IL과 VLA를 묶지만 비교표에서는 `IL`과 `VLA`를 분리하며, RL은 두 문서에서 동일한 의미로 사용한다.
 
 RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른다.
 
-1. Heuristic, planning/optimization/control, IL와 VLA가 이미 해결한 범위를 먼저 제시한다.
-2. 각 family의 한계는 먼저 hybrid contact-mode transition, model/data coverage, closed-loop recovery, safety와 computation처럼 nonprehensile manipulation의 공통 난제에서 설명한다.
-3. 그 장점과 한계를 approximate geometry, contact-state uncertainty, demonstration budget과 sequential outcome이라는 현재 조건에 별도로 대입한다.
-4. Simulation interaction, perturbation distribution, task-level success metric과 실제 배치 시 얻을 수 있는 policy observation을 구성할 수 있을 때에만 RL을 먼저 구현한다.
-5. Reward design, unsafe exploration과 Sim-to-Real gap은 RL이 새로 만드는 위험으로 함께 제시한다.
+1. Planning/control을 공통 기능으로 두고, task-level decision rule의 source를 designed specification, demonstration/action prior와 interaction return으로 구분한다.
+2. Conventional methods와 IL/VLA가 이미 contact feedback·reactive correction·multimodal action을 다룰 수 있음을 먼저 제시한다.
+3. 각 group의 상대적 부담을 model·mode·rule의 specification coverage, off-nominal·recovery data coverage와 interaction-return learning cost로 비교한다.
+4. `Specification 부담`이나 `demonstration 부족`만으로 RL을 결론 내리지 않고, measurable outcome, safe·affordable interaction/reset과 representative simulation을 구성할 수 있을 때에만 RL을 먼저 구현한다.
+5. Interaction volume, reward·credit assignment, unsafe exploration, simulator fidelity와 Sim-to-Real gap은 RL이 부담하는 비용으로 함께 제시한다.
+6. Reliable model·small mode set, sufficient recovery data·teacher 또는 one-off·OOD task 조건에서는 conventional method나 IL/VLA가 더 적합할 수 있음을 기각 경계로 둔다.
 
 따라서 `왜 RL인가`는 `[Baseline]` 방법 선택의 근거이며 contribution이 아니다. RL이 matched baseline보다 robustness 또는 Rotation-to-Push 성능을 개선하지 못하면 이 선택의 실험적 근거도 약해진다.
 
@@ -554,7 +561,7 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 
 `Object Geometry`는 System이 실행에 사용하는 **명시적 형상 표현**이다. RGB·depth 영상을 구조화하지 않고 직접 encode하면 `None`, sensor-estimated OBB·point cloud·shape feature는 `Estimated`, registered CAD·mesh 또는 known exact dimensions는 `Exact`다. Section 3.3의 `Implicit visual`은 이 표에서는 `None`이다. Training/simulator만 exact geometry를 사용하면 `Exact`로 세지 않는다.
 
-`Method`는 모든 module이 아니라 deployed task-level decision family 하나를 기록한다. Scripted heuristic, explicit controller·optimizer·planner와 generative proposal을 simulation/planning으로 고르는 stack은 `Planning/Control`, interaction return policy는 `RL`, non-VLA demonstration policy는 `IL`, pretrained vision–language action policy는 `VLA`다. Optimization·generative·low-level control은 함께 쓰이는 module일 수 있으므로 별도 peer label이나 `Hybrid`를 만들지 않는다.
+`Method`는 모든 module이 아니라 deployed task-level decision family 하나를 기록한다. Scripted heuristic, explicit controller·optimizer·planner와 generative proposal을 simulation/planning으로 고르는 stack은 `Planning/Control`, interaction return policy는 `RL`, non-VLA demonstration policy는 `IL`, pretrained vision–language action policy는 `VLA`다. 여기서 `Planning/Control`은 Previous Works 표를 위한 compact conventional-stack label이며, planning과 control이 RL·IL·VLA에 필요하지 않다는 뜻이 아니다. GD2P처럼 generative proposal이 있어도 최종 task-level selection을 physics simulation과 planning이 지배하면 `Planning/Control`로 기록한다. Optimization·generative·low-level control은 함께 쓰이는 module일 수 있으므로 별도 peer label이나 `Hybrid`를 만들지 않는다.
 
 현재 제안 시스템의 method-level 분류는 다음과 같다.
 
@@ -680,7 +687,7 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 | Tactile/F/T를 사용한다는 점이 novelty다. | 센서의 상보적 효과와 robustness gain이 H3에서 입증될 때만 method claim의 일부가 된다. | `[Rejected]` |
 | 후속 단계를 고려한 contact formation은 현재 contribution이다. | 어떤 학습·평가 방법을 뜻하는지 밝히고 H2에서 downstream success 향상이 입증될 때만 contribution 후보를 확정한다. | `[Rejected]` |
 | IL은 reactive하지 않고 VLA는 force를 사용하지 못한다. | 최신 reactive IL과 force/tactile VLA가 반례다. Track B의 좁은 execution gap만 비교한다. | `[Rejected]` |
-| RL은 다른 manipulation 방법보다 일반적으로 우월하므로 선택한다. | 현재 문제에서 simulation interaction을 얻을 수 있고 real demonstration coverage가 제한되며 contact-dependent recovery와 episode outcome을 함께 최적화해야 하므로 primary baseline으로 선택한다. | `[Baseline]` |
+| RL은 다른 manipulation 방법보다 일반적으로 우월하므로 선택한다. | 정확한 model·mode specification과 recovery label은 부족하지만 measurable outcome·safety constraint와 representative simulation·reset을 구성할 수 있다는 현재 자원 조건에서 primary baseline으로 선택한다. Interaction·reward/credit·exploration·Sim-to-Real 부담도 함께 검증한다. | `[Baseline]` |
 | Previous Works 표의 제안 연구 행을 `Our baseline`이라 부른다. | 제안 연구 전체는 `Ours`, 변경 가능한 최초 구현안과 비교군만 `baseline`으로 부른다. | `[Superseded]` |
 | OBB는 mesh/point cloud보다 현실적으로 항상 우월하다. | OBB는 deployability를 위한 baseline이며 정보 손실과 error를 geometry ladder로 평가한다. | `[Rejected]` |
 | 최초 접촉 후 hand reconfiguration은 최소여야 한다. | Minimum-necessary reconfiguration은 H4에서 검증할 효율 가설이다. | `[Hypothesis]` |
@@ -742,6 +749,7 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-24 | Conventional methods와 IL/VLA의 한계를 열거한 뒤 simulation과 recovery를 RL의 장점으로 바로 연결하고, broad trend에서도 planning/control을 RL·IL·VLA와 병렬인 family처럼 표현 | Planning/control은 공통 기능으로 두고 task-level decision source에 따라 `Conventional / IL·VLA / RL`을 비교. Specification·recovery-data 부담만으로 RL을 결론 내리지 않고 `measurable outcome + safe·affordable reset + representative simulation`을 추가 전제로 명시하며, interaction·reward/credit·exploration·Sim-to-Real 부담과 반증 조건을 함께 기록 | 기존 방법의 약점에서 RL로 건너뛰는 논리 비약을 제거하고, generative/reactive IL과 simulation teacher의 반례를 포함한 조건부 method selection으로 만들기 위해 | 6.1, 10.1, 10.3, 13, 14.1, `Intro/research_trend.md` |
 | 2026-09-21 | Scene·Workspace와 Sensing 등 넓거나 중첩된 항목을 사용하고, tool 내부 구성은 `End-effector Reconfiguration=Fixed / Pre-contact / Online`, Method는 Control·Optimization·Generative를 각각 분리 | 비교표를 여덟 축으로 통일: Environment의 `Object Configuration·Surrounding Objects`, Robot Agent의 `Sensory Input·Tool·Contact Configuration·Object Manipulation`, System의 `Object Geometry·Method`. `Contact Configuration=Constant / Pre-contact / Online`, `Method=Planning/Control / RL / IL / VLA`를 사용하며 full shelf는 `Surrounding Objects=Present`, S0는 removal ablation으로 고정 | 짧은 용어로 물체 형상, 주변 방해 물체, 접촉 장치와 그 제어 권한, 대상 물체 운동 및 핵심 방법 concept을 중복 없이 비교하기 위해 | 3.6, 7.1, 10.1, 10.3–10.5, 11–13, `Intro/previous_works.md` |
 | 2026-09-20 | B99 ForceVLA2를 formal learned-action 식에 gripper-aperture command가 없다는 이유로 `End-effector Reconfiguration=Fixed`로 해석 | Retrieve Plate의 autonomous retry/re-grasp를 근거로 deployed-system capability는 `Online`으로 정정. Learned policy, subtask script 또는 별도 controller 중 aperture-command source는 `미보고`로 주석하며, low-dimensional re-grasp와 Ours의 continuous multi-joint reconfiguration은 구분 | 비교 축은 hardware 이름이나 action 식의 보고 범위가 아니라 실행 중 실제 internal configuration update capability이며, reporting omission은 `Fixed`의 증거가 아니기 때문 | 10.2–10.5, 11, 12.1, 12.3, 14.1 |
 | 2026-09-20 | Intro에 정리된 broad RL 선택 논리, 환경 접촉의 역할 구분과 C2의 결합 검증 원칙 일부가 `context.md`에는 압축되어 있었음 | 비유일한 trajectory의 outcome optimization, failure/recovery simulation, sequential outcome coupling과 inference amortization을 RL의 조건부 강점으로 명시. Support-surface·auxiliary fixed-structure·movable-object contact를 구분하고, C2를 `contact objective × online action authority` matched factorial comparison으로 정의 | Introduction의 최신 method-selection 논리와 canonical decision record를 일치시키되 RL·online reconfiguration 자체를 novelty로 과장하지 않기 위해 | 1.3, 3.6, 6.1, 7.1, 8–9, 12.3, 14.1 |
