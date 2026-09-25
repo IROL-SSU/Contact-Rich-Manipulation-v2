@@ -6,7 +6,11 @@
 >
 > **현재 단계:** Track B Stage 1 — goal-conditioned low-level policy
 >
-> **문서 역할:** 연구 범위, 가설, 임시 baseline과 미결 사항을 분리하고 이후 판단의 기준을 제공한다.
+> **문서 역할:** 연구 범위, 가설, 합의된 작업 기준과 미결 사항을 분리하고 이후 판단의 기준을 제공한다.
+>
+> **현재 합의 범위:** [`Intro/`](./Intro/README.md)의 문제 정의·스토리라인과 [`policy_learning.md`](./policy_learning.md)의 actor observation까지
+>
+> **협의 중:** Policy architecture, action/controller, reward, termination, critic·RL 세부 방법, evaluation metric·protocol과 experiment/ablation 설계. 이 항목들은 현재 계획이나 baseline으로 간주하지 않는다.
 >
 > **최종 갱신:** 2026-09-24
 
@@ -16,7 +20,7 @@
 
 ### 1.1 이 문서의 우선순위
 
-이 문서는 현재 연구 정의를 통제하기 위한 기준 문서다. [`README.md`](./README.md), [`Intro/`](./Intro/README.md), [`research_topic.md`](./research_topic.md), [`policy_learning.md`](./policy_learning.md)와 [`papers/`](./papers/README.md)의 내용이 하나의 확정안처럼 서술되어 있더라도, 이 문서에서 `[Baseline]`, `[Open]` 또는 `[Candidate]`로 재분류되었다면 최신 판단은 이 문서를 따른다.
+이 문서는 현재 연구 정의와 논의 상태를 통제하기 위한 기준 문서다. [`README.md`](./README.md), [`Intro/`](./Intro/README.md), [`research_topic.md`](./research_topic.md), [`policy_learning.md`](./policy_learning.md)와 [`papers/`](./papers/README.md)의 내용이 하나의 확정안처럼 서술되어 있더라도, **현재 합의된 범위는 Intro와 actor observation까지**다. Policy architecture와 action/controller를 비롯해 그 이후의 reward·termination·critic·evaluation·experiment 관련 내용은 모두 `[Open]`인 논의 기록이며, 최신 판단은 이 문서를 따른다.
 
 상태 표기는 다음 의미로만 사용한다.
 
@@ -24,9 +28,9 @@
 | --- | --- |
 | `[Fixed]` | 현재 연구가 유지되는 동안 쉽게 바꾸지 않을 문제 범위와 시스템 경계 |
 | `[Hypothesis]` | 실험으로 지지되거나 기각되어야 하는 주장 |
-| `[Baseline]` | 가설 검증을 위해 먼저 구현하는 방법이며 변경 가능 |
+| `[Baseline]` | 합의 범위 안에서 현재 출발점으로 삼는 작업 기준이며 변경 가능 |
 | `[Open]` | 근거·실험·사용자 판단이 더 필요한 사항 |
-| `[Candidate]` | 실험과 문헌 비교가 지지할 때만 contribution이 될 수 있는 항목 |
+| `[Candidate]` | 향후 충분한 근거가 마련될 때만 contribution이 될 수 있는 항목 |
 | `[Rejected]` | 검토했지만 현재 사용하지 않는 방향 또는 주장 |
 | `[Superseded]` | 과거에는 사용했으나 최신 정의가 대체한 내용 |
 
@@ -40,7 +44,7 @@
 
 `[Fixed]` 이 문서에서 `nonprehensile manipulation`은 **task category**이고, `contact-rich manipulation`은 별도의 task category가 아니라 접촉 위치·마찰·stick–slip–separation과 힘 전달의 불확실성을 다루는 **interaction/control challenge**를 뜻한다.
 
-현재 연구는 다음 흐름으로 발전시킨다.
+향후 연구는 아래 흐름으로 발전할 수 있다. 다만 Method 이후의 구체 순서와 experiment 구성은 아직 합의하지 않았다.
 
 ```text
 Research Motivation
@@ -80,7 +84,7 @@ Research Motivation
 | Reason for rotation | 이후 Push에 적합한 object–hand relation, object orientation 또는 contact face를 형성하기 위한 preparatory manipulation | `[Fixed]` |
 | Geometry regime | 완전한 국소 접촉 형상을 actor가 안다고 가정하지 않는 approximate-geometry regime | `[Fixed]` |
 | Information roles | Vision/coarse geometry는 전역 task·접근 정보를 제공하고, tactile·wrist F/T는 실제 접촉 상태와 geometry approximation error를 보완하는 closed-loop feedback으로 사용 | `[Fixed]` |
-| Training boundary | 실물에서 얻을 수 없는 simulator state는 actor observation이 아니라 reward·constraint·evaluation용 teacher information으로 분리 | `[Fixed]` |
+| Information boundary | 실물에서 얻을 수 없는 simulator state는 actor observation에서 제외하며, 향후 사용하더라도 actor 외부의 teacher information으로만 구분 | `[Fixed]` |
 | Hardware platform | UR5e arm과 Inspire Robots RH56E2 hand를 현재 구현 플랫폼으로 사용 | `[Fixed]` |
 
 Approach–Rotation–Push는 세 개의 의미 있는 sub-objective를 나타낸다. 모든 episode에서 Rotation을 강제로 수행하거나 세 개의 독립 policy를 사용한다는 뜻은 아니다. 초기 상태가 이미 Push에 적합하면 Rotation은 작거나 생략될 수 있다.
@@ -89,7 +93,7 @@ Approach–Rotation–Push는 세 개의 의미 있는 sub-objective를 나타�
 
 | Out-of-scope item | Boundary | Status |
 | --- | --- | --- |
-| Target retrieval 전체 | Target grasp·인출은 전체 연구의 motivation과 후속 평가 대상이지 Stage 1 actor의 직접 동작이 아님 | `[Fixed]` |
+| Target retrieval 전체 | Target grasp·인출은 전체 application motivation과 가능한 후속 system stage이며 Stage 1 actor의 직접 동작이 아님 | `[Fixed]` |
 | Multi-blocker ordering | 여러 blocker 중 선택하고 순서를 정하는 문제는 상위 planning 또는 후속 단계 | `[Fixed]` |
 | Perception algorithm 자체 | Object tracking, marker detection, OBB estimation network의 성능 개선은 현재 method contribution이 아님 | `[Fixed]` |
 | General-purpose VLA | Open-world language instruction과 embodiment-general policy는 현재 연구 범위가 아님 | `[Fixed]` |
@@ -128,10 +132,10 @@ Marker 또는 tracker가 제공하는 기본 정보는 object pose다. Geometry�
 
 | Geometry level | Definition | Example | Intended use |
 | --- | --- | --- | --- |
-| No shape representation | Pose 외에 shape·dimension 정보를 actor에 주지 않음 | Object origin pose only | Geometry contribution의 하한 ablation |
-| Implicit visual | RGB·depth·RGB-D image를 구조화된 형상으로 변환하지 않고 직접 encode | RGB/depth image encoder | 비교 또는 후속 확장 |
+| No shape representation | Pose 외에 shape·dimension 정보를 actor에 주지 않음 | Object origin pose only | 형상 정보가 없는 조건의 개념적 구분 |
+| Implicit visual | RGB·depth·RGB-D image를 구조화된 형상으로 변환하지 않고 직접 encode | RGB/depth image encoder | 명시적 형상 표현과 구분되는 대안 |
 | Estimated explicit geometry | 실제 접촉 표면과 오차가 있을 수 있는 구조화 형상 | Partial point cloud, basis point set, estimated OBB | 현재 주 연구 조건 |
-| Exact model | Known CAD/mesh 또는 정확한 dimensions가 object pose와 일관되게 정합됨 | Registered mesh, calibrated dimensions | Oracle/upper-bound baseline |
+| Exact model | Known CAD/mesh 또는 정확한 dimensions가 object pose와 일관되게 정합됨 | Registered mesh, calibrated dimensions | 정확한 형상을 가정하는 조건의 개념적 구분 |
 
 - `[Fixed]` Simulation collision geometry가 정확하더라도 actor가 exact geometry를 관측하지 않으면 actor의 geometry condition은 approximate다.
 - `[Baseline]` Approximate geometry의 첫 표현으로 episode-consistent OBB를 사용한다.
@@ -149,22 +153,23 @@ Marker 또는 tracker가 제공하는 기본 정보는 object pose다. Geometry�
 | Proprioception | 현재 arm/hand configuration과 command 결과 제공 | 외부 접촉 상태를 단독으로 완전히 식별한다고 가정하지 않음 | `[Fixed]` |
 
 - `[Fixed]` Vision/coarse geometry와 contact sensing은 동일 정보를 중복 제공한다고 가정하지 않고, 전자는 전역 task·접근 정보를, 후자는 실행 중 실제 접촉과 model–reality mismatch에 관한 feedback을 담당한다.
-- `[Hypothesis]` Tactile과 wrist F/T가 approximate geometry error를 실제로 보완하고 성능을 높이는지는 H3와 E3/E5로 검증한다.
+- `[Hypothesis]` Tactile과 wrist F/T가 approximate geometry error를 실제로 보완하고 성능을 높이는지는 연구 질문으로 유지한다. 구체 검증 방식은 아직 협의 중이다.
 
 ### 3.5 Observability boundary
 
 - `[Fixed]` Object pose와 coarse geometry가 지속적으로 관측되어도 contact state, friction, mass distribution, local surface와 force transmission은 완전히 관측되지 않는다.
 - `[Rejected]` Track B를 `fully observable manipulation`으로 표현하는 방식.
-- `[Fixed]` 정확한 simulator contact pair·point·normal·force, object velocity와 collision identity는 actor가 아니라 privileged training/evaluation information이다.
-- `[Baseline]` Realistic deployment를 모사할 때 actor pose·OBB에는 tracker에서 측정한 noise, latency, dropout과 OBB ambiguity를 적용한다.
+- `[Fixed]` 정확한 simulator contact pair·point·normal·force, object velocity와 collision identity는 actor observation에서 제외한다. 이를 reward·constraint·termination·critic 또는 evaluation에 사용할지는 `[Open]`이다.
+- `[Fixed]` Actor의 pose·OBB는 deployment에서 tracker-derived signal을 뜻한다.
+- `[Open]` Training에서 ground-truth를 proxy로 사용할지, tracker noise·latency·dropout과 OBB ambiguity를 어떤 방식과 분포로 반영할지는 정하지 않았다.
 
 ### 3.6 Environment assumptions
 
 - `[Fixed]` Blocker–shelf support-surface contact는 pushing·pivoting을 성립시키는 dynamics이므로 허용한다. 의도하지 않은 robot/blocker–shelf sidewall·pillar contact, 구조물 충돌과 경계 이탈은 별도의 안전 조건으로 관리한다.
-- `[Baseline]` S0는 고정 shelf layout과 한 개의 조작 blocker만 두고 추가 movable surrounding object를 제거하여 핵심 가설을 분리하는 통제 조건이다.
+- `[Open]` 추가 movable surrounding object를 제거한 단순 조건을 S0로 부르는 안은 있으나, 실제 evaluation이나 experiment에서 사용할지는 정하지 않았다.
 - `[Fixed]` Intended shelf setting에는 active blocker 외의 target object와 movable surrounding objects가 존재한다. `[Open]`인 것은 존재 여부가 아니라 수·배치 randomization, 관측 범위와 접촉을 금지·허용·이용할지다.
 
-### 3.7 Task start와 Evaluation distribution
+### 3.7 Task start와 initial-state distribution
 
 - `[Baseline]` Task는 hand–blocker non-contact 상태에서 시작한다.
 - `[Open]` Evaluation에 사용할 initial pose sampling 분포는 아직 정하지 않았다.
@@ -180,69 +185,69 @@ Marker 또는 tracker가 제공하는 기본 정보는 object pose다. Geometry�
 | RQ3 | 동일한 approximate-geometry 조건에서 tactile과 wrist F/T가 pose·geometry·물성 오차에 대한 closed-loop robustness를 높이는가? | `[Hypothesis]` |
 | RQ4 | 실행 중 wrist control과 함께 finger configuration까지 갱신하는 `Online` 방식이 `Constant` 또는 `Pre-contact` 방식보다 robust하고 안전한가? | `[Hypothesis]` |
 
-Surrounding objects, exact geometry와 explicit downstream learning은 중요한 설계축이지만 현재 독립 research question으로 확정하지 않는다. 먼저 RQ1–RQ4의 조건과 비교군을 정의하는 데 사용한다.
+Surrounding objects, exact geometry와 explicit downstream learning은 중요한 설계축이지만 현재 독립 research question으로 확정하지 않는다. RQ1–RQ4를 어떤 method와 evaluation으로 다룰지도 아직 정하지 않았다.
 
 ---
 
-## 5. Testable Hypotheses
+## 5. Research Hypotheses
 
-가설은 최대 네 개로 유지한다. 통계 검정, practical significance threshold와 trial 수는 experiment protocol에서 정한다.
+다음은 Intro의 논지를 연구 질문 형태로 정리한 가설이다. **비교군, metric, protocol, ablation과 experiment를 정한 표가 아니며**, 구체 검증 방법은 모두 협의 중이다.
 
-| Hypothesis | 비교 조건 또는 Ablation | 주요 평가 지표 | 가설을 지지하는 결과 | 가설이 기각되는 결과 |
-| --- | --- | --- | --- | --- |
-| **H1 — Preparatory Rotation utility.** Direct push가 제한되는 initial condition에서 Rotation 후 Push가 direct push보다 최종 성공 가능한 상태 영역을 넓힌다. | 동일 object·goal·sensor·controller에서 `direct push` vs. `rotate-then-push`; initial face-direction error와 접근 가능성을 층화 | Final task success, success 가능한 initial-state volume, lateral error, collision/topple, completion time | 어려운 alignment 구간에서 최종 성공률 또는 feasible-region coverage가 유의하게 증가하고 안전 비용이 허용 범위 내임 | 이득이 없거나 direct push보다 실패·시간·안전 비용이 커 practical advantage가 없음 |
-| **H2 — Sequential/task-conditioned contact formation.** Goal과 전체 episode 결과에 조건화된 Approach/Rotation state가 contact-only 또는 phase-local objective보다 Rotation-to-Push 성공률을 높인다. | Full-episode goal-conditioned training vs. contact-onset/stability-only Approach vs. face-alignment-only Rotation; 동일 observation·action budget | Approach contact rate, Rotation success, Rotation-to-Push success, final success, saved-state continuation probability | Contact rate나 Rotation success를 통제한 뒤에도 downstream Push success가 높음 | 향상이 없거나 단순 phase-local baseline과 동일하며 추가 복잡도만 증가 |
-| **H3 — Complementary contact sensing.** Approximate geometry에서 tactile과 wrist F/T를 함께 사용하는 policy가 vision/proprioception-only보다 geometry perturbation과 접촉 불확실성에 강하다. | `no contact sensor`, `tactile only`, `F/T only`, `tactile+F/T`의 factorial ablation; 동일 OBB error·randomization | Rotation-to-Push/final success, contact-loss recovery, peak force/impulse, collision, OBB-error sensitivity | 결합 입력이 held-out error에서 성공률을 높이고 force/collision을 악화시키지 않으며 각 단일 modality와 상보적 차이를 보임 | 결합 이득이 없거나 한 modality만으로 동일 성능, 또는 센서 추가가 noise에 더 취약함 |
-| **H4 — Online wrist–finger adaptation.** 동일한 wrist controller에서 실행 중 finger configuration까지 갱신하는 policy가 configuration을 유지하는 방식보다 uncertainty 아래에서 성공률을 높인다. | `Constant`, `Pre-contact` 후 finger 고정, `Online` wrist+finger, `Online`+mild motion cost | Final success, contact loss·switch, hand joint travel, peak force, recovery, seen–held-out gap | `Online`이 held-out pose·friction·geometry에서 성공과 recovery를 높이고 과도한 force·motion을 만들지 않음 | `Constant`·`Pre-contact`와 차이가 없거나 finger motion이 불안정·과도하고 안전 지표가 악화됨 |
+| Hypothesis | 의미 | 상태 |
+| --- | --- | --- |
+| **H1 — Preparatory Rotation utility.** | Direct push가 제한되는 initial condition에서 preparatory Rotation이 이후 Push가 가능한 상태 범위를 넓힐 수 있다. | `[Hypothesis]` |
+| **H2 — Sequential/task-conditioned contact formation.** | Approach와 Rotation의 상태는 각 단계의 즉시 결과뿐 아니라 이후 Push와의 관계를 고려할 필요가 있다. | `[Hypothesis]` |
+| **H3 — Complementary contact sensing.** | Approximate geometry에서 tactile과 wrist F/T가 서로 다른 contact 정보를 제공해 geometry·physics mismatch 대응에 기여할 수 있다. | `[Hypothesis]` |
+| **H4 — Online wrist–finger adaptation.** | 실행 중 wrist와 finger configuration을 갱신하는 능력이 uncertainty와 contact 변화 대응에 기여할 수 있다. | `[Hypothesis]` |
 
-H2에서 `전체 episode 결과를 고려한다`는 말은 현재 explicit feasibility reward가 존재한다는 뜻이 아니다. Baseline은 full-episode return을 공유하며, 별도 explicit mechanism의 필요성은 Section 7에서 결정한다. 따라서 후속 Rotation·Push를 고려한 contact formation은 현재 `[Hypothesis]`이며, H2와 transition analysis가 지지하기 전에는 contribution으로 표현하지 않는다.
+H2의 `이후 단계를 고려한다`는 표현은 특정 reward, return, saved-state evaluation 또는 explicit feasibility model에 합의했다는 뜻이 아니다.
 
 ---
 
-## 6. Provisional Baseline Method
+## 6. Method 상태
 
-이 절은 contribution이 아니라 **가설을 검증하기 위한 최초 구현안**이다.
+현재 합의된 policy 수준의 구체안은 6.3의 actor observation이다. 그 밖의 architecture, action/controller, reward, evaluation과 contact 처리 방식은 논의를 위해 남긴 후보이며 현재 baseline이나 구현 계획이 아니다.
 
-### 6.1 먼저 구현할 학습 방법
+### 6.1 Intro에서 정리한 method family 판단
 
-- `[Baseline]` 현재 low-level execution policy는 RL로 먼저 구현한다.
+- `[Baseline]` Intro에서 정리한 현재 low-level execution의 primary method family는 RL이다.
 - `[Baseline]` RL 선택은 다른 방법보다 본질적으로 우월하다는 주장이 아니다. 현재는 **정확한 contact model·mode·switching rule과 포괄적인 recovery demonstration보다 task outcome·safety constraint와 randomized simulation interaction·reset을 더 쉽게 구성할 수 있다**는 자원 조건에 따른 선택이다.
 - `[Rejected]` RL 사용 자체를 contribution 또는 novelty로 주장하는 방식.
-- `[Open]` RL 선택의 실험적 타당성은 geometry perturbation과 contact disturbance 조건에서 matched Conventional 또는 IL/VLA baseline보다 유의한 이득이 있는지, 그리고 Sim-to-Real 성능이 유지되는지로 판단한다.
+- `[Open]` RL과 Conventional 또는 IL/VLA를 실제로 비교할지, 비교한다면 어떤 조건과 기준을 사용할지는 정하지 않았다.
 
 Planning과 control은 Conventional methods, IL/VLA와 RL 모두에 필요한 기능이며 RL·IL·VLA와 병렬인 broad method family가 아니다. Research Trend에서는 **task-level decision rule의 주된 source**로 방법을 구분한다. `Conventional methods`는 사람이 설계한 model·mode·constraint·rule·planner를, `IL/VLA`는 demonstration 또는 pretrained action prior를, `RL`은 interaction에서 얻은 task return·constraint를 주된 decision source로 사용한다. 여러 source가 역할을 나누면 별도 `Hybrid` family를 만들기보다 composition으로 기록한다.
 
 | Alternative family | 우리 조건에서 단독 적용할 때 남는 문제 | 본 연구에서 유지할 역할 | Status |
 | --- | --- | --- | --- |
-| Heuristic / motion primitive | Approximate geometry로 nominal contact가 달라지고 contact migration·slip·separation의 조합이 증가하면 예외 규칙이 확장됨 | 초기 action prior, reset behavior, 해석 가능한 최소 비교군 | `[Baseline]` |
-| Explicit-model planning / optimization | 명시적 contact model·mode에 의존하는 경우 geometry·friction 또는 신뢰할 수 있는 online state estimate가 필요하며, wrist–finger contact sequence를 반복 탐색하면 online solve 부담이 증가함 | OSC/Differential IK, feedback control, safety constraint, optimization-guided baseline | `[Baseline]` |
-| IL | Offline behavior cloning에서는 rollout error가 expert distribution 밖의 state를 만들 수 있으므로 geometry perturbation, contact loss와 recovery를 포괄하는 data·teacher 또는 interactive aggregation이 필요함 | 동일 observation/action을 사용하는 reactive/generative learning baseline과 향후 pretraining | `[Candidate]` |
-| VLA | Semantic task prior에는 강하지만 contact-level correction에는 tactile/F/T가 포함된 data와 architecture가 별도로 필요하고, 현재 task의 고정된 semantics에서는 generalist 규모의 직접 이득이 불명확함 | 상위 task command와 goal-generation interface | `[Candidate]` |
+| Heuristic / motion primitive | Approximate geometry로 nominal contact가 달라지고 contact migration·slip·separation의 조합이 증가하면 예외 규칙이 확장됨 | 초기 action prior, reset behavior 또는 비교 대상으로 검토 가능 | `[Open]` |
+| Explicit-model planning / optimization | 명시적 contact model·mode에 의존하는 경우 geometry·friction 또는 신뢰할 수 있는 online state estimate가 필요하며, wrist–finger contact sequence를 반복 탐색하면 online solve 부담이 증가함 | Low-level control, safety 또는 비교 대상으로 검토 가능 | `[Open]` |
+| IL | Offline behavior cloning에서는 rollout error가 expert distribution 밖의 state를 만들 수 있으므로 geometry perturbation, contact loss와 recovery를 포괄하는 data·teacher 또는 interactive aggregation이 필요함 | Reactive/generative learning과 향후 pretraining의 비교 참고 후보 | `[Open]` |
+| VLA | Semantic task prior에는 강하지만 contact-level correction에는 tactile/F/T가 포함된 data와 architecture가 별도로 필요하고, 현재 task의 고정된 semantics에서는 generalist 규모의 직접 이득이 불명확함 | 상위 task command와 goal-generation interface의 참고 후보 | `[Open]` |
 
-이 한계들은 각 family가 contact-rich manipulation을 해결할 수 없다는 뜻이 아니다. [Diffusion Policy](https://doi.org/10.15607/RSS.2023.XIX.026)는 generative IL이 multimodal action distribution을 표현할 수 있음을, [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)는 IL도 high-frequency tactile feedback에 반응할 수 있음을 보여준다. [DAgger](https://proceedings.mlr.press/v15/ross11a.html)는 learner-induced state에 expert label을 추가해 offline behavior cloning의 distribution shift를 줄이는 방법을 제시한다. Force-aware VLA도 contact-level feedback의 반례이며, 최신 흐름은 model·demonstration·RL이 역할을 나누는 composition에 가깝다. 따라서 Research Trend는 family의 우열이 아니라 **현재 정보·data·interaction budget에서 RL을 먼저 구현하는 조건부 이유**를 설명한다.
+이 한계들은 각 family가 contact-rich manipulation을 해결할 수 없다는 뜻이 아니다. [Diffusion Policy](https://doi.org/10.15607/RSS.2023.XIX.026)는 generative IL이 multimodal action distribution을 표현할 수 있음을, [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)는 IL도 high-frequency tactile feedback에 반응할 수 있음을 보여준다. [DAgger](https://proceedings.mlr.press/v15/ross11a.html)는 learner-induced state에 expert label을 추가해 offline behavior cloning의 distribution shift를 줄이는 방법을 제시한다. Force-aware VLA도 contact-level feedback의 반례이며, 최신 흐름은 model·demonstration·RL이 역할을 나누는 composition에 가깝다. 따라서 Research Trend는 family의 우열이 아니라 **현재 정보·data·interaction budget에서 RL을 primary method family로 두는 조건부 이유**를 설명한다.
 
 Nonprehensile manipulation 범주에서 RL의 상대적 강점은 다음 네 조건으로 정리한다.
 
 1. Action의 비유일성만으로 RL이 정당화되지는 않는다. 다만 policy rollout의 모든 state에 corrective expert action을 붙이기보다 outcome evaluator를 구성하기 쉬운 경우, 여러 contact choice와 recovery 결과를 task return으로 비교할 수 있다.
 2. Simulation은 IL/VLA의 demonstration 생성에도 사용할 수 있다. Reliable simulation teacher는 부족하지만 failure interaction을 안전하게 생성·reset하고 outcome으로 평가할 수 있을 때 RL의 상대적 이유가 생긴다.
-3. Pre-contact formation, reorientation과 translation을 episode return으로 연결해 초기 contact decision이 후속 object outcome에 미친 영향을 최적화할 수 있다. 다만 실제 credit 전달 여부는 H2와 transition evaluation으로 검증한다.
+3. Pre-contact formation, reorientation과 translation을 episode return으로 연결해 초기 contact decision이 후속 object outcome에 미친 영향을 최적화할 가능성이 있다. 구체 reward와 credit 확인 방식은 협의 중이다.
 4. Policy inference를 통한 amortization은 IL/VLA에도 해당한다. 반복되는 task family에서 빠른 policy 실행이 필요하고 recovery demonstration보다 simulation interaction을 더 많이 확보할 수 있을 때 RL 학습 비용을 회수할 수 있다.
 
 > `Specification coverage 부담 증가` + `policy-induced recovery data 부담 증가`만으로는 RL이 결론이 되지 않는다. 여기에 `measurable outcome` + `safe·affordable interaction/reset` + `representative simulation`이 있을 때 interaction-return RL이 조건부로 합리적이다.
 
-RL은 그 대신 interaction volume, reward·credit assignment, exploration safety, simulator contact fidelity와 Sim-to-Real 부담을 진다. Randomization 설정만으로 recovery coverage가 확보됐다고 보지 않으며, policy-induced failure·recovery state의 방문과 실제 복구 outcome을 별도로 확인한다. 신뢰할 수 있는 model과 작은 mode 집합이 있거나, 충분한 expert/recovery data나 simulation teacher가 있거나, one-off·OOD goal을 즉시 풀어야 하면 conventional method 또는 IL/VLA가 더 적합할 수 있다. RL은 geometry representation, low-level controller와 safety supervisor를 대체하지 않으며, 좁은 feasible-contact region에서 exploration이 병목이면 planning·optimization·demonstration prior를 결합한 structured RL을 비교한다. 또한 RL 선택은 auxiliary fixed-structure contact나 movable-object contact를 manipulation resource로 사용한다는 결정에 의존하지 않으며, 해당 contact의 적극적 활용은 Section 7.1의 `[Open]`을 따른다.
+RL은 그 대신 interaction volume, reward·credit assignment, exploration safety, simulator contact fidelity와 Sim-to-Real 부담을 진다. Randomization 설정만으로 recovery coverage가 확보됐다고 보지 않는다. 신뢰할 수 있는 model과 작은 mode 집합이 있거나, 충분한 expert/recovery data나 simulation teacher가 있거나, one-off·OOD goal을 즉시 풀어야 하면 conventional method 또는 IL/VLA가 더 적합할 수 있다. RL은 geometry representation, low-level controller와 safety supervisor를 대체하지 않으며, planning·optimization·demonstration prior와의 결합 여부도 `[Open]`이다. 또한 RL 선택은 auxiliary fixed-structure contact나 movable-object contact를 manipulation resource로 사용한다는 결정에 의존하지 않으며, 해당 contact의 적극적 활용은 Section 7.1의 `[Open]`을 따른다.
 
-### 6.2 Policy organization
+### 6.2 Policy organization — `[Open]`
 
-- `[Baseline]` 하나의 shared MLP policy가 세 sub-objective를 수행한다.
-- `[Baseline]` Actor에 phase ID를 주지 않고 current task/contact state에 따라 reward term을 gate한다.
-- `[Baseline]` 동일한 action space를 모든 phase에서 사용하여 Rotation 중 translation과 Push 중 orientation correction을 허용한다.
-- `[Open]` Shared phase-free policy의 이점은 아직 입증되지 않았다. `phase ID 포함 shared policy`와 `phase-specific policies/controller`를 비교해야 한다.
+- `[Open]` 하나의 shared MLP policy가 세 sub-objective를 수행하는 방안을 검토 중이다.
+- `[Open]` 현재 66D observation에는 Phase ID를 넣지 않는다. 향후 observation을 바꾸어 Phase ID를 포함할지와 reward gate 또는 phase transition 방식을 어떻게 둘지는 정하지 않았다.
+- `[Open]` 세 phase에서 같은 action space를 사용할지도 action/controller 설계와 함께 협의한다.
+- `[Open]` Shared phase-free policy, phase ID 포함 shared policy와 phase-specific policy/controller 중 어떤 구성을 비교할지도 정하지 않았다.
 - `[Rejected]` Shared policy 또는 phase-ID 제거 자체를 검증 없이 contribution으로 표현하는 방식.
 
 ### 6.3 현재 observation 구성
 
-현재 66D 구성은 구현 가능한 첫 baseline일 뿐 연구 범위가 아니다.
+현재 66D 구성은 합의된 actor observation의 작업 기준이며 연구 contribution 자체는 아니다.
 
 | Observation block | Current encoding | Dimension | Status |
 | --- | --- | ---: | --- |
@@ -252,60 +257,62 @@ RL은 그 대신 interaction volume, reward·credit assignment, exploration safe
 | Arm/hand proprioception | UR5e q + RH56E2 q | 12 | `[Baseline]` |
 | Tactile | Current 17D binary vector | 17 | `[Baseline]` |
 | Wrist F/T | Current end-effector-frame wrench | 6 | `[Baseline]` |
-| Minimal action memory | Previous action one step | 12 | `[Baseline]` |
+| Minimal action memory | Previous action one step | 12 | `[Baseline]`; 현재 12D action 후보를 전제로 하며 action이 바뀌면 차원을 다시 확인 |
 | **Total** |  | **66** | `[Baseline]` |
 
 - `[Baseline]` Tactile은 fixed sensor identity를 유지하는 17D any-contact binary vector다.
 - `[Baseline]` 하나의 threshold를 사용하고 hysteresis는 사용하지 않는다.
 - `[Baseline]` Tactile과 F/T는 current sample, previous action은 one-step만 사용한다.
-- `[Open]` Threshold, filtering, history, action memory와 exact sensor mapping은 실물 log와 ablation으로 결정한다.
-- `[Open]` Selected-face representation과 OBB consistency가 unseen/non-box-like objects에서 충분한지 검증한다.
+- `[Open]` Threshold, filtering, history, action memory와 exact sensor mapping의 세부값은 실물 log를 확인한 뒤 협의한다.
+- `[Open]` Selected-face representation과 OBB consistency의 적용 범위 및 확인 방식은 별도로 협의한다.
 
-### 6.4 Action and controller
+### 6.4 Action and controller — `[Open]`
 
 | Element | Current choice | Status |
 | --- | --- | --- |
-| Wrist action | End-effector-frame delta translation 3D + local rotation increment 3D | `[Baseline]` |
-| Finger action | RH56E2 actuated joint action 6D | `[Baseline]` |
-| Total action | 12D | `[Baseline]` |
-| Command semantics | 매 policy step의 measured state를 기준으로 새 command 생성 | `[Baseline]` |
+| Wrist action | End-effector-frame delta translation 3D + local rotation increment 3D | `[Open]` |
+| Finger action | RH56E2 actuated joint action 6D | `[Open]` |
+| Total action | 12D | `[Open]` |
+| Command semantics | 매 policy step의 measured state를 기준으로 새 command 생성 | `[Open]` |
 | Low-level controller | Differential IK 또는 OSC | `[Open]` |
 | Scale/frequency | Translation·rotation·finger scale와 policy rate | `[Open]` |
 
-6-DoF wrist와 finger action을 함께 쓰는 이유는 contact location, force direction과 configuration을 online으로 바꿀 자유도를 제공하기 위해서다. 이것이 모두 필요하다는 주장은 H4의 control ablation으로 검증한다.
+6-DoF wrist와 finger action을 함께 쓰는 안은 contact location, force direction과 configuration을 online으로 바꿀 자유도를 제공한다. 채택 여부와 비교 방식은 아직 협의 중이다.
 
-### 6.5 Reward and safety structure
+### 6.5 Reward and safety discussion — `[Open]`
 
-| Layer | Baseline role | Examples | Status |
+이 절은 합의된 reward 명세가 아니다. 아래 구분은 이후 논의를 위해 보존한 후보이며, 채택 여부·수식·우선순위는 모두 협의 중이다.
+
+| Layer | 논의할 역할 | Examples | Status |
 | --- | --- | --- | --- |
-| Final task objective | 목표 이동과 face-direction alignment, stable completion | Sparse success | `[Baseline]` |
-| Phase-specific shaping | Exploration과 credit assignment 보조 | Approach distance, alignment progress, push progress | `[Baseline]` |
-| Contact shaping | 전체 접촉 상실을 줄이되 개별 contact migration 허용 | Aggregate contact-loss event | `[Baseline]` |
-| Safety constraint | Task progress와 교환되지 않아야 하는 위반 | Shelf/pillar collision, boundary exit, topple, overload, joint limit | `[Baseline]` |
-| Control regularization | 불필요한 진동·명령 변화 억제 | Action rate, optional hand-motion cost | `[Baseline]` |
+| Final task objective | 목표 이동과 face-direction alignment, stable completion | Sparse success | `[Open]` |
+| Phase-specific shaping | Exploration과 credit assignment 보조 | Approach distance, alignment progress, push progress | `[Open]` |
+| Contact shaping | 전체 접촉 상실을 줄이되 개별 contact migration 허용 | Aggregate contact-loss event | `[Open]` |
+| Safety constraint | Task progress와 교환되지 않아야 하는 위반 | Boundary exit, topple, drop, overload, joint limit와 OD-1에서 금지한 auxiliary-structure·surrounding-object contact | `[Open]` |
+| Control regularization | 불필요한 진동·명령 변화 억제 | Action rate, optional hand-motion cost | `[Open]` |
 
 - `[Open]` 각 term의 수식, weight, threshold, curriculum과 constrained-RL/termination 방식은 확정하지 않았다.
 - `[Fixed]` Reward term과 evaluation metric을 같은 것으로 취급하지 않는다. Reward는 학습 신호이고 metric은 가설 검증을 위한 외부 측정이다.
-- `[Baseline]` Contact loss는 회복 가능한 penalty event이며 자동 failure termination이 아니다.
-- `[Open]` Contact 유지 penalty와 hand-motion cost가 실제로 필요한지 H4에서 비교한다.
+- `[Open]` Contact loss를 회복 가능한 penalty event로 둘지, termination과 어떻게 구분할지 아직 정하지 않았다.
+- `[Open]` Contact 유지 signal과 hand-motion cost가 실제로 필요한지, 필요하다면 어떻게 판단할지는 H4와 관련해 추후 협의한다.
 
-### 6.6 후속 단계의 고려 범위
+### 6.6 후속 단계의 고려 범위 — `[Open]`
 
 다음 세 수준을 구분한다.
 
 | 구분 | 의미 | 현재 사용 | 상태 |
 | --- | --- | --- | --- |
-| Shared episodic return | 앞 단계 action이 뒤 phase reward와 final success return을 함께 받음 | 현재 학습 baseline | `[Baseline]` |
-| Transition evaluation | 저장한 Approach/Rotation state에서 continuation rollout을 실행하여 다음 단계 성공률을 측정 | 반드시 유지할 evaluation | `[Baseline]` |
+| Shared episodic return | 앞 단계 action이 뒤 phase reward와 final success return을 함께 받음 | 학습 방식 후보 | `[Open]` |
+| Transition evaluation | 저장한 Approach/Rotation state에서 continuation rollout을 실행하여 다음 단계 성공률을 측정 | 평가 방식 후보 | `[Open]` |
 | Explicit downstream learning | Learned feasibility value, transition reward, terminal-state critic 또는 별도 objective로 다음 phase 가능성을 직접 최적화 | 구현 여부 미정 | `[Open]` |
 
-현재 method에는 shared episodic return과 transition evaluation만 명확히 포함된다. 다음 phase 가능성을 직접 최적화하는 별도 학습 요소가 없는 상태에서 이를 contribution으로 확정하지 않는다.
+세 방식 중 무엇을 사용할지는 아직 결정하지 않았다. 따라서 후속 단계 고려를 현재 method나 contribution으로 확정하지 않는다.
 
-### 6.7 Contact and reconfiguration behavior
+### 6.7 Contact and reconfiguration behavior — `[Open]`
 
-- `[Baseline]` 최초 접촉 이후 적어도 하나의 hand–blocker contact를 가급적 유지한다.
-- `[Baseline]` 동일 finger, taxel 또는 contact patch를 계속 유지하도록 강제하지 않는다.
-- `[Baseline]` Rotation과 Push 중 contact migration, release/re-contact와 wrist–finger adjustment를 허용한다.
+- `[Open]` 최초 접촉 이후 aggregate hand–blocker contact를 선호할지 정하지 않았다.
+- `[Open]` 동일 finger, taxel 또는 contact patch의 유지 여부는 별도 contact 규칙과 함께 협의한다.
+- `[Open]` Rotation과 Push 중 contact migration, release/re-contact와 wrist–finger adjustment를 어느 범위까지 허용할지 정하지 않았다.
 - `[Open]` Aggregate contact를 계속 유지하는 것이 항상 유리한지, deliberate full release가 필요한 object/task가 있는지 검토한다.
 - `[Rejected]` Tactile bit change 자체를 failure 또는 reconfiguration penalty로 해석하는 방식.
 
@@ -319,22 +326,22 @@ Intended shelf setting에는 active blocker 외의 movable surrounding objects�
 
 | Question | Alternatives | Evidence/decision needed | Current status |
 | --- | --- | --- | --- |
-| 주변 물체가 존재하는가? | Full shelf에는 존재 / S0 ablation에서는 제거 | Intended application과 통제 실험의 구분 | `[Fixed]` |
+| 주변 물체가 존재하는가? | Intended shelf에는 존재 / 단순화 조건에서는 제거 가능 | Application 범위와 단순 조건의 구분 | 존재 `[Fixed]`; 단순 조건 사용 `[Open]` |
 | 수와 위치를 randomize하는가? | Fixed layout / count·pose randomization / curriculum | 학습 안정성 및 generalization protocol | `[Open]` |
 | Shelf sidewall·pillar 같은 고정 구조물의 보조 접촉을 허용·이용하는가? | Support surface만 허용 / incidental contact 허용 / pivoting resource로 명시적 이용 | 구조적 constraint와 manipulation resource의 구분, force·collision limit 및 H1–H4와의 관계 | `[Open]` |
 | Blocker–surrounding-object contact를 허용하는가? | 모두 금지 / 제한적 contact 허용 / manipulation에 이용 | 실제 application에서 허용 가능한 물리적 상호작용 정의 | `[Open]` |
 | 주변 물체의 연구상 역할은 무엇인가? | Safety obstacle / policy가 대응할 uncertainty / active interaction 대상 | Observation에 scene state가 필요한지와 collision-only 처리가 충분한지 검증 | `[Open]` |
-| Single- vs. multi-object 실험을 분리하는가? | 단일 핵심 실험 후 multi-object stress test / 처음부터 혼합 | H1–H4의 효과를 구분하기 쉬운 정도와 연구 범위의 차이 | `[Open]` |
+| Single- vs. multi-object 조건을 분리하는가? | 단일 조건과 multi-object 조건을 분리 / 처음부터 혼합 | 연구 질문을 구분하기 쉬운 정도와 연구 범위의 차이 | `[Open]` |
 
-현재 권장 분리는 다음과 같다.
+논의 중인 장면 구분 후보는 다음과 같다. 아직 실험 조건으로 채택하지 않았다.
 
-- `[Baseline]` S0: 추가 movable surrounding object 없이 한 blocker만 사용하여 H1–H4를 분리해 식별하는 `Absent` ablation.
+- `[Open]` S0: 추가 movable surrounding object 없이 한 blocker만 두는 단순 조건.
 - `[Fixed]` S1: 1–N개의 passive surrounding objects가 존재하는 intended shelf condition. 수·pose randomization과 contact rule은 `[Open]`이다.
 - `[Open]` S2: Surrounding-object contact를 허용하거나 이용하는 multi-object contact manipulation. 채택하면 observation과 research scope가 크게 바뀐다.
 
-현재 판단에서 blocker–shelf support-surface contact는 pushing·pivoting을 성립시키는 필수 dynamics이며 항상 허용한다. Shelf sidewall·pillar 같은 **auxiliary fixed-structure contact**는 safety 조건으로 두되 pivoting resource로 이용할지는 별도 open decision이다. **Movable-object contact**는 S1에서 금지할지 제한적으로 허용할지 아직 정하지 않았고, 이를 적극적인 manipulation resource로 이용하는 경우를 S2로 구분한다. Broad nonprehensile manipulation에서 environmental contact가 유용하다는 사실만으로 이를 현재 method의 핵심 contribution으로 승격하지 않으며, auxiliary contact 또는 S2를 채택할 때 별도 research question·observation·safety rule과 비교 실험을 정의한다.
+현재 판단에서 blocker–shelf support-surface contact는 pushing·pivoting을 성립시키는 필수 dynamics다. Shelf sidewall·pillar 같은 **auxiliary fixed-structure contact**와 **movable-object contact**를 금지·허용·이용 중 어디까지 둘지는 open decision이다. Broad nonprehensile manipulation에서 environmental contact가 유용하다는 사실만으로 이를 현재 method의 핵심 contribution으로 승격하지 않는다.
 
-S1은 application-level method를 나타내는 조건이고 S0는 원인 분리를 위한 ablation이다. Experiment protocol 전에는 S1의 object count·pose distribution, observation 범위와 contact rule을 결정해야 한다.
+S1은 intended application을 나타내고 S0는 이를 단순화한 논의용 조건이다. 실제 evaluation이나 experiment에서 둘을 어떻게 사용할지는 아직 정하지 않았다.
 
 ### 7.2 OD-2 — Geometry Information and Perturbation
 
@@ -346,40 +353,40 @@ OBB를 쓴다는 사실보다 `무엇을 알고 얼마나 틀리는가`를 먼�
 | Pose source | Marker/vision pose와 geometry source를 분리하고 frame registration 방법 정의 | `[Open]` |
 | OBB error components | Center offset, orientation error, extent scale/asymmetry, temporal jitter, axis permutation을 분리 | `[Open]` |
 | Error distribution | Uniform 임의값이 아니라 실제 perception log 또는 명시적 stress range 사용 | `[Open]` |
-| Exact baseline | Oracle OBB만 둘지 registered CAD/mesh upper bound까지 둘지 | `[Open]` |
+| Exact-geometry reference | Oracle OBB만 둘지 registered CAD/mesh upper bound까지 둘지 | `[Open]` |
 | Implicit geometry 비교 조건 | Point cloud/RGB feature policy를 구현할지 문헌 비교로만 둘지 | `[Open]` |
 
-Core geometry ladder는 다음과 같이 제안한다.
+Geometry 조건을 논의하기 위한 후보는 다음과 같다. 이 구분을 그대로 evaluation이나 experiment에 사용할지는 미정이다.
 
 | Code | Condition | Purpose | Status |
 | --- | --- | --- | --- |
-| G0 | Pose only, no geometry | Geometry input의 최소 하한 | `[Candidate]` |
-| G1 | Perturbed approximate OBB | 주 연구 조건 | `[Baseline]` |
-| G2 | Oracle OBB dimensions/frame | OBB estimation error의 upper bound | `[Candidate]` |
+| G0 | Pose only, no geometry | Geometry input의 최소 하한 | `[Open]` |
+| G1 | Perturbed approximate OBB | 현재 observation 가정과 맞는 조건 | `[Open]` |
+| G2 | Oracle OBB dimensions/frame | OBB estimation error의 upper bound | `[Open]` |
 | G3 | Registered exact mesh/CAD | Contact geometry까지 아는 upper bound | `[Open]` |
 
-Coarse geometry와 tactile/F/T의 보완 관계를 주장하려면 최소한 G0–G2가 필요하다. G3는 exact local geometry까지의 gap을 해석하는 데 강하지만 구현 비용과 baseline fairness를 검토해야 한다.
+Coarse geometry와 tactile/F/T의 관계를 어떤 조건에서 살펴볼지, G0–G3 중 무엇을 사용할지는 이후 협의한다.
 
 ### 7.3 OD-3 — Next-Phase Consideration
 
 | Interpretation | What it demonstrates | What it does not demonstrate | Current status |
 | --- | --- | --- | --- |
-| Shared full-episode return | 앞 단계가 전체 성공 return의 영향을 받을 가능성 | Credit가 실제로 전달되었거나 terminal state가 개선되었다는 보장 | `[Baseline]` |
-| Rotation과 Rotation-to-Push의 분리 평가 | Rotation success와 Rotation-to-Push success가 다른지 측정 | Policy가 그 차이를 명시적으로 학습했다는 증거 | `[Baseline]` |
+| Shared full-episode return | 앞 단계가 전체 성공 return의 영향을 받을 가능성 | Credit가 실제로 전달되었거나 terminal state가 개선되었다는 보장 | `[Open]` |
+| Rotation과 Rotation-to-Push의 분리 평가 | Rotation success와 Rotation-to-Push success가 다른지 측정 | Policy가 그 차이를 명시적으로 학습했다는 증거 | `[Open]` |
 | Explicit feasibility objective | 다음 phase 성공 가능성을 직접 학습·shaping | 별도 estimator의 calibration·OOD 안정성 | `[Open]` |
 
-현재 권장안은 shared episodic return과 transition evaluation으로 H2를 먼저 검증하는 것이다. Phase-local baseline보다 다음 단계 성공률이 개선되지 않거나 long-horizon credit failure가 나타날 때 explicit downstream learning을 추가한다. 최종 선택은 아직 `[Open]`이며, 이를 실제로 구현하기 전에는 후속 단계를 직접 학습하는 방법을 contribution으로 쓰지 않는다.
+세 해석은 구분해서 논의하되, 어떤 것을 학습이나 평가에 사용할지는 정하지 않았다. 이를 실제로 합의·구현하기 전에는 후속 단계를 직접 학습하는 방법을 contribution으로 쓰지 않는다.
 
 ### 7.4 Additional open decisions
 
 | ID | Decision | Why unresolved | Required evidence |
 | --- | --- | --- | --- |
 | OD-4 | Selected face+direction vs. explicit desired rotation goal | OBB symmetry와 non-box-like object에서 동일하지 않을 수 있음 | Task set과 goal ambiguity analysis |
-| OD-5 | Shared/phase-free vs. phase-aware/phase-specific policy | 현재 선택의 성능·sample-efficiency 근거가 없음 | Matched policy-organization ablation |
+| OD-5 | Shared/phase-free vs. phase-aware/phase-specific policy | 현재 선택의 성능·sample-efficiency 근거가 없음 | Policy organization에 대한 추가 논의 |
 | OD-6 | Initial non-contact state distribution과 upper planner–policy 시작 경계 | 너무 쉬운 sampling은 Approach 가설을 약화하고 너무 넓으면 학습을 막으며, long-range reaching을 policy 범위에 포함하는지에 따라 비교 조건이 달라짐 | Planner/reachability 기반 분포, policy 시작 위치와 curriculum study |
 | OD-7 | DiffIK vs. OSC, action scale·rate | Contact response와 sim-to-real behavior가 달라짐 | Controller-matched rollout statistics and hardware limits |
 | OD-8 | Tactile threshold, F/T preprocessing, history | Sensor calibration과 latency를 아직 측정하지 않음 | RH56E2/F/T logs, synchronization and noise analysis |
-| OD-9 | Reward gate, weight와 safety algorithm | 문헌의 수치를 직접 이식할 수 없음 | Unweighted-term distribution, failure analysis, ablation |
+| OD-9 | Reward gate, weight와 safety algorithm | 문헌의 수치를 직접 이식할 수 없음 | Reward formulation과 검토 방법에 대한 합의 |
 | OD-10 | Exact held-out object/generalization boundary | `unseen`의 범위가 category·shape·physics 중 무엇인지 불명확 | Train/test split definition |
 | OD-11 | Real-world deployment protocol | Tracker, sensor calibration과 safety supervisor interface 미정 | Hardware integration plan |
 
@@ -387,20 +394,20 @@ Coarse geometry와 tactile/F/T의 보완 관계를 주장하려면 최소한 G0�
 
 | Item | Existing Statement | Problem | Required Decision/Evidence | Current Status |
 | --- | --- | --- | --- | --- |
-| 연구 범위와 구현 범위 | Selected-face goal, 66D observation과 shared MLP가 현재 연구 정의처럼 서술됨 | 연구 문제와 최초 구현 선택이 혼합됨 | H1–H4에 필요한 최소 interface를 확인하고 구현안은 ablation으로 변경 가능하게 유지 | `[Baseline]`으로 재분류 |
+| 연구 범위와 구현 범위 | Selected-face goal, 66D observation과 shared MLP가 현재 연구 정의처럼 서술됨 | 연구 문제와 최초 구현 선택이 혼합됨 | Selected-face goal과 66D observation만 현재 기준으로 두고 policy organization은 별도 협의 | Observation `[Baseline]`; organization `[Open]` |
 | Fully observable 표현 | Continuous pose와 OBB가 있으므로 상태를 충분히 안다는 암묵적 전제 | Local contact, friction, mass와 geometry error가 남음 | Partial observability와 hidden physics를 perturbation별로 정의 | `fully observable`은 `[Rejected]` |
 | Vision과 privileged simulator information | Continuous vision pose와 exact simulator state가 같은 state처럼 사용될 수 있음 | 실물 perception과 simulation teacher의 가용성이 다름 | Actor tensor와 reward/constraint/evaluation tensor를 코드·표에서 분리 | 경계 `[Fixed]`, 구현 검증 `[Open]` |
 | Policy input과 reward/evaluation 정보 | Exact contact force·collision을 reward에 쓰므로 policy도 이를 활용한다고 오해 가능 | Deployment information leakage 위험 | Asymmetric critic 포함 여부까지 별도 목록과 unit test 작성 | Actor/teacher 분리 `[Fixed]` |
 | Surrounding objects | Intended shelf에는 다른 물체가 있지만 S0에서는 제거 | 존재는 고정됐으나 수·pose randomization, 관측 범위와 접촉 역할이 미정 | S1 distribution·contact rule과 optional S2 결정 | 존재 `[Fixed]`, 처리 OD-1 `[Open]` |
-| Shared policy 사용 이유 | 세 phase를 하나의 shared policy로 학습하는 것이 자연스러운 선택처럼 서술 | Phase-specific policy 대비 장점과 실패 조건이 미검증 | 동일 capacity·budget의 shared vs. phase-specific E6 | Shared MLP `[Baseline]` |
-| Phase ID 제거 이유 | 이전 연구 경험상 gate만으로 가능하므로 phase ID를 제거 | Markov state sufficiency와 성능상 이점이 본 task에서 미검증 | No-ID vs. phase-ID shared policy 및 hidden-gate ambiguity 분석 | No-ID `[Baseline]`, 우위 `[Open]` |
-| Hand configuration 평가 시점 | Approach 종료 state가 후속 Rotation·Push에 유효한지 평가 | Rotation·Push 중 계속 변하는 configuration을 설명하지 못함 | Approach terminal continuation과 전체 trajectory의 contact/joint metrics를 함께 기록 | Terminal+trajectory 평가 `[Baseline]` |
-| Approach contact 유지 | 최초 접촉을 Rotation·Push까지 유지하는 것이 효율적이라는 직관 | 필요한 release/re-contact를 막을 수 있음 | Aggregate contact-loss와 contact-switch/recovery를 분리 측정 | Soft preference `[Baseline]`, 강도 `[Open]` |
-| 실행 중 contact-configuration update | Approach에서 좋은 configuration을 만들면 이후 갱신이 적어야 한다는 서술 | Configuration 고정이 조작 범위와 robustness를 제한할 가능성 | H4 `Constant / Pre-contact / Online`과 mild-cost ablation | Minimum-necessary update `[Hypothesis]` |
-| Tactile과 F/T 역할 | 두 센서가 geometry error를 함께 보완한다고 포괄적으로 서술 | 제공 정보와 중복·상보성이 분리되지 않음 | Tactile은 spatial contact identity, F/T는 net wrench라는 가설을 E3 factorial ablation으로 검증 | 역할 구분 `[Hypothesis]` |
-| 6-DoF wrist와 finger control | 둘을 모두 action에 포함하는 12D interface | 모든 자유도가 실제로 필요하다는 근거가 아직 없음 | 동일 wrist control 아래 `Pre-contact` finger 유지와 `Online` joint adaptation 비교 및 controllability/failure analysis | 12D `[Baseline]`, 필요성 H4 |
-| Reward term과 evaluation metric | Alignment, contact와 success가 reward와 metric 양쪽에 등장 | Reward 최적화가 곧 가설 입증이라는 순환 논증 위험 | 독립 metric 계산, held-out perturbation과 continuation rollout 사용 | 분리 원칙 `[Fixed]` |
-| Contribution/novelty | 후속 단계 고려, multimodal adaptation과 unified policy를 가능한 contribution으로 서술 | 평가 방법, method 범위와 contribution 후보가 혼재 | C1·C2의 비교 실험과 선행연구 비교를 완료하고 Rotation-to-Push는 평가 지표로 분리 | C1·C2 `[Candidate]`; Rotation-to-Push 평가 `[Baseline]`; unified policy `[Baseline]` |
+| Shared policy 사용 이유 | 세 phase를 하나의 shared policy로 학습하는 것이 자연스러운 선택처럼 서술 | Phase-specific policy 대비 장점과 실패 조건이 미검증 | Policy organization 후보와 비교 필요성을 이후 협의 | `[Open]` |
+| Phase ID 제거 이유 | 이전 연구 경험상 gate만으로 가능하므로 phase ID를 제거 | Markov state sufficiency와 성능상 이점이 본 task에서 미검증 | Phase ID와 gate 방식을 이후 협의 | `[Open]` |
+| Hand configuration 평가 시점 | Approach 종료 state가 후속 Rotation·Push에 유효한지 평가 | Rotation·Push 중 계속 변하는 configuration을 설명하지 못함 | 무엇을 어느 시점에 측정할지 이후 협의 | `[Open]` |
+| Approach contact 유지 | 최초 접촉을 Rotation·Push까지 유지하는 것이 효율적이라는 직관 | 필요한 release/re-contact를 막을 수 있음 | Contact 유지·전환 규칙과 평가 방식을 이후 협의 | `[Open]` |
+| 실행 중 contact-configuration update | Approach에서 좋은 configuration을 만들면 이후 갱신이 적어야 한다는 서술 | Configuration 고정이 조작 범위와 robustness를 제한할 가능성 | Action authority와 contact 변경 규칙을 이후 협의 | `[Open]` |
+| Tactile과 F/T 역할 | 두 센서가 geometry error를 함께 보완한다고 포괄적으로 서술 | 제공 정보와 중복·상보성이 분리되지 않음 | Tactile은 spatial contact identity, F/T는 net wrench라는 해석과 검증 방식을 이후 협의 | 역할 구분 `[Hypothesis]` |
+| 6-DoF wrist와 finger control | 둘을 모두 action에 포함하는 12D interface | 모든 자유도가 실제로 필요하다는 근거가 아직 없음 | Action authority와 검토 방법을 이후 협의 | `[Open]` |
+| Reward term과 evaluation metric | Alignment, contact와 success가 reward와 metric 양쪽에 등장 | Reward 최적화가 곧 가설 입증이라는 순환 논증 위험 | Reward와 evaluation을 구분하되 각각의 구체 정의는 이후 협의 | 구분 원칙 `[Fixed]`; 내용 `[Open]` |
+| Contribution/novelty | 후속 단계 고려, multimodal adaptation과 unified policy를 가능한 contribution으로 서술 | 평가 방법, method 범위와 contribution 후보가 혼재 | C1·C2의 검증 조건과 평가 방식을 이후 협의 | C1·C2 `[Candidate]`; 구체 method·evaluation `[Open]` |
 
 ---
 
@@ -408,74 +415,42 @@ Coarse geometry와 tactile/F/T의 보완 관계를 주장하려면 최소한 G0�
 
 현재 활성 contribution 후보는 C1과 C2뿐이다.
 
-| Candidate Contribution | 필요한 Method 요소 | 필요한 비교 실험 | 현재 근거 수준 | 확정 조건 |
-| --- | --- | --- | --- | --- |
-| **C1. Contact feedback을 통한 approximate-geometry error 보완** | Approximate OBB, deployable tactile/F/T feedback과 closed-loop correction | G0/G1/G2 geometry ladder, tactile × F/T factorial ablation, geometry-error sweep | 센서별 선행 근거와 H3 설계만 존재; 본 task의 보완 효과는 미검증 | Geometry error가 증가할 때 contact feedback이 vision/proprioception-only 대비 Rotation-to-Push와 final success의 저하를 유의하게 줄임 |
-| **C2. 이후 Rotation·Push에 적합한 contact-state formation과 online wrist–finger adaptation** | Goal-conditioned Approach/Rotation, continuation evaluation, wrist+finger action | Contact-only/phase-local objective와 `Constant / Pre-contact / Online` 비교; tool과 wrist control은 고정 | H2/H4와 관련 문헌만 존재; sequential 이점과 adaptation 효과 모두 미검증 | Contact/Rotation 성공을 통제한 뒤에도 downstream success가 높고, held-out uncertainty에서 online adaptation의 추가 이점이 확인됨 |
+| Candidate Contribution | 현재 아이디어 | 아직 필요한 근거 | 상태 |
+| --- | --- | --- | --- |
+| **C1. Contact feedback을 통한 approximate-geometry error 보완** | Approximate OBB와 tactile/F/T를 함께 사용해 실행 중 geometry·physics mismatch에 대응 | Contact feedback이 실제로 approximate-geometry error에 따른 성능 저하를 줄인다는 근거와 선행연구 대비 차이 | `[Candidate]` |
+| **C2. 이후 Rotation·Push에 적합한 contact-state formation과 online wrist–finger adaptation** | Task goal을 고려한 contact formation과 실행 중 wrist–finger adjustment | 초기 configuration 형성과 online adaptation이 이후 Rotation·Push에 주는 추가 효과 및 선행연구 대비 차이 | `[Candidate]` |
 
-C2의 **결합 효과**를 주장하려면 `contact-formation objective × online action authority`의 모든 조건을 교차한 matched factorial comparison이 필요하다. Full crossing이 현실적으로 불가능하면 H2의 contact-objective 효과와 H4의 action-authority 효과를 별도로 보고하고 두 요인의 interaction이나 결합 contribution은 주장하지 않는다.
+C2의 **결합 효과**를 주장하려면 contact formation과 online adaptation 각각의 역할을 구분할 근거가 필요하다. 구체적인 evaluation과 experiment 설계는 아직 합의하지 않았다.
 
-Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는 contact feedback이 **approximate geometry의 오차를 보완하고**, 이후 Rotation과 Push에 적합한 접촉 상태의 형성 및 online adaptation에 기여한다는 결과가 matched baseline과 ablation에서 확인될 때만 확정한다. 후속 단계를 고려한 contact formation도 같은 이유로 H2가 지지되기 전에는 `[Candidate]`를 유지한다.
+Tactile 또는 wrist F/T의 사용 자체는 contribution이 아니다. C1/C2는 contact feedback이 **approximate geometry의 오차를 보완하고**, 이후 Rotation과 Push에 적합한 접촉 상태의 형성 및 online adaptation에 기여한다는 근거가 마련될 때만 확정한다. 그 근거를 만드는 구체 방법은 `[Open]`이다.
 
-- `[Baseline / Evaluation]` Rotation success와 Rotation-to-Push success를 나누어 측정하는 것은 C1·C2의 효과가 후속 Push까지 이어지는지 확인하기 위한 평가이며 contribution이 아니다.
-- `[Superseded]` 이전 C4인 `Approach–Rotation–Push goal-conditioned low-level policy`는 현재 method scope와 baseline이다. 별도의 explicit mechanism과 matched advantage가 확인되기 전에는 contribution 후보로 세지 않는다.
+- `[Open]` Rotation success와 Rotation-to-Push success를 구분하는 관점은 contribution이 아니라 향후 평가 방식의 후보다.
+- `[Superseded]` 이전 C4인 `Approach–Rotation–Push goal-conditioned low-level policy`는 현재 연구 범위의 설명이며 그 자체를 contribution 후보로 세지 않는다.
 
 다음은 contribution으로 단독 주장하지 않는다.
 
 - `[Rejected]` Tactile 사용 자체, F/T 사용 자체, RL 사용 자체.
 - `[Rejected]` Rotate-then-push라는 순서 자체.
-- `[Rejected]` Task-conditioned contact formation, wrist–finger control 또는 `Contact Configuration=Online`이라는 구성 자체를 novelty로 주장하는 방식. C2는 approximate geometry 아래에서 downstream goal conditioning과 실행 중 online adaptation이 주는 **추가 효과**만 검증한다.
+- `[Rejected]` Task-conditioned contact formation, wrist–finger control 또는 `Contact Configuration=Online`이라는 구성 자체를 novelty로 주장하는 방식. C2의 구체 범위와 입증 조건은 협의 중이다.
 - `[Rejected]` MLP, 66D observation 또는 12D action이라는 구현 수치.
 - `[Rejected]` 기존 IL/VLA가 contact feedback을 사용하지 못한다는 일반화.
 - `[Rejected]` OBB가 point cloud/mesh보다 일반적으로 우월하다는 주장.
 
 ---
 
-## 9. Evaluation and Ablation Plan
+## 9. Evaluation and Experiment — `[Open]`
 
-### 9.1 평가 항목
+현재 evaluation metric·success criterion·protocol, baseline 비교, ablation과 experiment 구성은 **합의된 적이 없다**. 앞선 정리 과정에서 부여했던 E1–E9 번호와 세부 표는 현재 계획에서 철회한다. 이력은 Section 14에만 보존한다.
 
-| 항목 | 질문 | 주요 지표 | 상태 |
-| --- | --- | --- | --- |
-| Task execution | Goal을 정확하고 안전하게 실행하는가? | Final success, axial/lateral error, alignment error, completion time | `[Baseline]` |
-| Phase outcome | 각 sub-objective는 달성되는가? | Contact formation, Rotation success, Push success | `[Baseline]` |
-| Transition quality | 앞 단계 종료 상태가 다음 단계에 유효한가? | Approach→Rotation success, Rotation→Push success, continuation probability | `[Baseline]` |
-| Robustness | Geometry·pose·friction·mass perturbation에서 유지되는가? | Success degradation curve, recovery rate, seen–held-out gap | `[Baseline]` |
-| Safety | 환경·물체·robot에 위험을 만들지 않는가? | Forbidden collision, boundary exit, topple, peak force/impulse, joint-limit violation | `[Baseline]` |
-| Contact/control efficiency | 필요 이상으로 접촉과 hand motion을 바꾸지 않는가? | Contact loss/switch, hand joint travel, action variation, energy proxy | `[Candidate]` |
-| Target 접근 효과 | Blocker 조작이 target access를 실제로 개선하는가? | Visibility, reachability, clearance, retrieval success | `[Open]` |
+향후 협의가 필요한 질문은 다음 수준에 머문다.
 
-### 9.2 Rotation과 Rotation-to-Push 성공 정의
+- Task 성공과 각 조작 단계의 결과를 무엇으로 정의할 것인가?
+- 앞 단계의 상태가 다음 Rotation 또는 Push에 유효한지를 별도로 볼 것인가?
+- Geometry·pose·물성 변화, 안전과 contact behavior를 어떤 지표로 다룰 것인가?
+- 어떤 method 또는 component를 실제 비교 대상으로 삼을 것인가?
+- Simulation과 hardware 결과를 어떤 범위에서 연결할 것인가?
 
-- **Rotation success:** Selected face와 desired push direction이 tolerance 안에서 정렬되고 object가 안정적이다.
-- **Rotation-to-Push success:** Rotation-success state에서 정해진 continuation controller/policy가 Push goal을 안전하게 달성한다.
-- **Final task success:** 지정된 translation goal과 alignment/stability tolerance를 만족하고 hard safety failure가 없다.
-- **Contact maintenance:** 학습상 선호되는 soft behavior이며 final success의 필요조건으로 자동 고정하지 않는다.
-- `[Open]` 모든 tolerance, dwell time과 continuation horizon은 task scale과 rollout 분포를 보고 정한다.
-
-### 9.3 주요 실험
-
-| Experiment | Main variable | Controlled factors | Answers |
-| --- | --- | --- | --- |
-| E1 | Direct push vs. rotate-then-push | Goal, object, sensing, controller, trial budget | H1 |
-| E2 | Contact-only/phase-local vs. full-episode goal-conditioned objective | Observation, action, policy capacity | H2 |
-| E3 | Tactile × F/T factorial ablation | Approximate OBB error, network, training budget | H3 |
-| E4 | `Constant` vs. `Pre-contact` vs. `Online` contact configuration | Tool, wrist control, sensor inputs, object split, controller rate | H4 |
-| E5 | G0/G1/G2 geometry ladder | Sensors and policy capacity | Geometry–sensing interaction |
-| E6 | Shared phase-free vs. phase-ID vs. phase-specific | Reward and total capacity as closely as possible | Baseline architecture decision |
-| E7 | S0 vs. S1, 필요 시 S2 | Object/goal split and sensor setup | Surrounding-object 영향과 contact rule |
-
-C2의 결합 효과를 최종 판정하려면 E2와 E4를 `contact-formation objective × Contact Configuration`의 full matched factorial design으로 교차한다. Initial state, task goal, tool, geometry·sensor input, wrist controller·training budget과 safety rule을 동일하게 유지하고 두 요인의 main effect와 interaction을 함께 보고한다. Full crossing을 수행하지 못하면 E2와 E4를 각각 H2와 H4의 검증으로만 해석한다.
-
-### 9.4 Fair comparison rules
-
-1. 같은 initial-state distribution, object split, goal, observation availability, action/controller limit와 safety rule을 사용한다.
-2. Network parameter count, training interaction, demonstration amount, pretraining과 real trial budget을 보고한다.
-3. 기존 method를 확장한 baseline은 원 논문의 기능과 추가한 component를 분리해 기록한다.
-4. Literature-only reference와 실제 재현·재학습한 experimental baseline을 구분한다.
-5. Success rate만이 아니라 transition, safety, contact와 efficiency metric을 함께 보고한다.
-6. 여러 seed와 confidence interval을 사용하고, 유의성뿐 아니라 practical effect size를 정한다.
-7. Reward에 사용한 신호로만 성공을 평가하지 않고 독립 evaluation 계산을 유지한다.
+구체 metric, tolerance, split, controlled factor, seed·trial budget과 통계 방법은 모두 `[Open]`이다. 합의 전에는 위 질문을 `평가 계획`, `실험 계획`, `primary metric` 또는 `baseline experiment`라고 부르지 않는다.
 
 ---
 
@@ -490,7 +465,7 @@ C2의 결합 효과를 최종 판정하려면 E2와 E4를 `contact-formation obj
 | **Research Trend** | Designed model·rule, demonstration·action prior와 interaction return은 nonprehensile manipulation의 decision knowledge를 어떻게 제공하며, 어떤 조건에서 RL이 더 합리적인가? | Direct nonprehensile work와 method 선택의 반례가 되는 adjacent contact-rich IL/VLA | 공통 decision burden, 각 supervision source의 해결 범위·resource burden, 조건부 RL 선택과 기각 근거 |
 | **Closest Previous Works** | 우리와 유사한 연구는 시간적으로 어떤 method concept을 발전시켰으며, Environment, Robot Agent와 System의 공통 기준에서 Ours와 어떻게 다른가? | B85를 포함해 nonprehensile execution, tactile/F/T, geometry uncertainty 또는 wrist–finger control과 직접 관련된 11편 | 비교 집합만의 2022–2026 timeline, `Object Configuration·Surrounding Objects / Sensory Input·Tool·Contact Configuration·Object Manipulation / Object Geometry·Method` 비교와 남은 검증 질문 |
 
-`Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. 어떤 uncertainty와 downstream outcome을 개선하는지 matched experiment가 필요하다.
+`Research Trend`는 method 선택을 정당화하지만 novelty를 만들지 않는다. `Previous Works` 표에서 관찰한 feature 조합도 그 자체로 contribution이 아니다. Contribution으로 주장하려면 어떤 uncertainty와 downstream outcome을 개선하는지에 대한 근거가 필요하며, 구체적인 evaluation과 experiment는 협의 중이다.
 
 Research Trend에는 연도별 timeline을 두지 않는다. Planning과 control은 모든 family에 필요한 기능으로 보고, method는 task-level decision knowledge의 source에 따라 `Conventional methods`, `IL/VLA`, `RL`로 묶는다. Composition은 별도 family가 아니라 model·demonstration·interaction return이 맡는 역할을 표시한다. 설명 순서는 `nonprehensile manipulation의 공통 decision burden → 기존 연구가 해결한 범위와 남긴 resource burden → RL 전환이 성립하는 추가 전제 → 현재 조건에 적용 → 반증 조건`으로 고정한다. 연도별 변화는 Previous Works 비교표의 11편만 사용한 timeline에서 다루며, 각 논문은 동일한 `B-ID`로 비교표와 연결한다.
 
@@ -501,11 +476,11 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 1. Planning/control을 공통 기능으로 두고, task-level decision rule의 source를 designed specification, demonstration/action prior와 interaction return으로 구분한다.
 2. Conventional methods와 IL/VLA가 이미 contact feedback·reactive correction·multimodal action을 다룰 수 있음을 먼저 제시한다.
 3. 각 group의 상대적 부담을 model·mode·rule의 specification coverage, off-nominal·recovery data coverage와 interaction-return learning cost로 비교한다.
-4. `Specification 부담`이나 `demonstration 부족`만으로 RL을 결론 내리지 않고, measurable outcome, safe·affordable interaction/reset과 representative simulation을 구성할 수 있을 때에만 RL을 먼저 구현한다.
+4. `Specification 부담`이나 `demonstration 부족`만으로 RL을 결론 내리지 않고, measurable outcome, safe·affordable interaction/reset과 representative simulation을 구성할 수 있을 때에만 RL을 primary method family로 둔다.
 5. Interaction volume, reward·credit assignment, unsafe exploration, simulator fidelity와 Sim-to-Real gap은 RL이 부담하는 비용으로 함께 제시한다.
 6. Reliable model·small mode set, sufficient recovery data·teacher 또는 one-off·OOD task 조건에서는 conventional method나 IL/VLA가 더 적합할 수 있음을 기각 경계로 둔다.
 
-따라서 `왜 RL인가`는 `[Baseline]` 방법 선택의 근거이며 contribution이 아니다. RL이 matched baseline보다 robustness 또는 Rotation-to-Push 성능을 개선하지 못하면 이 선택의 실험적 근거도 약해진다.
+따라서 `왜 RL인가`는 Intro의 조건부 method 선택 근거이며 contribution이 아니다. RL의 세부 algorithm과 비교 방법은 아직 정하지 않았다.
 
 ### 10.2 두 문헌 흐름과 연구의 교차점
 
@@ -513,15 +488,15 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 
 | Literature stream | 포함할 세부 주제 | 각 흐름에서 확인할 질문 | 현재 연구와의 관계 |
 | --- | --- | --- | --- |
-| **Nonprehensile manipulation** | Pushing, pulling, pivoting, dexterous-hand contact/pose planning | 목표 물체 운동을 위해 contact pose, hand configuration과 contact-mode transition을 어떻게 정하고 실행하는가? | Task category와 Approach–Rotation–Push 구조의 직접 근거·baseline을 제공 |
-| **Contact-feedback-based manipulation** | Tactile feedback, wrist F/T feedback, contact-state estimation, online adaptation | 실행 중 실제 접촉·힘·동역학 오차를 어떤 sensing과 feedback mechanism으로 추정·보정하는가? | Approximate geometry 아래의 closed-loop correction과 wrist–finger adaptation 근거·baseline을 제공 |
-| **두 흐름의 교차점** | Approximate geometry를 이용한 전역 접근/goal 설정 + deployable contact feedback을 이용한 접촉 상태 조정 | Contact feedback이 geometry approximation error를 보완하고 이후 Rotation·Push에 적합한 상태와 robust execution을 만드는가? | H2–H4와 E2–E5로 검증하며, 결과 전에는 gap·contribution을 `[Candidate]`로 유지 |
+| **Nonprehensile manipulation** | Pushing, pulling, pivoting, dexterous-hand contact/pose planning | 목표 물체 운동을 위해 contact pose, hand configuration과 contact-mode transition을 어떻게 정하고 실행하는가? | Task category와 Approach–Rotation–Push 구조의 직접 근거와 비교 관점을 제공 |
+| **Contact-feedback-based manipulation** | Tactile feedback, wrist F/T feedback, contact-state estimation, online adaptation | 실행 중 실제 접촉·힘·동역학 오차를 어떤 sensing과 feedback mechanism으로 추정·보정하는가? | Approximate geometry 아래의 closed-loop correction과 wrist–finger adaptation 근거와 비교 관점을 제공 |
+| **두 흐름의 교차점** | Approximate geometry를 이용한 전역 접근/goal 설정 + deployable contact feedback을 이용한 접촉 상태 조정 | Contact feedback이 geometry approximation error를 보완하고 이후 Rotation·Push에 적합한 상태와 robust execution을 만드는가? | H2–H4의 연구 질문과 연결하며, 결과 전에는 gap·contribution을 `[Candidate]`로 유지 |
 
 초기 literature map은 다음과 같다. 한 논문이 두 흐름에 걸칠 수 있으며, 최종 분류는 full text에서 실제 observation, feedback loop와 action을 확인한 뒤 확정한다.
 
 | Stream | Subtopic | Representative starting points | Reading purpose |
 | --- | --- | --- | --- |
-| Nonprehensile manipulation | Pushing / cluttered pushing | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166), [Goal-Oriented Non-Prehensile Pushing](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal·collision·toppling 조건과 unknown-object pushing baseline 확인 |
+| Nonprehensile manipulation | Pushing / cluttered pushing | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166), [Goal-Oriented Non-Prehensile Pushing](https://doi.org/10.1109/IROS47612.2022.9981873) | Goal·collision·toppling 조건과 unknown-object pushing의 비교 관점 확인 |
 | Nonprehensile manipulation | Pulling and direction-conditioned hand pose | [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Pushing/pulling direction에 맞춘 dexterous pre-contact pose의 범위 확인 |
 | Nonprehensile manipulation | Rotation / pivoting | [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262), [Learning Generalizable Pivoting Skills](https://doi.org/10.1109/ICRA48891.2023.10161271) | Target orientation, contact/force guidance와 object generalization 비교 |
 | Nonprehensile manipulation | Dexterous contact/pose planning | [Learning Contact Locations](https://doi.org/10.1109/HUMANOIDS.2013.7030011), [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652), [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Contact location·hand pose가 manipulation goal에 조건화되는 방식 확인 |
@@ -569,11 +544,11 @@ RL 선택 논리는 `RL의 장점 나열`이 아니라 다음 순서를 따른�
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Ours** | **Unstructured** | **Present** | **Vision+Contact** | **Dexterous Hand** | **Online** | **Combined** | **Estimated** | **RL** |
 
-`Unstructured`와 `Present`는 intended shelf method scope를 나타낸다. 정확한 held-out object 범위와 non-box-like generalization은 OD-10에서 확정하고, 주변 물체를 제거한 S0는 `Absent` ablation으로 유지한다. Continuous vision-derived pose·OBB와 tactile·wrist F/T를 사용하고, RH56E2 finger joints를 실행 중 갱신하며, reorientation 뒤 translation을 수행하고, perception-derived OBB를 이용하는 RL policy이므로 나머지 값을 위와 같이 분류한다. 이 행은 capability definition이지 C1·C2의 효과가 검증됐다는 뜻이 아니다.
+`Unstructured`와 `Present`는 intended shelf research scope를 나타낸다. Ours 행은 Intro에서 논의하는 목표 system의 방향을 분류한 것이며, policy architecture·action/controller·reward·evaluation·experiment가 확정됐다는 뜻은 아니다. 주변 물체를 제거한 단순 조건의 사용 방식과 held-out object 범위도 `[Open]`이다.
 
 Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제외한다. Human demonstration은 training source이지 manual execution이 아니다. Task와 Evaluation은 Sections 2–3과 9에서 관리하며 이 표에는 넣지 않는다.
 
-세부 observation·action, training source, controller와 결과는 근거 문서에 보존하고 비교표는 위 여덟 column으로 유지한다. 직접 비교에서는 여덟 조건을 먼저 확인하며, `Contact Configuration`을 비교할 때는 특히 `Tool`과 나머지 조건을 고정한다.
+세부 observation·action, training source, controller와 결과는 근거 문서에 보존하고 비교표는 위 여덟 column으로 유지한다. 향후 직접 비교를 논의한다면 여덟 조건의 차이를 먼저 확인해야 하며, 실제 비교군과 통제 방식은 아직 정하지 않았다.
 
 ### 10.4 문헌 확인과 포함 기준
 
@@ -591,47 +566,47 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 
 ### 10.5 균형 잡힌 초기 후보군
 
-이 표는 최종 baseline 선정이 아니라 비교표를 채울 출발점이다.
+이 표는 문헌 비교표를 채울 출발점일 뿐, 실제 baseline이나 비교군을 선정한 표가 아니다.
 
 | 비교 역할 | 세부 접근 | 대표 연구 | 포함 이유 | 상태 |
 | --- | --- | --- | --- | --- |
-| Implementation baseline | Heuristic | Nearest feasible OBB face 선택 + scripted normal alignment + straight push | Learned contact formation과 Rotation sequence의 이득을 분리하는 최소 비교군; 특정 논문의 방법으로 잘못 귀속하지 않음 | `[Candidate]` |
-| Geometry/contact selection | Learning-based contact selection | [Learning Contact Locations for Pushing and Orienting Unknown Objects](https://doi.org/10.1109/HUMANOIDS.2013.7030011) | Straight push와 orienting contact의 관계를 다룬 기초 비교 연구 | `[Candidate]` |
-| Dexterous pose planning | Optimization | [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) | Task wrench에 조건화된 hand pose 평가 | `[Candidate]` |
-| Dexterous pose planning | Generative geometry-conditioned | [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | ICRA 2026; direction-conditioned dexterous pre-contact pose | `[Candidate]` |
-| Tactile pushing | Goal-conditioned RL | [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236) | Vision 없이 tactile feedback으로 pushing을 제어한 직접 사례 | `[Candidate]` |
-| Object pushing | Constrained RL | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166) | Unknown-object pushing과 task/safety 분리 | `[Candidate]` |
-| Cluttered pushing | RL | [Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) | Surrounding-object collision을 포함한 pushing | `[Candidate]` |
-| Reactive feedback | IL | [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052) | IL도 high-frequency tactile/force feedback에 반응할 수 있다는 강한 반례 | `[Candidate]` |
-| Force feedback and runtime re-grasp | VLA + hybrid control | [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) | Force target·control mode를 생성해 active force regulation에 연결하고 Retrieve Plate에서 autonomous retry/re-grasp를 수행한다는 반례. Formal action에는 gripper aperture가 없어 learned policy·subtask script·별도 controller 중 command source는 미보고 | `[Candidate]` |
-| Tactile grounding and adaptation | VLA + control | [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Tactile history를 target-force action, hybrid position–force control과 failure reasoning에 연결할 수 있다는 반례; preprint 상태를 명시 | `[Candidate]` |
-| 관련 VLA 연구 | VLA | [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017) | VLA latency와 adaptation 개선을 확인하기 위한 참고 논문 | `[Candidate]` |
-| Online configuration adaptation | Residual policy | [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) | Task-informed initial grasp와 residual joint adaptation의 결합 | `[Candidate]` |
+| Simple heuristic reference | Heuristic | Nearest feasible OBB face 선택 + scripted normal alignment + straight push | 학습 방식과 구분되는 단순 접근의 참고 후보; 실제 비교군 채택 여부는 미정 | `[Open]` |
+| Geometry/contact selection | Learning-based contact selection | [Learning Contact Locations for Pushing and Orienting Unknown Objects](https://doi.org/10.1109/HUMANOIDS.2013.7030011) | Straight push와 orienting contact의 관계를 다룬 기초 비교 연구 | `[Open]` |
+| Dexterous pose planning | Optimization | [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652) | Task wrench에 조건화된 hand pose 평가 | `[Open]` |
+| Dexterous pose planning | Generative geometry-conditioned | [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | ICRA 2026; direction-conditioned dexterous pre-contact pose | `[Open]` |
+| Tactile pushing | Goal-conditioned RL | [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236) | Vision 없이 tactile feedback으로 pushing을 제어한 직접 사례 | `[Open]` |
+| Object pushing | Constrained RL | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166) | Unknown-object pushing과 task/safety 분리 | `[Open]` |
+| Cluttered pushing | RL | [Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873) | Surrounding-object collision을 포함한 pushing | `[Open]` |
+| Reactive feedback | IL | [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052) | IL도 high-frequency tactile/force feedback에 반응할 수 있다는 강한 반례 | `[Open]` |
+| Force feedback and runtime re-grasp | VLA + hybrid control | [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169) | Force target·control mode를 생성해 active force regulation에 연결하고 Retrieve Plate에서 autonomous retry/re-grasp를 수행한다는 반례. Formal action에는 gripper aperture가 없어 learned policy·subtask script·별도 controller 중 command source는 미보고 | `[Open]` |
+| Tactile grounding and adaptation | VLA + control | [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Tactile history를 target-force action, hybrid position–force control과 failure reasoning에 연결할 수 있다는 반례; preprint 상태를 명시 | `[Open]` |
+| 관련 VLA 연구 | VLA | [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017) | VLA latency와 adaptation 개선을 확인하기 위한 참고 논문 | `[Open]` |
+| Online configuration adaptation | Residual policy | [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) | Task-informed initial grasp와 residual joint adaptation의 결합 | `[Open]` |
 
-최종 previous-works table은 논문별 full-text 검증 후 작성한다. 이 후보군만으로 novelty를 결론내리지 않는다.
+[`Intro/previous_works.md`](./Intro/previous_works.md)의 현재 비교표는 확인한 full text를 바탕으로 계속 갱신한다. 위 문헌 후보나 비교표만으로 실제 비교군 또는 novelty를 확정하지 않는다.
 
 ---
 
-## 11. 연구 주장과 검증 방법
+## 11. 연구 주장과 남은 질문
 
-선행연구의 결과와 그 결과를 바탕으로 현재 연구에서 남은 질문을 구분한다.
+선행연구의 결과와 그 결과를 바탕으로 Intro에서 남은 질문을 구분한다. 이 표는 method·evaluation·experiment 계획을 정하지 않는다.
 
-| 검증할 내용 | 선행연구에서 확인한 내용 | 남은 질문 | 필요한 방법 | 필요한 실험 | 상태 |
-| --- | --- | --- | --- | --- | --- |
-| Direct push만으로 처리하기 어려운 상태에는 preparatory orientation/contact change가 필요할 수 있다. | [Learning Contact Locations](https://doi.org/10.1109/HUMANOIDS.2013.7030011)은 pushing과 orienting을 위한 contact location을 구분하고, [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271)은 target-orientation pivoting을 학습한다. | Shelf blocker에서 rotation이 실제 final Push 성공 영역을 넓히는 조건은 아직 본 task에서 검증되지 않음 | Rotation을 포함한 goal-conditioned execution | E1 initial-state-stratified comparison | `[Hypothesis]` |
-| 좋은 contact formation은 접촉 여부가 아니라 task goal에 대한 실행 가능성으로 평가해야 한다. | [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652)은 task wrench에 맞는 hand pose를, [RL-Critic Grasp Selection](https://doi.org/10.1109/ICRA55743.2025.11127792)은 downstream manipulation critic으로 grasp를 평가한다. | Static/task-local score가 Approach→Rotation→Push continuation을 예측하는지 불명확 | Goal-conditioned Approach와 saved-state continuation evaluation | E2와 transition calibration | `[Hypothesis]` |
-| Vision/coarse geometry는 전역 task·접근 정보를, contact sensing은 실행 중 실제 접촉과 geometry mismatch에 대한 feedback을 제공한다. | [Coarse-to-Fine Pushing](https://doi.org/10.1109/LRA.2024.3511378)은 vision과 touch/proprioception의 역할을 나누고, [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)은 tactile feedback의 sim-to-real utility를 보였다. | Coarse OBB와 binary tactile+wrist F/T 조합이 selected-face rotation-to-push에서 실제 geometry error를 얼마나 보완하는지 불명확 | Approximate OBB + tactile + wrist F/T observation and closed-loop wrist–finger correction | E3 sensor ablation과 E5 geometry-error interaction | `[Hypothesis]` |
-| Tactile와 F/T의 추가가 자동으로 상보성을 의미하지는 않는다. | [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052)와 [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160)는 IL/VLA도 tactile/force feedback을 action generation과 active force control에 사용할 수 있음을 보이며, [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169)는 active force regulation과 runtime re-grasp를 보고한다. 단, ForceVLA2의 gripper command pathway는 미보고다. | 저차원 binary tactile와 wrist wrench의 독립·결합 효과가 분리되지 않음 | Factorial sensor ablation | E3 | `[Hypothesis]` |
-| Task-conditioned initial configuration과 online adaptation은 구분해서 평가해야 한다. | [GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 direction-conditioned pre-contact pose를, [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744)는 initial grasp와 residual adaptation을 결합한다. | Nonprehensile Rotation→Push에서 wrist–finger adaptation의 추가 가치가 불명확 | Joint wrist–finger action and adaptation | E4 | `[Hypothesis]` |
-| Rotation success는 subsequent Push feasibility와 동일하지 않을 수 있다. | [Value-Informed Skill Chaining](https://doi.org/10.1109/IROS55552.2023.10342180)과 [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)는 skill transition/feasibility의 중요성을 보여준다. | C1·C2의 효과가 alignment에만 머무는지 downstream Push까지 이어지는지 별도 판정이 필요 | Rotation success와 Rotation-to-Push success를 나누어 측정 | Saved-state continuation and E2 | `[Baseline]` evaluation requirement |
-| Safety는 task reward와 분리해 해석해야 한다. | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)은 task reward와 collision·toppling constraint를 분리한다. | Shelf structure, multi-finger force와 boundary condition에 맞는 constraint 정의가 필요 | Privileged safety cost/termination and hardware supervisor | Safety ablation은 simulation에 한정; threshold validation | `[Baseline]` |
-| Intended shelf setting에는 주변 물체가 존재하며, 그 접촉 역할은 collision constraint와 contact-interaction variable 사이에서 정의되어야 한다. | [Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873)은 clutter collision을 포함한 goal pushing을 다룬다. | 존재 여부는 고정됐지만 수·배치와 접촉을 금지·허용·이용할지는 미정 | Full S1과 S0 removal ablation, 필요 시 S2 | E7 after OD-1 contact-rule decision | `[Open]` |
-| Explicit downstream learning이 필요한지는 아직 확인되지 않았다. | 기존 skill-chaining·critic 연구는 explicit transition/value modeling의 가능성을 제공한다. | Shared full-episode return만으로 H2가 학습되는지 미확인 | Shared episodic return과 transition evaluation을 먼저 사용하고 필요할 때만 별도 objective 추가 | E2, credit/failure diagnostics | `[Open]` |
+| Intro의 주장 또는 질문 | 선행연구에서 확인한 내용 | 아직 남은 질문 | 상태 |
+| --- | --- | --- | --- |
+| Direct push만으로 처리하기 어려운 상태에는 preparatory orientation/contact change가 필요할 수 있다. | [Learning Contact Locations](https://doi.org/10.1109/HUMANOIDS.2013.7030011)은 pushing과 orienting을 위한 contact location을 구분하고, [Learning Generalizable Pivoting](https://doi.org/10.1109/ICRA48891.2023.10161271)은 target-orientation pivoting을 학습한다. | Shelf blocker에서 rotation이 실제 final Push 가능 영역을 넓히는 조건은 무엇인가? | `[Hypothesis]` |
+| 좋은 contact formation은 접촉 여부보다 task goal에 대한 실행 가능성과 연결되어야 한다. | [TaskDexGrasp](https://doi.org/10.1109/IROS58592.2024.10802652)은 task wrench에 맞는 hand pose를, [RL-Critic Grasp Selection](https://doi.org/10.1109/ICRA55743.2025.11127792)은 downstream manipulation critic으로 grasp를 평가한다. | Static/task-local score와 Approach→Rotation→Push의 관계를 어떻게 정의할 것인가? | `[Hypothesis]` |
+| Vision/coarse geometry와 contact sensing은 서로 다른 정보를 제공한다. | [Coarse-to-Fine Pushing](https://doi.org/10.1109/LRA.2024.3511378)은 vision과 touch/proprioception의 역할을 나누고, [DexTouch](https://doi.org/10.1109/LRA.2024.3478571)은 tactile feedback의 sim-to-real utility를 보였다. | Coarse OBB와 binary tactile+wrist F/T가 geometry error 아래에서 어떤 역할을 하는가? | `[Hypothesis]` |
+| Tactile와 F/T의 추가가 자동으로 상보성을 뜻하지는 않는다. | [Reactive Diffusion Policy](https://doi.org/10.15607/RSS.2025.XXI.052), [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160)와 [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169)는 IL/VLA도 tactile/force feedback과 runtime correction을 사용할 수 있음을 보인다. | 저차원 binary tactile와 wrist wrench의 독립·결합 효과를 어떤 방식으로 판단할 것인가? | `[Hypothesis]` |
+| Task-conditioned initial configuration과 online adaptation은 구분할 필요가 있다. | [GD2P](https://doi.org/10.48550/arXiv.2509.18455)는 direction-conditioned pre-contact pose를, [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744)는 initial grasp와 residual adaptation을 결합한다. | Nonprehensile Rotation→Push에서 online wrist–finger adaptation의 추가 가치는 무엇인가? | `[Hypothesis]` |
+| Rotation success와 subsequent Push feasibility는 동일하지 않을 수 있다. | [Value-Informed Skill Chaining](https://doi.org/10.1109/IROS55552.2023.10342180)과 [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)는 transition feasibility의 중요성을 보여준다. | 두 결과를 구분할지, 구분한다면 어떤 정의와 방법을 사용할 것인가? | `[Open]` |
+| Safety와 task objective의 관계를 정해야 한다. | [Dynamic Object Goal Pushing](https://doi.org/10.1109/ICRA55743.2025.11128166)은 task reward와 collision·toppling constraint를 분리한다. | Shelf structure, multi-finger force와 boundary condition을 어떤 규칙으로 다룰 것인가? | `[Open]` |
+| Intended shelf setting에는 주변 물체가 존재한다. | [Goal-Oriented Pushing in Clutter](https://doi.org/10.1109/IROS47612.2022.9981873)은 clutter collision을 포함한 goal pushing을 다룬다. | 주변 물체의 수·배치·관측 범위와 접촉 역할을 어떻게 정할 것인가? | `[Open]` |
+| Explicit downstream learning이 필요한지는 확인되지 않았다. | 기존 skill-chaining·critic 연구는 explicit transition/value modeling의 가능성을 제공한다. | Shared return, 별도 objective와 평가 방법 중 무엇이 필요한가? | `[Open]` |
 
 연결되지 않은 요소에 대한 현재 판단은 다음과 같다.
 
-- Previous action, exact quaternion encoding, tactile threshold와 reward gate 식은 implementation diagnostics에는 필요할 수 있지만 독립 research claim과 직접 연결되지 않는다. 따라서 `[Baseline]` 또는 `[Open]`으로 유지한다.
-- 주변 물체의 존재는 intended scope이며 S0는 이를 제거한 ablation이다. 다만 surrounding-object robustness나 접촉 활용을 contribution으로 삼으려면 별도의 observation·method·experiment가 필요하므로, OD-1의 접촉 규칙을 정하기 전에는 contribution에 포함하지 않는다.
+- Previous action, exact quaternion encoding과 tactile threshold는 observation 구현 세부다. Reward gate는 별도의 `[Open]` 항목이며 같은 합의 상태로 묶지 않는다.
+- 주변 물체의 존재는 intended scope다. 단순화한 S0를 실제 비교 조건으로 사용할지와 surrounding-object robustness·접촉 활용을 어떤 방식으로 판단할지는 협의 전이므로 contribution에 포함하지 않는다.
 - `후속 단계를 고려한다`고 쓸 때는 shared return, transition evaluation 또는 별도 learning objective 중 무엇을 뜻하는지 명시한다.
 
 ---
@@ -661,13 +636,13 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 | Transition evaluation | 앞 phase 종료 state에서 다음 phase rollout 성공을 별도로 측정하는 것 |
 | Explicit downstream learning | 다음 phase feasibility를 별도 value/reward/objective로 직접 최적화하는 것 |
 | Ours | Previous Works 비교표에서 현재 제안 연구 시스템을 지칭하는 행 이름; 개별 설계가 확정되었거나 contribution이 검증되었다는 뜻은 아님 |
-| Baseline | 가설 검증을 위해 먼저 구현하는 변경 가능한 내부 방법안 또는 비교 대상; 제안 연구 전체의 고유명사가 아님 |
+| Baseline | 합의 범위 안에서 현재 출발점으로 둔 변경 가능한 안. 현재 비교군·평가·실험 baseline이 정해졌다는 뜻은 아님 |
 
-### 12.2 Actor, privileged information and metric
+### 12.2 Actor observation과 이후 설계의 경계
 
 - **Actor observation:** 실제 deployment에서 같은 의미로 획득 가능한 policy input.
-- **Privileged training information:** Simulator에서 reward, constraint, termination 또는 critic teacher로만 쓰는 exact state.
-- **Evaluation metric:** 학습 reward와 독립적으로 가설을 판정하는 측정값.
+- **Privileged-information candidate:** Simulator에서만 얻을 수 있어 actor observation에서 제외하는 exact state. Reward, constraint, termination 또는 critic에 실제로 사용할지는 `[Open]`이다.
+- **Evaluation candidate:** 향후 reward와 독립적으로 정의할 수 있는 측정값. 구체 metric과 protocol은 `[Open]`이다.
 - `[Rejected]` Reward에 들어갔다는 이유로 해당 정보가 actor observation이라고 표현하는 방식.
 - `[Rejected]` Privileged contact force로 학습했다는 이유로 실물 tactile의 continuous force를 관측한다고 표현하는 방식.
 
@@ -678,31 +653,31 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 | 연구의 task category는 contact-rich manipulation이다. | Task category는 `nonprehensile manipulation`이고, contact-rich는 접촉 불확실성을 다루는 interaction/control challenge다. | `[Superseded]` |
 | Continuous vision과 OBB가 있으므로 fully observable하다. | Pose·coarse geometry만 관측되며 contact/physics uncertainty가 남는다. | `[Superseded]` |
 | Marker가 pose와 exact geometry를 모두 제공한다. | Marker는 pose source이며 geometry source·accuracy는 별도 정의한다. | `[Rejected]` |
-| Selected-face goal이 연구의 확정 인터페이스다. | 유력한 baseline이며 explicit rotation goal과 비교 가능성을 열어 둔다. | `[Baseline]` |
-| 66D observation과 12D action이 확정 연구 설계다. | 현재 구현안이며 실험과 hardware interface에 따라 변경 가능하다. | `[Baseline]` |
-| Shared MLP와 phase-ID 제거가 method contribution이다. | 비교가 필요한 baseline organization이다. | `[Baseline]` |
+| Selected-face goal이 연구의 확정 인터페이스다. | 현재 actor observation의 변경 가능한 작업 기준이며 explicit rotation goal의 필요성은 열어 둔다. | `[Baseline]` |
+| 66D observation과 12D action이 모두 합의된 연구 설계다. | 66D actor observation은 현재 합의안이다. 12D action/controller는 협의 중이다. | Observation `[Baseline]`; action `[Open]` |
+| Shared MLP와 phase-ID 제거가 method contribution이다. | Policy organization과 phase 정보 사용 여부는 아직 협의 중이다. | `[Open]` |
 | Full-episode reward를 공유하므로 explicit downstream feasibility를 학습한다. | Shared return, transition evaluation과 별도 learning objective를 구분한다. | `[Superseded]` |
-| Rotation alignment success가 다음 Push 가능성을 의미한다. | Rotation success와 Rotation-to-Push success를 별도 측정한다. | `[Rejected]` |
-| Approach contact를 이후에도 동일 taxel/finger로 유지해야 한다. | Aggregate support를 선호하되 contact migration과 re-contact를 허용한다. | `[Rejected]` |
+| Rotation alignment success가 다음 Push 가능성을 의미한다. | 두 개념은 구분할 필요가 있으나 구체 평가 방식은 협의 중이다. | `[Rejected]` |
+| Approach contact를 이후에도 동일 taxel/finger로 유지해야 한다. | Contact 유지·전환 규칙은 아직 협의 중이며 특정 contact pattern을 합의하지 않았다. | `[Rejected]` |
 | Tactile/F/T를 사용한다는 점이 novelty다. | 센서의 상보적 효과와 robustness gain이 H3에서 입증될 때만 method claim의 일부가 된다. | `[Rejected]` |
 | 후속 단계를 고려한 contact formation은 현재 contribution이다. | 어떤 학습·평가 방법을 뜻하는지 밝히고 H2에서 downstream success 향상이 입증될 때만 contribution 후보를 확정한다. | `[Rejected]` |
 | IL은 reactive하지 않고 VLA는 force를 사용하지 못한다. | 최신 reactive IL과 force/tactile VLA가 반례다. Track B의 좁은 execution gap만 비교한다. | `[Rejected]` |
-| RL은 다른 manipulation 방법보다 일반적으로 우월하므로 선택한다. | 정확한 model·mode specification과 recovery label은 부족하지만 measurable outcome·safety constraint와 representative simulation·reset을 구성할 수 있다는 현재 자원 조건에서 primary baseline으로 선택한다. Interaction·reward/credit·exploration·Sim-to-Real 부담도 함께 검증한다. | `[Baseline]` |
-| Previous Works 표의 제안 연구 행을 `Our baseline`이라 부른다. | 제안 연구 전체는 `Ours`, 변경 가능한 최초 구현안과 비교군만 `baseline`으로 부른다. | `[Superseded]` |
-| OBB는 mesh/point cloud보다 현실적으로 항상 우월하다. | OBB는 deployability를 위한 baseline이며 정보 손실과 error를 geometry ladder로 평가한다. | `[Rejected]` |
-| 최초 접촉 후 hand reconfiguration은 최소여야 한다. | Minimum-necessary reconfiguration은 H4에서 검증할 효율 가설이다. | `[Hypothesis]` |
-| Task-conditioned contact formation, wrist–finger control 또는 `Contact Configuration=Online` 자체가 novelty다. | GD2P·DexMove와 인접 연구가 관련 구성을 이미 보여준다. C2는 approximate geometry 아래 downstream goal conditioning과 실행 중 online adaptation의 추가 효과가 matched comparison에서 확인될 때만 주장한다. | `[Rejected]` |
+| RL은 다른 manipulation 방법보다 일반적으로 우월하므로 선택한다. | Intro에서는 현재 자원 조건에서 RL을 우선 검토할 조건부 이유만 제시한다. 세부 algorithm, 학습 방식과 비교·검증 방법은 협의 중이다. | Method family `[Baseline]`; 세부 설계 `[Open]` |
+| Previous Works 표의 제안 연구 행을 `Our baseline`이라 부른다. | 제안 연구 전체는 `Ours`로 부른다. 현재 `baseline`은 합의 범위 안의 변경 가능한 observation 기준에만 사용하며, 실제 비교 baseline은 아직 정하지 않았다. | `[Superseded]` |
+| OBB는 mesh/point cloud보다 현실적으로 항상 우월하다. | OBB는 현재 observation 표현일 뿐 다른 geometry 표현과의 비교 방법은 정하지 않았다. | `[Rejected]` |
+| 최초 접촉 후 hand reconfiguration은 최소여야 한다. | Hand reconfiguration의 허용 범위와 효율 판단 방법은 협의 중이다. | `[Open]` |
+| Task-conditioned contact formation, wrist–finger control 또는 `Contact Configuration=Online` 자체가 novelty다. | GD2P·DexMove와 인접 연구가 관련 구성을 이미 보여준다. C2의 구체 method와 입증 조건은 아직 협의 중이다. | `[Rejected]` |
 | Formal learned-action 식에 gripper command가 없으면 deployed contact configuration은 `Constant`다. | Reported autonomous execution 중 re-open/close·retry·re-contact·re-grasp가 확인되면 system-level capability는 `Online`으로 판정하고, learned policy·script·별도 controller 중 command provenance가 불명확하다는 사실은 별도 주석으로 남긴다. | `[Superseded]` |
-| Surrounding objects는 모두 forbidden collision이다. | Full S1에는 주변 물체가 존재하고 S0에서만 ablation으로 제거한다. 수·배치와 접촉 규칙은 OD-1에서 결정한다. | `[Superseded]` |
+| Surrounding objects는 모두 forbidden collision이다. | Intended setting에는 주변 물체가 존재하지만 수·배치·관측 범위, 접촉 규칙과 단순화 조건의 사용 방식은 협의 중이다. | `[Superseded]` |
 
-### 12.4 실험 전 사용할 표현
+### 12.4 근거 확보 전 사용할 표현
 
 사용 가능한 표현:
 
-- `본 연구는 …을 검증한다.`
-- `현재 baseline은 …으로 구성한다.`
+- `본 연구는 …이라는 질문을 다룬다.`
+- `현재 합의된 actor observation은 …으로 구성한다.`
 - `기존 연구는 자신의 설정에서 …을 보였으며, 본 연구에는 …이 남는다.`
-- `실험이 지지할 경우 contribution 후보는 …이다.`
+- `충분한 근거가 마련될 경우 contribution 후보는 …이다.`
 
 사용하지 않는 표현:
 
@@ -713,31 +688,23 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 
 ---
 
-## 13. 작업 순서
+## 13. 현재 작업 경계와 이후 협의
 
-각 단계는 앞 단계의 산출물이 있어야 진행한다.
+### 13.1 합의된 범위
 
-| 순서 | 작업 | 필요한 결과 | 다음 단계 조건 | 상태 |
-| ---: | --- | --- | --- | --- |
-| 1 | 연구 범위와 open decisions 검토 | OD-1 surrounding-object 접촉·randomization, OD-2 geometry, OD-3 next-phase에 대한 사용자 결정 | 남은 environment interaction과 information condition이 고정됨 | `[Open]` |
-| 2 | 핵심 가설 3–4개 확정 | H1–H4 문구, primary metric과 rejection criterion 승인 | 각 가설이 실제로 반증 가능함 | `[Open]` |
-| 3 | 가설별 previous works 조사 | 가설마다 closest work, strong counterexample와 foundational work | Full text에서 비교 column의 사실을 확인 | `[Open]` |
-| 4 | 논문별 근거 검증과 비교표 작성 | DOI-verified balanced comparison table + transition analysis table | 과장·누락 없이 gap이 남음 | `[Open]` |
-| 5 | Baseline method 수정 | Goal, geometry, policy organization, observation/action/reward v1.0 | 모든 method 요소가 가설 또는 안전 요구와 연결됨 | `[Open]` |
-| 6 | Experiment/ablation 설계 | E1–E7 protocol, split, metric, seed·trial budget | 각 contribution 후보의 판정 조건이 존재 | `[Open]` |
-| 7 | Contribution 문장 확정 | 실험으로 지지된 C1·C2만 남긴 claim set | 결과와 matched comparison이 확보됨 | `[Open]` |
-| 8 | 서론 및 관련 연구 작성 | Introduction과 related-work 초안 | 연구 주장과 근거·검증 방법의 연결 확인 | `[Open]` |
-| 9 | PPT 구성 | 발표용 slide hierarchy와 figures | 앞 단계의 확정 내용을 시각화 | `[Open]` |
+- Intro의 문제 정의, 연구 흐름과 previous-works 비교 관점
+- Track B actor observation의 구성과 정보 경계
 
-### 13.1 우선 결정할 사항
+### 13.2 협의 중인 범위
 
-가장 먼저 다음 세 결정을 사용자와 확정한다.
+- Policy architecture와 phase 처리
+- Action과 low-level controller
+- Reward, safety constraint, termination, critic과 RL 세부 algorithm
+- Evaluation metric·success criterion·protocol
+- Baseline comparison, ablation과 experiment 구성
+- Contribution 후보를 최종 주장으로 확정하는 조건
 
-1. **Surrounding objects:** Full S1의 물체 수·배치를 어떻게 randomize하고, 접촉을 금지·허용·이용 중 어디까지 둘 것인가? S0는 removal ablation으로 유지한다.
-2. **Geometry ladder:** G0–G2를 필수로 하고 G3 exact mesh를 포함할 것인가?
-3. **Next-phase mechanism:** Shared episodic return과 transition evaluation을 우선 검증하고 실패 시 explicit downstream learning을 추가할 것인가, 처음부터 이를 method 핵심으로 설계할 것인가?
-
-이 세 항목이 정리된 뒤 H1–H4와 previous-works 조사 범위를 확정한다.
+이 목록은 작업 순서를 정한 것이 아니다. 다음 논의에서는 필요한 항목을 하나씩 합의하고, 합의 전의 아이디어를 구현안이나 실험 계획으로 승격하지 않는다.
 
 ---
 
@@ -749,6 +716,9 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 
 | Date | Previous Definition | Updated Definition | Reason | Affected Sections |
 | --- | --- | --- | --- | --- |
+| 2026-09-24 | Reward·evaluation 후보와 E1–E9가 합의된 baseline 및 experiment plan처럼 본문에 기록됨 | 현재 합의 범위를 Intro와 actor observation까지로 복원. Policy architecture, action/controller, reward·termination·critic·evaluation·experiment는 모두 `[Open]`으로 두고 E1–E9 번호와 당시의 확정형 실험표를 현행 본문에서 철회함. Reward·evaluation 관련 아이디어는 채택안이 아닌 `[Open]` 논의 기록으로만 보존 | 사용자가 실험 계획을 세운 적이 없고 observation 이후는 아직 협의 중이라고 명확히 정정함 | 1, 3, 5–14, `README.md`, `research_topic.md`, `policy_learning.md`, `Intro/` 전체, `papers/README.md`, `papers/core_papers.md`, `papers/reading_guide.md`, `papers/reward_formulation.md`, `papers/topic_groups.md`, `papers/screening/` |
+| 2026-09-24 | `policy_learning.md`와 reward 문서가 pillar·주변 물체 접촉을 모두 금지하고, selected-face goal·phase-free shared policy·sensor complementarity를 확정안처럼 서술. Hand 비교도 `fixed/free adaptation`을 사용 | S0와 intended S1을 구분하고 support contact는 항상 허용하며 auxiliary fixed structure·movable-object contact는 OD-1의 open decision으로 복원. Selected-face goal, shared phase-free policy, 66D observation과 RL을 `[Baseline]`으로 명시하고 E3/E5/E6/E8/E9 검증에 연결. Hand 비교는 `Constant / Pre-contact / Online`으로 통일 | Canonical status와 구현·reward 명세의 충돌을 제거하고, 미검증 설계와 contribution을 구분하기 위해 | 3.2, 3.6, 6–9, 12–14, `README.md`, `research_topic.md`, `policy_learning.md`, `Intro/research_trend.md`, `papers/reward_formulation.md`, `papers/topic_groups.md` |
+| 2026-09-24 | 일부 Intro·reading 문서가 이전 7-column 비교표와 `End-effector Reconfiguration` 용어를 사용하고, 주변 물체의 존재 자체를 open으로 서술. C1의 geometry–sensing interaction과 RL 선택의 실험적 타당성도 E1–E7에 직접 연결되지 않음 | 모든 현재 문서를 8-column `Object Configuration·Surrounding Objects / Sensory Input·Tool·Contact Configuration·Object Manipulation / Object Geometry·Method`로 동기화. Intended S1의 주변 물체 존재와 S0 removal ablation을 구분하고, C2를 `Contact-formation objective × Contact Configuration`으로 통일. E5를 geometry×sensor 교차 실험으로 명시하고 matched method-family E8과 Sim-to-Real E9를 추가 | 최신 기준 문서와 파생 문서의 충돌을 제거하고 C1·C2 및 조건부 RL 선택을 실제 검증 계획에 연결하기 위해 | 7.1, 8–9, 10.3, 13–14, `research_topic.md`, `Intro/README.md`, `Intro/research_motivation.md`, `Intro/research_trend.md`, `Intro/contributions.md`, `papers/reading_guide.md`, `papers/topic_groups.md` |
 | 2026-09-24 | Conventional methods와 IL/VLA의 한계를 열거한 뒤 simulation과 recovery를 RL의 장점으로 바로 연결하고, broad trend에서도 planning/control을 RL·IL·VLA와 병렬인 family처럼 표현 | Planning/control은 공통 기능으로 두고 task-level decision source에 따라 `Conventional / IL·VLA / RL`을 비교. Specification·recovery-data 부담만으로 RL을 결론 내리지 않고 `measurable outcome + safe·affordable reset + representative simulation`을 추가 전제로 명시하며, interaction·reward/credit·exploration·Sim-to-Real 부담과 반증 조건을 함께 기록 | 기존 방법의 약점에서 RL로 건너뛰는 논리 비약을 제거하고, generative/reactive IL과 simulation teacher의 반례를 포함한 조건부 method selection으로 만들기 위해 | 6.1, 10.1, 10.3, 13, 14.1, `Intro/research_trend.md` |
 | 2026-09-21 | Scene·Workspace와 Sensing 등 넓거나 중첩된 항목을 사용하고, tool 내부 구성은 `End-effector Reconfiguration=Fixed / Pre-contact / Online`, Method는 Control·Optimization·Generative를 각각 분리 | 비교표를 여덟 축으로 통일: Environment의 `Object Configuration·Surrounding Objects`, Robot Agent의 `Sensory Input·Tool·Contact Configuration·Object Manipulation`, System의 `Object Geometry·Method`. `Contact Configuration=Constant / Pre-contact / Online`, `Method=Planning/Control / RL / IL / VLA`를 사용하며 full shelf는 `Surrounding Objects=Present`, S0는 removal ablation으로 고정 | 짧은 용어로 물체 형상, 주변 방해 물체, 접촉 장치와 그 제어 권한, 대상 물체 운동 및 핵심 방법 concept을 중복 없이 비교하기 위해 | 3.6, 7.1, 10.1, 10.3–10.5, 11–13, `Intro/previous_works.md` |
 | 2026-09-20 | B99 ForceVLA2를 formal learned-action 식에 gripper-aperture command가 없다는 이유로 `End-effector Reconfiguration=Fixed`로 해석 | Retrieve Plate의 autonomous retry/re-grasp를 근거로 deployed-system capability는 `Online`으로 정정. Learned policy, subtask script 또는 별도 controller 중 aperture-command source는 `미보고`로 주석하며, low-dimensional re-grasp와 Ours의 continuous multi-joint reconfiguration은 구분 | 비교 축은 hardware 이름이나 action 식의 보고 범위가 아니라 실행 중 실제 internal configuration update capability이며, reporting omission은 `Fixed`의 증거가 아니기 때문 | 10.2–10.5, 11, 12.1, 12.3, 14.1 |
@@ -802,13 +772,13 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 | 2026-09-13 | Vision-based sweeping에서 시작해 Track A/B를 구분 | Track A/B는 동작 이름이 아니라 다른 연구 방향이었으며 현재는 Track B Stage 1만 구체화 |
 | 2026-09-14 | Low-level execution을 먼저 학습한 뒤 상위 의사결정으로 확장 | Stage 1 범위와 이후 확장 경계로 유지 `[Fixed]` |
 | 2026-09-14–15 | GD2P, TaskDexGrasp, contact selection과 downstream state quality 검토 | H2와 C2의 문헌 출발점으로 유지; novelty는 미확정 |
-| 2026-09-15 | Actor/privileged information 분리, end-effector delta pose+hand action, binary tactile와 F/T 검토 | 원칙은 유지하되 구체 차원·encoding은 `[Baseline]` |
+| 2026-09-15 | Actor/privileged information 분리, end-effector delta pose+hand action, binary tactile와 F/T 검토 | Actor observation과 simulator-only 정보의 분리 원칙 및 observation encoding은 유지. Action과 privileged 정보의 구체 용도는 `[Open]` |
 | 2026-09-15 | Rotation representation 5D/6D/quaternion, history와 action memory 논의 | Quaternion/current-only/one-step은 현재 baseline; representation 우위는 미확정 |
 | 2026-09-16 | Motivation, paper index, topic groups와 reward references를 별도 문서로 분리 | 문헌과 세부 근거의 참고 자료로 유지; 현재 분류 권한은 이 문서 |
 | 2026-09-16 | 최신 IL/VLA도 tactile/force와 fast feedback을 다룬다는 반례 확인 | 기존 방법을 과도하게 단순화하지 않도록 주장 범위에 반영 |
-| 2026-09-17 | 64D goal-quaternion 안을 66D selected-face/direction 안으로 대체 | 64D는 `[Superseded]`; 66D는 확정 scope가 아니라 `[Baseline]` |
-| 2026-09-17 | Single-threshold 17D tactile, current wrench와 one-step previous action | 현재 baseline이며 threshold/history는 hardware evidence가 필요한 `[Open]` |
-| 2026-09-17 | Rotation 중 translation, recoverable alignment/contact loss와 contact migration 허용 | 현재 baseline behavior; 효과는 H4 및 safety evaluation에서 검증 |
+| 2026-09-17 | 64D goal-quaternion 안을 66D selected-face/direction 안으로 대체 | 64D는 `[Superseded]`; 66D actor observation은 현재 합의된 `[Baseline]` |
+| 2026-09-17 | Single-threshold 17D tactile, current wrench와 one-step previous action | Single-threshold·current-only·one-step 구성은 observation `[Baseline]`; threshold 수치, sensor mapping·전처리와 향후 history 추가 여부는 `[Open]` |
+| 2026-09-17 | Rotation 중 translation, recoverable alignment/contact loss와 contact migration 허용 | 과거 제안으로 보존하며 action·contact·safety 규칙은 현재 `[Open]` |
 
 ### 14.3 과거 구현안
 
@@ -819,6 +789,6 @@ Observability와 autonomy는 현재 비교 집합에서 구분력이 작아 제�
 | Observation v0.2 | Target/current quaternion을 포함한 64D input | `[Superseded]` |
 | Observation v0.3 | Selected-face/direction 기반 66D input | `[Baseline]` |
 | Reward v0.1–v0.2 | Target yaw/quaternion 중심의 phase reward | `[Superseded]` |
-| Reward v0.3 | Face-direction alignment, translation progress, aggregate-contact loss와 safety 분리 | `[Baseline]` |
+| Reward v0.3 | Face-direction alignment, translation progress, aggregate-contact loss와 safety 분리 | 과거 논의안; 현재 `[Open]` |
 
 이후 변경은 기존 정의를 삭제하는 대신 Section 14.1 표에 `Previous Definition → Updated Definition → Reason`을 추가한다.

@@ -85,7 +85,7 @@ Pure interaction-return RL을 선택할 때에는 부담이 제거되는 것이 
 
 ### 4.3 초기 contact와 downstream outcome을 함께 평가해야 하는 경우
 
-Multi-stage manipulation에서는 각 primitive의 local success가 final object goal을 보장하지 않는다. Conventional method는 단계 간 cost·terminal constraint를, IL/VLA는 downstream trade-off가 포함된 demonstration을 설계해야 한다. RL은 episode-level return으로 초기 contact와 environment use가 downstream success에 미친 영향을 함께 평가할 수 있지만, 긴 horizon의 credit assignment가 새로운 부담이 된다. [HACMan++](https://doi.org/10.15607/RSS.2024.XX.129)은 primitive type·contact location·motion parameter를 순차적으로 선택해 multi-step manipulation을 구성한 사례다. 본 연구의 `Rotation 종료 상태가 후속 Push에 유리한가`는 이 일반 논리의 전제가 아니라 Section 5에서 검증할 project-level hypothesis다.
+Multi-stage manipulation에서는 각 primitive의 local success가 final object goal을 보장하지 않는다. Conventional method는 단계 간 cost·terminal constraint를, IL/VLA는 downstream trade-off가 포함된 demonstration을 설계해야 한다. RL은 episode-level return으로 초기 contact와 environment use가 downstream success에 미친 영향을 함께 평가할 수 있지만, 긴 horizon의 credit assignment가 새로운 부담이 된다. [HACMan++](https://doi.org/10.15607/RSS.2024.XX.129)은 primitive type·contact location·motion parameter를 순차적으로 선택해 multi-step manipulation을 구성한 사례다. 본 연구의 `Rotation 종료 상태가 후속 Push에 유리한가`는 이 일반 논리를 현재 조건에 적용할 때 남는 project-level hypothesis이며, 구체적인 검증 방법은 아직 정하지 않았다.
 
 ### 4.4 반복 task에서 policy 학습 비용을 회수할 수 있는 경우
 
@@ -121,15 +121,15 @@ Multi-stage manipulation에서는 각 primitive의 local success가 final object
 
 | 현재 조건 | RL이 더 합리적인 이유 | 반드시 확인할 경계 |
 | --- | --- | --- |
-| Estimated OBB와 실제 contact surface·dynamics 사이에 오차가 있음 | Geometry·friction·sensor perturbation 아래의 실패와 recovery를 simulation interaction으로 반복 생성할 수 있음 | 실제 error를 대표하는 perturbation 정의와 matched model/control baseline |
-| Contact formation과 reorientation이 후속 Push feasibility를 결정함 | Episode return으로 initial contact와 final Rotation-to-Push outcome을 연결할 수 있음 | Rotation-only success와 saved-state Push success를 분리해 credit 전달 확인 |
-| Shelf contact가 constraint이면서 manipulation resource일 수 있음 | 정확한 shelf-contact model과 mode schedule은 없지만 final Rotation-to-Push outcome은 측정 가능하므로, return에서 도움이 되는 접촉과 해로운 접촉의 조건을 학습할 수 있음 | `contact allowed / penalized / unavailable` 비교와 force·collision violation 측정. 신뢰할 수 있는 model·mode scheduler가 확보되면 MPC/control과 직접 비교 |
-| Tactile·wrist F/T에 따라 wrist와 finger를 함께 조정할 가능성이 있음 | 포괄적인 wrist–finger recovery demonstration과 결합 dynamics model은 없지만 interaction outcome은 얻을 수 있으므로, multimodal feedback에 따른 coupled correction을 학습할 수 있음 | Fixed-hand, wrist-only, wrist+finger 및 sensor factorial ablation. 충분한 model이나 recovery demonstration이 확보되면 MPC·IL과 직접 비교 |
-| Real recovery demonstration은 제한적이지만 simulation interaction은 많이 확보할 수 있음 | Privileged simulator information은 reward·constraint에만 사용하고 actor는 deployable observation으로 학습할 수 있음 | Sensor corruption·dynamics randomization과 real transfer 평가 |
+| Estimated OBB와 실제 contact surface·dynamics 사이에 오차가 있음 | Geometry·friction·sensor 변화가 있는 interaction을 simulation에서 생성할 수 있음 | 실제 오차를 어떻게 반영하고 다른 method와 어떤 기준으로 비교할지는 `[Open]` |
+| Contact formation과 reorientation이 후속 Push feasibility에 영향을 줄 수 있음 | Episode-level outcome으로 initial contact와 final Rotation-to-Push의 관계를 학습할 가능성이 있음 | Credit assignment 방식과 두 결과를 구분하는 방법은 `[Open]` |
+| Support-surface contact는 필수 dynamics이고, auxiliary fixed-structure contact는 constraint 또는 manipulation resource가 될 수 있음 | Auxiliary contact를 채택할 경우 exact contact model과 mode schedule 없이도 final Rotation-to-Push outcome과 safety cost로 유용한 접촉과 해로운 접촉을 구분할 가능성이 있음 | Support contact만 항상 허용한다. Auxiliary contact를 금지·허용·이용 중 어디까지 둘지와 어떻게 판단할지는 `[Open]` |
+| Tactile·wrist F/T에 따라 wrist와 finger를 함께 조정할 가능성이 있음 | 포괄적인 wrist–finger recovery demonstration과 결합 dynamics model은 없지만 interaction outcome은 얻을 수 있으므로, multimodal feedback에 따른 coupled correction을 학습할 수 있음 | Action authority와 sensing 효과를 어떤 방식으로 구분할지는 `[Open]` |
+| Real recovery demonstration은 제한적이지만 simulation interaction은 많이 확보할 수 있음 | Actor는 deployable observation으로 제한하고 simulator의 exact state는 별도 정보로 구분할 수 있음 | Exact state의 학습 용도, simulation 변화와 real-world 확인 방식은 `[Open]` |
 
-> **이 연구에서 RL을 선택하는 이유는 contact feedback이나 recovery가 RL만의 기능이기 때문이 아니다. 정확한 contact model·mode schedule과 다양한 recovery demonstration은 확보하기 어렵지만, task outcome과 deployable sensor feedback을 정의하고 randomized simulation interaction을 반복 생성할 수 있다. 따라서 contact formation, environmental-contact exploitation, reorientation과 후속 pushing의 영향을 reusable closed-loop policy로 학습하는 RL이 현재 자원 구조에 더 합리적인 primary task-level policy-learning method다.**
+> **이 연구에서 RL을 선택하는 이유는 contact feedback이나 recovery가 RL만의 기능이기 때문이 아니다. 정확한 contact model·mode schedule과 다양한 recovery demonstration은 확보하기 어렵지만, task outcome과 deployable sensor feedback을 정의하고 randomized simulation interaction을 반복 생성할 수 있다. 따라서 contact formation, reorientation, contact-feedback correction과 후속 pushing의 영향을 reusable closed-loop policy로 학습하는 RL이 현재 자원 구조에 더 합리적인 primary task-level policy-learning method다. Auxiliary environmental contact의 적극적 이용은 OD-1에서 채택할 때만 이 근거에 추가한다.**
 
-여기서 RL은 low-level controller, safety supervisor와 geometry representation을 대체하지 않는다. Feasible contact의 발견이 병목이면 GD2P나 Optimization-Guided RL처럼 planning·optimization prior를 결합한 structured RL로 확장한다.
+여기서 RL은 low-level controller, safety supervisor와 geometry representation을 대체하지 않는다. Feasible contact의 발견이 병목인 경우에는 GD2P나 Optimization-Guided RL처럼 planning·optimization prior를 결합한 structured RL도 대안으로 검토할 수 있다.
 
 ---
 
@@ -137,11 +137,11 @@ Multi-stage manipulation에서는 각 primitive의 local success가 final object
 
 RL 선택은 `[Baseline]` 방법 판단이며 research gap이나 contribution이 아니다. 다음 결과가 나오면 RL을 primary method로 선택한 근거는 약해지거나 수정되어야 한다.
 
-- 동일한 sensing·action budget의 model/control baseline이 estimated geometry에서도 더 적은 data와 computation으로 같은 robustness를 냄
+- 동일한 sensing·action budget의 model/control 접근이 estimated geometry에서도 더 적은 data와 computation으로 같은 robustness를 냄
 - Pose generation과 단순 feedback만으로 perturbation 아래 Rotation-to-Push를 안정적으로 해결함
 - Reactive IL이 더 적은 data와 safety violation으로 같은 recovery 및 final-task 성능을 냄
-- Environmental contact 허용이 final-task success를 높이지 않고 force·collision risk만 증가시킴
+- Auxiliary fixed-structure 또는 movable-object contact의 이용을 채택했는데 final-task success를 높이지 않고 force·collision risk만 증가시킴
 - Simulation에서 얻은 이점이 실제 tactile/F/T 조건으로 전이되지 않음
-- Vanilla RL이 좁은 feasible contact region을 반복적으로 찾지 못함. 이 경우 pure RL을 유지하지 않고 planning·demonstration-guided RL과 비교함
+- Vanilla RL이 좁은 feasible contact region을 반복적으로 찾지 못함. 이 경우 primary method 판단을 다시 검토하고 planning·demonstration-guided 대안을 고려할 수 있음
 
 다음 문서인 [Previous Works](./previous_works.md)는 B85를 포함한 비교 대상 11편만으로 구성한 timeline과 여덟 개의 공통 column을 사용해, Ours와 가장 가까운 조건 및 아직 검증되지 않은 C1·C2를 정리한다.

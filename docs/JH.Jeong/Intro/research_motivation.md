@@ -39,7 +39,7 @@ Approach / Contact Formation → Rotation / Pivoting → Push / Translation
 
 Approach는 후속 조작에 사용할 contact state를 형성하고, Rotation은 direct push가 불안정하거나 현재 orientation이 desired push direction에 부적합할 때만 preparatory action으로 사용하며, Push는 blocker를 목표 방향과 거리로 이동한다. 세 항목은 sub-objective이지 독립 policy나 강제된 hard sequence가 아니므로 초기 상태가 적합하면 Rotation은 작거나 생략될 수 있다.
 
-Target retrieval, multi-blocker ordering과 perception algorithm 자체는 이 low-level policy의 직접 범위가 아니다. Blocker–shelf support contact는 pushing·pivoting에 필요한 dynamics로 허용하지만 pillar와 비표적 물체의 접촉은 기본적으로 피한다. 주변 movable object를 main condition 또는 robustness condition에 포함할지는 [`context.md`](../context.md)의 open decision으로 남긴다.
+Target retrieval, multi-blocker ordering과 perception algorithm 자체는 이 low-level policy의 직접 범위가 아니다. Blocker–shelf support-surface contact는 pushing·pivoting에 필요한 dynamics다. Intended shelf condition에는 주변 movable object가 존재한다. 주변 물체를 제거한 단순 조건을 사용할지, 수·배치·관측 범위와 auxiliary fixed structure 또는 movable object와의 접촉을 금지·허용·이용할지는 아직 정하지 않았다. 세부 경계는 [`context.md`](../context.md)의 OD-1을 따른다.
 
 핵심 질문은 단순히 접촉하는 방법이 아니다.
 
@@ -47,8 +47,8 @@ Target retrieval, multi-blocker ordering과 perception algorithm 자체는 이 l
 
 ## 4. 방법 선정을 위한 질문
 
-이 문제 정의만으로 특정 방법이 자동으로 선택되지는 않는다. Heuristic/control, optimization/planning, generative/planning, RL, IL, VLA와 hybrid는 서로 다른 model·data·interaction 조건을 필요로 하므로, 어느 하나를 약한 대안으로 전제하지 않고 현재 조건에 맞는 방법을 비교해야 한다.
+이 문제 정의만으로 특정 방법이 자동으로 선택되지는 않는다. Planning과 control은 모든 방법에 필요한 공통 기능이며, task-level decision knowledge를 사람이 설계한 model·mode·rule에서 얻는 Conventional methods, demonstration·pretrained prior에서 얻는 IL/VLA, interaction return에서 얻는 RL은 서로 다른 model·data·interaction 조건을 필요로 한다. 어느 하나를 약한 대안으로 전제하지 않고 현재 조건에서 감당할 수 있는 부담을 비교해야 한다.
 
-> **Heuristic/control, planning, RL, IL와 VLA는 contact-feedback manipulation을 어떻게 확장해 왔으며, 현재의 model·data·interaction 조건에서는 어떤 방법을 우선해야 하는가?**
+> **Conventional methods, IL/VLA와 RL은 contact-feedback manipulation에 필요한 decision knowledge를 어디에서 얻으며, 현재의 model·data·interaction 조건에서는 어떤 방법을 우선해야 하는가?**
 
-이 질문은 [Research Trend](./research_trend.md)에서 다룬다. 방법을 조건부로 선택한 뒤 [Previous Works](./previous_works.md)에서 Environment의 Scene·Workspace, Robot Agent의 Sensing·Object Geometry·End-effector Reconfiguration·Manipulation과 System Method를 비교하고 남은 research gap을 판정한다.
+이 질문은 [Research Trend](./research_trend.md)에서 다룬다. 방법을 조건부로 선택한 뒤 [Previous Works](./previous_works.md)에서 Environment의 `Object Configuration·Surrounding Objects`, Robot Agent의 `Sensory Input·Tool·Contact Configuration·Object Manipulation`, System의 `Object Geometry·Method`를 비교하고 남은 research gap을 판정한다.

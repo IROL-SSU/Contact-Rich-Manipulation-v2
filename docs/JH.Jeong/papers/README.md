@@ -22,14 +22,16 @@
 ### Policy observation을 설계할 때
 
 1. [`../policy_learning.md`](../policy_learning.md#3-observation-v03)에서 현재 66D baseline을 확인한다.
-2. [`reading_guide.md`](./reading_guide.md#2-observation을-검증하는-독해-경로)에서 각 입력을 사용한 이유를 따라간다.
+2. [`reading_guide.md`](./reading_guide.md#2-observation-근거를-확인하는-독해-경로)에서 각 입력을 사용한 이유를 따라간다.
 3. 더 넓은 후보가 필요하면 [`topic_groups.md`](./topic_groups.md#7-policy-observation-표현과-isaac-lab-구현-근거)와 [Sensing and State screening](./screening/sensing_and_state.md)을 검색한다.
 
-### Reward를 설계할 때
+### Reward 후보를 검토할 때
 
 1. [`reward_formulation.md`](./reward_formulation.md)에서 pushing·pivoting reward를 failure별로 비교한다.
-2. [`reading_guide.md`](./reading_guide.md#3-reward를-검증하는-독해-경로)의 순서로 원문을 확인한다.
+2. [`reading_guide.md`](./reading_guide.md#3-reward-후보를-이해하는-독해-경로)의 순서로 원문을 확인한다.
 3. 넓은 reward·safety·transition 후보는 [Sim-to-Real and Learning](./screening/sim2real_and_learning.md)과 [Transitions, Safety and Geometry](./screening/transitions_safety_geometry.md)에서 찾는다.
+
+Reward, termination, evaluation과 experiment는 아직 합의되지 않았다. 이 경로는 설계 확정이 아니라 문헌 근거와 선택지를 정리하기 위한 것이다.
 
 ---
 

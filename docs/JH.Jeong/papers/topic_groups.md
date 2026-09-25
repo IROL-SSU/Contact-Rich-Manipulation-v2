@@ -4,11 +4,13 @@
 
 이 문서는 핵심 논문을 연구 질문별로 다시 묶은 **lookup-oriented synthesis**다. 처음부터 모든 절을 순서대로 읽기보다 아래 경로에서 현재 질문에 맞는 절로 이동한다. 동일 논문이 여러 질문에 답하면 중복 배치한다.
 
+> **범위 경계:** 이 문서의 `baseline`은 주로 외부 논문이 사용한 기준 방법 또는 비교 참고 후보를 뜻한다. 우리 연구에서 합의된 policy 범위는 observation까지이며, reward, evaluation, experiment와 실제 비교군 채택은 모두 `[Open]`이다.
+
 ## 이 문서를 사용하는 순서
 
 | 현재 목적 | 먼저 읽을 절 | 다음에 읽을 절 |
 | --- | --- | --- |
-| 연구 motivation과 최신 baseline 파악 | [`../Intro/README.md`](../Intro/README.md) | [`../Intro/previous_works.md`](../Intro/previous_works.md) → 8. 최신 VLA·IL 기반 motivation |
+| 연구 motivation과 최신 비교 연구 파악 | [`../Intro/README.md`](../Intro/README.md) | [`../Intro/previous_works.md`](../Intro/previous_works.md) → 8. 최신 VLA·IL 기반 motivation |
 | Approach hand configuration 검토 | 1. Hand·Contact Configuration | 6. Hand-pose·접촉 품질 → 2. Phase 전환 |
 | Tactile·F/T observation 검토 | 3. Closed-loop contact 보정 | 7. Observation 표현과 구현 근거 |
 | Goal-conditioned manipulation 범위 검토 | 4. Nonprehensile manipulation | 5. Retrieval·2단계 확장 |
@@ -151,7 +153,7 @@
 | [B35](https://doi.org/10.48550/arXiv.2511.04831) | [Isaac Lab](https://doi.org/10.48550/arXiv.2511.04831) | Camera, ContactSensor, FrameTransformer, joint wrench, quaternion과 `last_action` observation term을 통한 구현 가능 범위 |
 | [B36](https://doi.org/10.48550/arXiv.2411.04776) | [TacEx](https://doi.org/10.48550/arXiv.2411.04776) | Vanilla ContactSensor를 넘어 GelSight 영상까지 모사할 때의 외부 Isaac Sim 확장 후보 |
 | [B37](https://doi.org/10.1109/TRO.2021.3104471) | [Goal-Driven Robotic Pushing](https://doi.org/10.1109/TRO.2021.3104471) | Local tactile pose와 global proprioceptive goal을 분리한 이유; binary tactile로 그대로 재현할 수 없는 정보의 경계 |
-| [B38](https://doi.org/10.1109/CVPR.2019.00589) | [Continuity of Rotation Representations](https://doi.org/10.1109/CVPR.2019.00589) | Quaternion의 antipodal discontinuity와 5D/6D continuous representation의 근거. 현재는 Isaac Lab interface와 차원 단순성을 우선해 canonical quaternion 4D를 baseline으로 선택하며, 6D는 sign-boundary failure를 확인할 representation ablation으로 사용 |
+| [B38](https://doi.org/10.1109/CVPR.2019.00589) | [Continuity of Rotation Representations](https://doi.org/10.1109/CVPR.2019.00589) | Quaternion의 antipodal discontinuity와 5D/6D continuous representation의 근거. 현재 observation은 canonical quaternion 4D를 사용하며, 6D는 필요 시 검토할 대안 |
 | [B39](https://doi.org/10.48550/arXiv.2111.03043) | [General In-Hand Object Re-Orientation](https://doi.org/10.48550/arXiv.2111.03043) | 임의 goal orientation에는 quaternion difference를, symmetric-object vision 평가에는 shape-equivalent criterion을 둔 사례 |
 | [B40](https://doi.org/10.48550/arXiv.2309.09979) | [RotateIt](https://doi.org/10.48550/arXiv.2309.09979) | 연속 회전 task에서 hand-centric 3D rotation-axis vector를 observation에 추가한 이유 |
 
@@ -165,9 +167,9 @@
 
 1. **정식 게재 수준:** ICLR·NeurIPS·ICCV·RSS·CoRL·ICRA 또는 IEEE RA-L을 우선한다.
 2. **Track B 직접성:** Contact-rich, nonprehensile, dexterous hand, tactile/F/T와 long-horizon transition의 중첩 정도를 본다.
-3. **영향력:** 인용 수와 후속 baseline 채택을 보조 지표로 사용하되, 최신 논문의 시간상 불이익을 감안한다.
+3. **영향력:** 인용 수와 후속 연구의 비교 대상 채택을 보조 지표로 사용하되, 최신 논문의 시간상 불이익을 감안한다.
 4. **비교 가능성:** Observation·action·sensor·data budget과 공개 code·checkpoint·dataset을 확인한다.
-5. **주장 대응성:** 각 baseline이 검증할 Track B의 주장 또는 구성요소를 명시한다.
+5. **주장 대응성:** 각 연구가 Track B의 어떤 질문 또는 구성요소와 관련되는지 명시한다.
 
 아래 인용 수는 **2026-09-16 Semantic Scholar snapshot**이며 데이터베이스와 시점에 따라 바뀐다. 연구의 질이나 직접성을 대신하는 지표로 사용하지 않는다.
 
@@ -189,22 +191,24 @@
 | Dexterous tactile IL | [B22](https://openreview.net/forum?id=dT3ZciXvNX) [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), ICLR 2026 | 신규·집계 미성숙 | Simulation trajectory와 human tactile demonstration을 결합한 wrist–finger nonprehensile control | Dense visuotactile·hybrid demonstration 없이 coarse tactile RL이 어느 수준까지 가능한가 | 가장 가까운 task-level reference |
 | Geometry-conditioned execution | [B01](https://doi.org/10.48550/arXiv.2509.18455) [GD2P](https://doi.org/10.48550/arXiv.2509.18455), ICRA 2026 | 5 citations | Pushing/pulling direction에 맞는 dexterous pre-contact pose를 대규모로 생성·실험 | 정적 pre-contact selection과 contact 중 feedback adaptation 중 무엇이 필요한가 | Contact-configuration baseline |
 
-높은 인용 수와 task 직접성은 다르다. [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)는 영향력이 큰 상한 reference이고, [DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[RDP](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)와 long-horizon contact-rich RL이 Track B의 실험 질문에는 더 가깝다.
+높은 인용 수와 task 직접성은 다르다. [π0.5](https://doi.org/10.48550/arXiv.2504.16054)·[OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017)는 영향력이 큰 상한 reference이고, [DexMove](https://openreview.net/forum?id=dT3ZciXvNX)·[DyWA](https://doi.org/10.48550/arXiv.2503.16806)·[RDP](https://doi.org/10.15607/RSS.2025.XXI.052)·[FoAR](https://doi.org/10.1109/LRA.2025.3560871)와 long-horizon contact-rich RL은 Track B의 연구 질문에 더 가깝다.
 
-### 8.3 Baseline 계층과 비교 원칙
+### 8.3 비교에 참고할 문헌군
 
-| 계층 | 포함할 연구·방법 | 비교 목적 | 구현 원칙 |
+아래 분류는 실제 실험 baseline이나 protocol을 정한 것이 아니다. 무엇을 구현해 비교할지는 `[Open]`이다.
+
+| 분류 | 포함할 연구·방법 | 참고 목적 | 현재 해석 |
 | --- | --- | --- | --- |
-| A. Matched experimental baseline | Same-task PPO/asymmetric critic, [FoAR](https://doi.org/10.1109/LRA.2025.3560871)-style vision+F/T IL, 가능한 경우 [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)-style reactive IL | Reward·privileged learning·closed-loop transition의 실제 이득 검증 | Task distribution, actor observation, action, controller와 real trial budget을 맞추고 pretraining·demonstration 비용도 기록 |
-| B. Component baseline | [B27](https://openreview.net/forum?id=jf7C7EGw21) tactile encoding, [B73](https://doi.org/10.1109/LRA.2025.3551637) force threshold·randomization, [B74](https://doi.org/10.48550/arXiv.2502.15442) privileged curriculum, [B75](https://doi.org/10.48550/arXiv.2603.15789) diverse resets | Sensor, force safety, exploration과 phase-free learning의 효과 분리 | 전체 architecture 대신 논문이 검증한 핵심 구성요소를 ablation으로 재현 |
-| C. Closest-task system baseline | [B26](https://doi.org/10.48550/arXiv.2503.16806) [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [B22](https://openreview.net/forum?id=dT3ZciXvNX) [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [B01](https://doi.org/10.48550/arXiv.2509.18455) [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Nonprehensile generalization, wrist–finger contact와 hand-pose selection의 현재 상한 확인 | Sensor·geometry·data가 다르면 성공률을 단순 대조하지 않고 공통 조건에서만 정량 비교 |
-| D. High-impact / adjacent VLA reference | [B43](https://doi.org/10.48550/arXiv.2504.16054) [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [B44](https://doi.org/10.15607/RSS.2025.XXI.017) [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017), [B99](https://doi.org/10.48550/arXiv.2603.15169) [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169), [B48](https://doi.org/10.48550/arXiv.2507.09160) [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Generalist semantics, fast adaptation과 force/tactile-aware VLA가 해결한 범위를 인정 | Compute·data·task 조건이 다르면 literature comparison과 제한된 fine-tuning을 구분하고 전체 우열은 주장하지 않음 |
+| Same-task 비교 후보 | Same-task RL, [FoAR](https://doi.org/10.1109/LRA.2025.3560871)-style vision+F/T IL, [RDP](https://doi.org/10.15607/RSS.2025.XXI.052)-style reactive IL | 학습 방법에 따른 차이를 검토할 때 참고 | 실제 비교군, algorithm, critic input과 비교 조건은 `[Open]` |
+| 구성요소 참고 | [B27](https://openreview.net/forum?id=jf7C7EGw21) tactile encoding, [B73](https://doi.org/10.1109/LRA.2025.3551637) force threshold·randomization, [B74](https://doi.org/10.48550/arXiv.2502.15442) privileged curriculum, [B75](https://doi.org/10.48550/arXiv.2603.15789) diverse resets | Sensor, force safety, exploration과 phase organization의 선행 근거 확인 | 어떤 요소를 직접 비교할지는 `[Open]` |
+| Closest-task reference | [B26](https://doi.org/10.48550/arXiv.2503.16806) [DyWA](https://doi.org/10.48550/arXiv.2503.16806), [B22](https://openreview.net/forum?id=dT3ZciXvNX) [DexMove](https://openreview.net/forum?id=dT3ZciXvNX), [B01](https://doi.org/10.48550/arXiv.2509.18455) [GD2P](https://doi.org/10.48550/arXiv.2509.18455) | Nonprehensile generalization, wrist–finger contact와 hand-pose selection의 현재 범위 확인 | Sensor·geometry·data가 달라 직접 수치 비교에는 별도 조건 합의가 필요 |
+| High-impact / adjacent VLA reference | [B43](https://doi.org/10.48550/arXiv.2504.16054) [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [B44](https://doi.org/10.15607/RSS.2025.XXI.017) [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017), [B99](https://doi.org/10.48550/arXiv.2603.15169) [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169), [B48](https://doi.org/10.48550/arXiv.2507.09160) [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160) | Generalist semantics, fast adaptation과 force/tactile-aware VLA가 해결한 범위를 인정 | Compute·data·task 조건이 다르면 literature comparison과 제한된 fine-tuning을 구분하고 전체 우열은 주장하지 않음 |
 
 ### 8.4 계열별 해결 범위와 남는 질문
 
 | 계열 | 핵심 논문 | 확인된 장점 | Track B에서 남는 질문 |
 | --- | --- | --- | --- |
-| Generalist VLA | [B41](https://doi.org/10.48550/arXiv.2406.09246) [OpenVLA](https://doi.org/10.48550/arXiv.2406.09246), [B42](https://doi.org/10.48550/arXiv.2410.24164) [π0](https://doi.org/10.48550/arXiv.2410.24164), [B43](https://doi.org/10.48550/arXiv.2504.16054) [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [B45](https://doi.org/10.48550/arXiv.2410.07864) [RDT-1B](https://doi.org/10.48550/arXiv.2410.07864) | 대규모 이종 robot data와 semantic prior를 이용한 다과업·다환경 transfer | Shelf 내부 unseen blocker의 국소 contact configuration과 Rotation→Push 전환을 제한된 실물 센서로 얼마나 정밀하게 다루는가 |
+| Generalist VLA | [B41](https://doi.org/10.48550/arXiv.2406.09246) [OpenVLA](https://doi.org/10.48550/arXiv.2406.09246), [B42](https://doi.org/10.48550/arXiv.2410.24164) [π0](https://doi.org/10.48550/arXiv.2410.24164), [B43](https://doi.org/10.48550/arXiv.2504.16054) [π0.5](https://doi.org/10.48550/arXiv.2504.16054), [B45](https://doi.org/10.48550/arXiv.2410.07864) [RDT-1B](https://doi.org/10.48550/arXiv.2410.07864) | 대규모 이종 robot data와 semantic prior를 이용한 다과업·다환경 transfer | Shelf 내부의 다양한 blocker에서 국소 contact configuration과 Rotation→Push 전환을 제한된 실물 센서로 얼마나 정밀하게 다루는가. Held-out object 범위는 별도로 정의해야 함 |
 | Fast·efficient VLA | [B44](https://doi.org/10.15607/RSS.2025.XXI.017) [OpenVLA-OFT](https://doi.org/10.15607/RSS.2025.XXI.017), [B59](https://doi.org/10.52202/085713-3276) [Fast-in-Slow](https://doi.org/10.52202/085713-3276), [B61](https://doi.org/10.52202/085713-5484) [VLA-Cache](https://doi.org/10.52202/085713-5484), [B64](https://doi.org/10.52202/085713-1122) [RTC](https://doi.org/10.52202/085713-1122) | 병렬 decoding, fast action module, caching과 asynchronous chunk execution으로 latency·control frequency를 개선 | 빠른 실행만으로 접촉 관측 가능성, force safety와 downstream contact feasibility까지 해결되는가 |
 | Force·tactile VLA | [B46](https://doi.org/10.52202/085713-3124) [ForceVLA](https://doi.org/10.52202/085713-3124), [B99](https://doi.org/10.48550/arXiv.2603.15169) [ForceVLA2](https://doi.org/10.48550/arXiv.2603.15169), [B47](https://doi.org/10.48550/arXiv.2503.08548) [TLA](https://doi.org/10.48550/arXiv.2503.08548), [B48](https://doi.org/10.48550/arXiv.2507.09160) [Tactile-VLA](https://doi.org/10.48550/arXiv.2507.09160), [B49](https://doi.org/10.48550/arXiv.2505.09577) [VTLA](https://doi.org/10.48550/arXiv.2505.09577), [B50](https://doi.org/10.48550/arXiv.2512.23864) [DreamTacVLA](https://doi.org/10.48550/arXiv.2512.23864), [B51](https://doi.org/10.48550/arXiv.2601.20321) [TaF-VLA](https://doi.org/10.48550/arXiv.2601.20321), [B52](https://doi.org/10.48550/arXiv.2603.15257) [HapticVLA](https://doi.org/10.48550/arXiv.2603.15257) | Force/tactile을 VLA의 명시적 modality 또는 학습 supervision으로 도입하고, ForceVLA2는 이를 active hybrid force–position action으로 확장 | Specialized sensor와 task-specific multimodal demonstration 비용 없이 coarse binary tactile+F/T로 preparatory rotation과 pushing을 연결할 수 있는가 |
 | Demonstration IL | [B54](https://doi.org/10.48550/arXiv.2304.13705) [ACT](https://doi.org/10.48550/arXiv.2304.13705), [B55](https://doi.org/10.15607/RSS.2023.XIX.026) [Diffusion Policy](https://doi.org/10.15607/RSS.2023.XIX.026), [B45](https://doi.org/10.48550/arXiv.2410.07864) [RDT-1B](https://doi.org/10.48550/arXiv.2410.07864) | 자연스러운 multimodal trajectory, action chunk와 expressive action distribution을 reward engineering 없이 학습 | Demonstration 밖의 접촉 이탈·물성 변화·실패 상태를 어떻게 탐색하고 회복할 것인가 |
@@ -217,9 +221,9 @@
 
 현재 가장 방어 가능한 gap은 `VLA는 힘을 모른다` 또는 `IL은 반응하지 못한다`가 아니다. 최신 반례가 이미 존재한다. 현재 문헌에서 직접 평가가 부족한 조합은 다음과 같이 더 좁게 정의한다.
 
-> **Unknown shelf blocker의 선택된 OBB 면을 목표 방향에 정렬하는 preparatory rotation을 수행하면서, Approach의 hand configuration과 Rotation의 terminal contact가 최종 pushing까지 실행 가능하도록 유지·전환하고, 이를 coarse OBB·binary tactile·wrist F/T라는 배포 가능한 저차원 입력과 simulation privileged supervision으로 학습할 수 있는가?**
+> **다양한 shelf blocker의 선택된 OBB 면을 목표 방향에 정렬하는 preparatory rotation을 수행하면서, Approach의 hand configuration과 Rotation의 terminal contact가 최종 pushing까지 실행 가능하도록 유지·전환할 수 있는가? 또한 합의된 coarse OBB·binary tactile·wrist F/T observation이 이 과정에 어떤 정보를 제공하는가?**
 
-우리 방법의 우위 주장은 matched baseline, sensor·history ablation, unseen geometry·friction·mass 평가와 데이터·계산·센서 비용 비교가 완료된 뒤에만 사용한다. 그 전에는 `극복한다`가 아니라 `이 공백을 겨냥한다` 또는 `검증한다`로 서술한다.
+우리 방법의 우위를 주장하려면 향후 합의된 비교와 평가가 필요하다. 비교군, ablation, split, metric과 비용 보고 방식은 아직 정하지 않았으므로, 현재는 `극복한다`가 아니라 `이 공백을 겨냥한다`로 서술한다.
 
 ## 9. 연구 배경 — Conventional Method와 Learning Method의 Trade-off
 

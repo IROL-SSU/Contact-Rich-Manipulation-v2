@@ -69,13 +69,13 @@ B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사�
 ### Ours를 읽는 기준
 
 - `Unstructured`: intended shelf task는 다양한 blocker 형상을 대상으로 한다. 단, 정확한 train/test object 범위와 non-box-like generalization은 아직 OD-10에서 확정할 사항이다.
-- `Present`: 실제 shelf setting에는 target 외의 movable object가 있다. 주변 물체를 제거한 S0는 핵심 가설을 분리하기 위한 `Absent` ablation이다.
+- `Present`: 실제 shelf setting에는 target 외의 movable object가 있다. 주변 물체를 제거한 단순 조건은 `Absent`로 분류할 수 있지만, 이를 실제 experiment에 사용할지는 아직 정하지 않았다.
 - `Vision+Contact`: continuous vision-derived pose·OBB와 tactile·wrist F/T를 함께 사용한다.
 - `Dexterous Hand`: RH56E2의 여러 finger joint를 독립적으로 구동한다.
-- `Online`: 실행 중 feedback에 따라 finger-joint configuration을 계속 갱신한다. Wrist motion은 이 판정에 포함하지 않으며, online finger update의 추가 이득은 C2에서 검증한다.
+- `Online`: C2가 다루는 목표 system은 실행 중 feedback에 따라 finger-joint configuration을 갱신할 수 있는 방향으로 분류한다. Wrist motion은 이 판정에 포함하지 않으며, 구체 action/controller와 추가 이득의 판단 방식은 아직 협의 중이다.
 - `Combined`: preparatory reorientation/pivoting과 이후 translation을 모두 다룬다.
 - `Estimated`: System은 exact mesh가 아니라 perception-derived OBB를 사용한다.
-- `RL`: Stage 1 policy는 interaction return으로 최적화한다. Scripted heuristic은 별도 baseline이다.
+- `RL`: Intro의 조건부 method-family 판단에 따라 Stage 1의 주된 학습 방식을 RL로 분류한다. 실제 비교군은 아직 정하지 않았다.
 
 ---
 
@@ -115,6 +115,6 @@ B99는 B46의 단순 개정판이 아니라 새 dataset과 architecture를 사�
 1. **C1:** Estimated geometry에 오차가 있을 때 contact feedback이 Rotation-to-Push와 final-task 성능 저하를 줄이는가?
 2. **C2:** Task-conditioned pre-contact formation 이후 contact 중 online wrist–finger adaptation이 추가 이득을 주는가?
 
-직접 수치 비교에서는 `Object Configuration`, `Surrounding Objects`, `Sensory Input`, `Tool`과 `Object Geometry` 조건을 우선 맞춘다. `Contact Configuration`이 비교 요인인 C2에서는 같은 tool·task·controller에서 `Constant / Pre-contact / Online`만 바꾸는 matched ablation을 사용한다. 조건이 다른 논문은 특정 요소의 근거나 인접 연구의 반례로 사용하고, 원 논문의 success rate를 Ours와 그대로 대조하지 않는다.
+향후 수치 비교를 논의한다면 `Object Configuration`, `Surrounding Objects`, `Sensory Input`, `Tool`과 `Object Geometry`의 차이를 먼저 확인해야 한다. `Contact Configuration`을 어떤 조건에서 비교할지, 실제 비교군과 통제 방식은 아직 정하지 않았다. 조건이 다른 논문의 success rate를 Ours와 그대로 대조하지 않는다는 해석 원칙만 유지한다.
 
 각 cell은 full text에서 확인한다. 현재 근거가 부족한 분류는 후속 원문 검토에서 수정하며, 세부 observation·action·training source와 결과는 [Paper Index](../papers/README.md)와 각 독서 문서에 남긴다.

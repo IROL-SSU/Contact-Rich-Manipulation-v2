@@ -10,11 +10,11 @@
 
 ### Step 1. 상위 task category와 method trend를 먼저 구분한다
 
-먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)에서 explicit model/control, demonstration·pretrained prior와 interaction-return RL이 해결한 범위와 남긴 부담을 비교한다. 그다음 [`../Intro/previous_works.md#3-comparison-set-timeline`](../Intro/previous_works.md#3-comparison-set-timeline)에서 B85를 포함한 비교 대상 11편만의 2022–2026 변화를 확인한다.
+먼저 [`../Intro/research_trend.md`](../Intro/research_trend.md)에서 Conventional methods, IL/VLA와 RL이 task-level decision knowledge를 얻는 방식과 각각의 model·data·interaction 부담을 비교한다. 그다음 [`../Intro/previous_works.md#3-comparison-set-timeline`](../Intro/previous_works.md#3-comparison-set-timeline)에서 B85를 포함한 비교 대상 11편만의 2022–2026 변화를 확인한다.
 
-확인할 내용은 planning/control, RL, IL와 VLA가 서로 일방적으로 대체된 것이 아니라 physical model, demonstration prior, semantic prior와 interaction learning을 서로 다른 비율로 결합해 왔다는 점이다. RL 선택은 보편적 우위가 아니라 `명확한 low-level goal + 불확실한 contact outcome + 풍부한 simulation interaction + 제한된 real demonstration`이라는 현재 조건에서 정당화한다.
+확인할 내용은 Conventional methods, IL/VLA와 RL이 서로 일방적으로 대체된 것이 아니라 designed specification, demonstration·pretrained prior와 interaction return을 서로 다른 역할로 결합해 왔다는 점이다. Planning과 control은 세 방법군에 공통으로 필요한 기능이다. Specification 또는 recovery-data 부담만으로 RL을 선택하지 않는다. `Measurable outcome + safe·affordable interaction/reset + representative simulation`을 구성할 수 있고, interaction volume·reward/credit·exploration·Sim-to-Real 부담을 감당할 때에만 현재 조건의 primary method family로 정당화한다.
 
-같은 [`Previous Works`](../Intro/previous_works.md#2-비교표)에서 `Scene·Workspace / Sensing·Object Geometry·End-effector Reconfiguration·Manipulation / Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
+같은 [`Previous Works`](../Intro/previous_works.md#2-비교표)에서 `Object Configuration·Surrounding Objects / Sensory Input·Tool·Contact Configuration·Object Manipulation / Object Geometry·Method`의 공통 값으로 closest systems를 비교한다. 여기서 contact-rich manipulation은 별도 task category가 아니라 friction, contact transition과 force transmission uncertainty가 만드는 interaction/control challenge로 해석한다.
 
 ### Step 2. Geometry uncertainty를 처리하는 대안을 비교한다
 
@@ -40,7 +40,7 @@
 
 이 순서는 geometry-conditioned pre-contact pose, task-wrench capability, downstream critic scoring, transition feasibility로 평가 관점이 확장되는 흐름이다. 정적 pose score와 실제 Rotation→Push continuation success를 동일시하지 않는다.
 
-이어서 [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) → [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) → [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)을 비교한다. 첫 논문은 task-informed 초기 grasp와 작은 online adaptation의 결합을, 뒤의 두 논문은 contact switching과 firm-contact 유지가 함께 필요한 조건을 보여준다. 여기서 검증할 명제는 `Approach 후 손 자세를 고정해야 한다`가 아니라 `전체 접촉 지지는 유지하되 성공에 필요하지 않은 재구성은 줄여야 한다`이다.
+이어서 [Grasp to Act](https://doi.org/10.1109/LRA.2026.3677744) → [Guided Exploration with Sub-skill Controllers](https://doi.org/10.1109/ICRA57147.2024.10611300) → [Tac2Motion](https://doi.org/10.48550/arXiv.2509.17812)을 비교한다. 첫 논문은 task-informed 초기 grasp와 작은 online adaptation의 결합을, 뒤의 두 논문은 contact switching과 firm-contact 유지가 함께 필요한 조건을 보여준다. 여기서 남는 질문은 aggregate contact를 선호할지, 필요한 migration·release·re-contact와 deliberate full release를 어느 범위까지 허용할지다. 구체 contact 규칙과 판단 방식은 아직 정하지 않았다.
 
 ### Step 6. Contact feedback이 무엇을 보완하는지 확인한다
 
@@ -52,7 +52,7 @@
 
 [HAMNET](https://doi.org/10.15607/RSS.2025.XXI.154), [SPIN](https://doi.org/10.48550/arXiv.2502.18015), [Sequential Dexterity](https://doi.org/10.48550/arXiv.2309.00987)과 [Privileged Action](https://doi.org/10.48550/arXiv.2502.15442)을 비교한다.
 
-Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 것 자체는 contribution이 아니다. 우리 방법에 explicit downstream-feasibility objective가 없다면 Rotation-to-Push는 우선 분리된 evaluation metric으로만 유지한다.
+Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 것 자체는 contribution이 아니다. Rotation 결과와 이후 Push 가능성을 구분해서 볼지, 구분한다면 어떤 metric이나 방법을 사용할지는 아직 협의 중이다.
 
 ### 이 경로의 산출물
 
@@ -60,7 +60,7 @@ Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 
 
 ---
 
-## 2. Observation을 검증하는 독해 경로
+## 2. Observation 근거를 확인하는 독해 경로
 
 현재 baseline은 `target position + push direction + selected-face normal + current object pose + coarse OBB + arm/hand q + current 17D binary tactile + current wrist F/T + previous action 1-step`의 66D 입력이다. 다음 순서는 각 입력이 왜 필요한지와 무엇을 제외할지를 판단하기 위한 것이다.
 
@@ -74,13 +74,13 @@ Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 
 
 ### 이 경로의 산출물
 
-각 observation에 대해 `필요한 task information / sensor source / policy 표현 / sim–real 대응 / 제외 시 예상 failure / ablation`을 한 행으로 기록한다. 논문의 threshold나 history 길이는 복사하지 않고 실제 hardware rate와 calibration으로 다시 정한다.
+각 observation에 대해 `필요한 task information / sensor source / policy 표현 / sim–real 대응 / 제외 시 예상 failure / 검토할 대안`을 한 행으로 기록한다. 논문의 threshold나 history 길이는 복사하지 않고 실제 hardware rate와 calibration을 확인한 뒤 별도로 논의한다.
 
 ---
 
-## 3. Reward를 검증하는 독해 경로
+## 3. Reward 후보를 이해하는 독해 경로
 
-세부 비교표는 [`reward_formulation.md`](./reward_formulation.md)를 기준으로 한다. 아래 순서는 term을 많이 수집하기 위한 것이 아니라, Track B reward의 각 층을 순서대로 정당화하기 위한 것이다.
+세부 비교표는 [`reward_formulation.md`](./reward_formulation.md)를 기준으로 한다. 아래 순서는 term을 많이 수집하거나 Track B reward를 확정하기 위한 것이 아니라, 각 선택지가 어떤 failure를 다루는지 이해하기 위한 것이다.
 
 1. **Task progress와 success:** [Optimization-Guided Non-Prehensile RL](https://doi.org/10.1109/LRA.2026.3655262)에서 pushing·pivoting의 공통 task progress, sparse success와 demonstration-conditioned reward를 확인한다.
 2. **Gate가 필요한 이유:** [Tactile Pushing](https://doi.org/10.1109/LRA.2023.3295236)에서 goal distance에 따라 orientation·position reward의 의미를 바꾼 이유를 본다.
@@ -93,9 +93,9 @@ Shared policy, phase label 제거 또는 여러 동작을 한 episode에 넣는 
 
 Reward 검토 결과는 `term 이름`이 아니라 다음 형식으로 남긴다.
 
-> `해결할 failure → 계산 신호 → actor/privileged 경계 → 활성 조건 → 예상 부작용 → 검증할 ablation`
+> `해결할 failure → 계산 신호 → actor/privileged 경계 → 활성 조건 → 예상 부작용 → 남은 질문`
 
-기존 논문의 모든 항을 합치지 않는다. Final task success를 먼저 고정하고, phase shaping, safety constraint, regularization과 downstream candidate를 한 층씩 추가한다.
+기존 논문의 모든 항을 합치지 않는다. Final task success, phase shaping, safety constraint, regularization과 downstream signal의 역할을 구분해 기록하되 채택 순서와 비교 방법은 정하지 않는다.
 
 ---
 
