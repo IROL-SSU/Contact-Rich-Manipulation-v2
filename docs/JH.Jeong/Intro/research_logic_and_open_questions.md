@@ -74,29 +74,40 @@ flowchart TD
 
 비교 대상은 “explicit goal 대 모호한 goal”이 아니다. Functional goal도 명시적으로 정의할 수 있다. 정확한 비교는 다음과 같다.
 
-- **Explicit pose goal:** 선택된 방해물체를 지정된 pose \(x_B^*\)로 이동한다.
+- **Explicit pose goal:** 선택된 방해물체를 지정된 pose $x_B^*$로 이동한다.
 - **Functional access goal:** 방해물체의 pose와 무관하게 후속 접근 조건을 만족하는 상태 집합 중 하나에 도달한다.
 
 후속 접근 가능 상태 집합을 다음과 같이 둘 수 있다.
 
-\[
-\mathcal G_{\mathrm{access}}(g)
+$$
+\mathcal{G}_{\mathrm{access}}(g)
 =
 \left\{
 s \mid \exists \tau \in \Gamma(g),\;
-\tau\text{가 상태 }s\text{에서 실행 가능}
-\right\},
-\]
+\operatorname{Feasible}(\tau \mid s)=1
+\right\}.
+$$
 
-여기서 \(g\)는 high-level planner가 준 downstream condition이고, \(\Gamma(g)\)는 허용되는 grasp 또는 retrieval trajectory 집합이다.
+여기서 $g$는 high-level planner가 준 downstream condition이고, $\Gamma(g)$는 허용되는 grasp 또는 retrieval trajectory 집합이다.
 
-하나의 explicit pose \(x_B^*\)가 유효하다면 일반적으로 \(\{x_B^*\}\subseteq\mathcal G_{\mathrm{access}}\)이다. 동일한 motion cost \(C(\xi)\)를 사용하고 최적화를 완벽하게 수행한다고 가정하면,
+Explicit pose에 대응하는 terminal-state set은 다음과 같이 둔다.
 
-\[
-\min_{\xi:\,s_T\in\mathcal G_{\mathrm{access}}}C(\xi)
+$$
+\mathcal{G}_{\mathrm{pose}}(x_B^*)
+=
+\left\{
+s \mid x_B(s)=x_B^*
+\right\}.
+$$
+
+해당 pose goal이 downstream access를 보장하도록 선택되어
+$\mathcal{G}_{\mathrm{pose}}(x_B^*)\subseteq\mathcal{G}_{\mathrm{access}}(g)$이고, 두 방식이 동일한 initial condition과 motion cost $C(\xi)$를 사용하며 최적화를 완벽하게 수행한다고 가정하면,
+
+$$
+\min_{\xi:\,s_T\in\mathcal{G}_{\mathrm{access}}(g)} C(\xi)
 \le
-\min_{\xi:\,x_B(T)=x_B^*}C(\xi).
-\]
+\min_{\xi:\,s_T\in\mathcal{G}_{\mathrm{pose}}(x_B^*)} C(\xi).
+$$
 
 따라서 functional goal은 가장 가까운 유효 상태, 가장 적은 힘이 필요한 상태, 주변 물체를 가장 적게 교란하는 상태를 선택할 가능성을 남긴다. 다만 이는 **이론적 feasible-set 관계**이며, 실제 학습된 policy가 그 최적해를 찾는다는 보장은 아니다.
 
@@ -171,18 +182,30 @@ Functional goal은 “어디까지 조작해야 하는가”의 문제를 다루
 
 본 연구에서 Rapid는 다음과 같이 정의해야 한다.
 
-\[
-\min_\pi \; \mathbb E[T_{\mathrm{access}}]
-\]
+$$
+\begin{aligned}
+\min_{\pi}\quad
+& \mathbb{E}\!\left[T_{\mathrm{access}}\right] \\
+\text{subject to}\quad
+& \Pr(\mathrm{success}) \ge \eta, \\
+& F_{\mathrm{peak}} \le F_{\max}, \\
+& I_{\mathrm{contact}} \le I_{\max}, \\
+& D_{\mathrm{scene}} \le D_{\max}.
+\end{aligned}
+$$
 
-subject to
+여기서 $T_{\mathrm{access}}$는 horizon $H$에서 절단한 최초 접근 가능 시점,
 
-\[
-P(\mathrm{success})\ge\eta,\quad
-F_{\mathrm{peak}}\le F_{\max},\quad
-I_{\mathrm{contact}}\le I_{\max},\quad
-D_{\mathrm{scene}}\le D_{\max}.
-\]
+$$
+T_{\mathrm{access}}
+=
+\min\!\left\{
+\inf\!\left\{t\ge 0 \mid s_t\in\mathcal{G}_{\mathrm{access}}(g)\right\},
+H
+\right\},
+$$
+
+이며 expectation과 success probability는 동일한 initial-state, task와 disturbance distribution에 대해 계산한다.
 
 즉, rapid는 단순한 end-effector 속도가 아니라 **동일한 성공률·접촉력·충격량·주변 교란 수준에서 time-to-access를 줄이는 것**이다.
 
@@ -284,27 +307,27 @@ D_{\mathrm{scene}}\le D_{\max}.
 
 가능한 goal 표현은 다음과 같다.
 
-\[
-g = (o_B,\,\Gamma_{\mathrm{next}},\,\tau_{\mathrm{access}}),
-\]
+$$
+g = \left(o_B,\,\Gamma_{\mathrm{next}},\,\theta_{\mathrm{access}}\right).
+$$
 
-- \(o_B\): 현재 조작할 blocker
-- \(\Gamma_{\mathrm{next}}\): 후속 grasp/retrieval trajectory 또는 trajectory set
-- \(\tau_{\mathrm{access}}\): clearance, feasibility 또는 success threshold
+- $o_B$: 현재 조작할 blocker
+- $\Gamma_{\mathrm{next}}$: 후속 grasp/retrieval trajectory 또는 trajectory set
+- $\theta_{\mathrm{access}}$: clearance, feasibility 또는 success threshold
 
 다만 이것은 아직 **[미결정]**이다. 실제 입력은 corridor voxel, swept volume, target-relative approach direction, candidate grasp set 또는 learned downstream-success embedding 중 하나가 될 수 있다.
 
-현재 가장 일관된 상위 정식화는 후속 skill \(\pi_D\)의 **initiation set**을 이용하는 것이다.
+현재 가장 일관된 상위 정식화는 후속 skill $\pi_D$의 **initiation set**을 이용하는 것이다.
 
-\[
-\mathcal I_D(g)
+$$
+\mathcal{I}_D(g)
 =
 \left\{
-s\mid P\bigl(\text{downstream success}\mid s,g,\pi_D\bigr)\ge p_0
+s \mid \Pr\!\left(\mathrm{success}_D \mid s,g,\pi_D\right) \ge p_0
 \right\}.
-\]
+$$
 
-Rearrangement policy의 목적은 빠르고 안전하게 \(s_T\in\mathcal I_D(g)\)가 되도록 만드는 것이다. 이 관점은 “공간을 확보한다”는 표현을 실제 다음 skill의 실행 가능성과 연결한다.
+Rearrangement policy의 목적은 빠르고 안전하게 $s_T\in\mathcal{I}_D(g)$가 되도록 만드는 것이다. 이 관점은 “공간을 확보한다”는 표현을 실제 다음 skill의 실행 가능성과 연결한다.
 
 권장되는 계층은 다음과 같다.
 
@@ -318,17 +341,18 @@ Rearrangement policy의 목적은 빠르고 안전하게 \(s_T\in\mathcal I_D(g)
 
 개념적으로 다음 정보를 포함할 수 있다.
 
-\[
-o_t =
-\left[
-z_t^{\mathrm{vision}},
-q_t,\dot q_t,
-z_{t-h:t}^{\mathrm{tactile}},
-w_{t-h:t}^{\mathrm{F/T}},
-a_{t-1},
+$$
+\begin{aligned}
+o_t = \operatorname{concat}\!\bigl(
+&z_t^{\mathrm{vision}},\;
+q_t,\;\dot{q}_t,\;
+z_{t-h:t}^{\mathrm{tactile}},\\
+&w_{t-h:t}^{\mathrm{F/T}},\;
+a_{t-1},\;
 g
-\right].
-\]
+\bigr).
+\end{aligned}
+$$
 
 - Vision representation은 scene의 전역 배치를 설명한다.
 - Proprioception은 현재 hand/arm configuration을 설명한다.
@@ -353,29 +377,32 @@ Low-level policy임을 유지하려면 discrete primitive가 아니라 continuou
 
 현재 방향과 가장 정합적인 형태는 다음과 같다.
 
-\[
-r_t =
-\alpha\bigl(\Phi(s_{t+1},g)-\Phi(s_t,g)\bigr)
-+R_{\mathrm{succ}}\mathbf 1[s_{t+1}\in\mathcal G_{\mathrm{access}}]
--\lambda_T\Delta t
--\lambda_D C_{\mathrm{disturbance}}
--\lambda_F C_{\mathrm{wrench}}
--\lambda_I C_{\mathrm{impulse}}
--\lambda_A C_{\mathrm{action}}.
-\]
+$$
+\begin{aligned}
+r_t
+&= \alpha\!\left(\Phi(s_{t+1},g)-\Phi(s_t,g)\right) \\
+&\quad + R_{\mathrm{succ}}\mathbf{1}
+  \!\left\{s_{t+1}\in\mathcal{G}_{\mathrm{access}}(g)\right\} \\
+&\quad - \lambda_T\Delta t
+       - \lambda_D C_{\mathrm{disturbance}}
+       - \lambda_F C_{\mathrm{wrench}} \\
+&\quad - \lambda_I C_{\mathrm{impulse}}
+       - \lambda_A C_{\mathrm{action}}.
+\end{aligned}
+$$
 
-- \(\Phi(s,g)\): functional access progress
-- \(R_{\mathrm{succ}}\): downstream motion이 실제로 feasible할 때의 terminal reward
-- \(C_{\mathrm{disturbance}}\): 주변 물체와 target의 불필요한 변위
-- \(C_{\mathrm{wrench}}\): force/moment threshold 초과
-- \(C_{\mathrm{impulse}}\): 충격적인 contact
-- \(C_{\mathrm{action}}\): 과도한 action, jerk 또는 불필요한 motion
+- $\Phi(s,g)$: functional access progress
+- $R_{\mathrm{succ}}$: downstream motion이 실제로 feasible할 때의 terminal reward
+- $C_{\mathrm{disturbance}}$: 주변 물체와 target의 불필요한 변위
+- $C_{\mathrm{wrench}}$: force/moment threshold 초과
+- $C_{\mathrm{impulse}}$: 충격적인 contact
+- $C_{\mathrm{action}}$: 과도한 action, jerk 또는 불필요한 motion
 
 이 reward는 특정 동작 순서를 직접 보상하지 않는다. Policy는 필요하다면 밀기, 회전, 손 자세 변경, 접촉 이탈과 재접촉을 반복할 수 있다.
 
 **중요한 설계 쟁점:** 안전을 주요 주장으로 삼는다면 force/impulse를 단순 weighted penalty로만 둘 것인지, constrained RL 또는 hard controller limit로 둘 것인지 결정해야 한다. Penalty weight로만 안전을 정의하면 reward scale에 따라 위반을 거래할 수 있다.
 
-### 5.5 Functional progress \(\Phi\)의 후보
+### 5.5 Functional progress Φ의 후보
 
 | 후보 | 장점 | 핵심 한계 |
 |---|---|---|
@@ -610,7 +637,7 @@ Tactile/F/T가 vision보다 높은 sampling rate를 갖고 policy 또는 reflex 
 
 1. fixed explicit pose
 2. planner가 선택한 explicit pose
-3. best-of-\(K\) explicit pose 또는 online replanning
+3. best-of-$K$ explicit pose 또는 online replanning
 4. geometric functional access goal
 5. 가능하면 downstream-success functional goal 또는 simulator oracle
 
